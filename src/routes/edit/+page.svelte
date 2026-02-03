@@ -63,6 +63,8 @@
     window.addEventListener('appinstalled', () => {
       logEvent('pwaInstalled', { isMobile });
     });
+    // Ensure panZoom is enabled if it was accidentally disabled
+    verifyState();
   });
 
   let isHistoryOpen = $state(false);

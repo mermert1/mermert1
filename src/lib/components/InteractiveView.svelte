@@ -16,15 +16,19 @@
   function handleSvgClick(event: MouseEvent) {
     if (!isInteractive) return;
     
-    const target = event.target as SVGElement;
-    let current: SVGElement | null = target;
+    // Check if we are clicking on the toolbar or other UI elements
+    const target = event.target as HTMLElement;
+    if (target.closest('button') || target.closest('select') || target.closest('input')) return;
+
+    const svgTarget = event.target as SVGElement;
+    let current: SVGElement | null = svgTarget;
     
     // Check if we clicked exactly on a text element or its immediate parent
-    if (target.tagName === 'text' || target.tagName === 'tspan' || target.classList.contains('label') || target.parentElement?.classList.contains('label')) {
-         const label = target.textContent?.trim() || target.parentElement?.textContent?.trim() || '';
+    if (svgTarget.tagName === 'text' || svgTarget.tagName === 'tspan' || svgTarget.classList.contains('label') || svgTarget.parentElement?.classList.contains('label')) {
+         const label = svgTarget.textContent?.trim() || svgTarget.parentElement?.textContent?.trim() || '';
          if (label) {
              selectedElement = { 
-                id: (target as any).id || (target.parentElement as any).id || (target.closest('.edgeLabel') as any)?.id || 'text-element', 
+                id: (svgTarget as any).id || (svgTarget.parentElement as any).id || (svgTarget.closest('.edgeLabel') as any)?.id || 'text-element', 
                 type: 'label', 
                 label 
              };
@@ -186,13 +190,19 @@
 
   function updateTheme(themeName: string) {
     const oldCode = $stateStore.code;
-    const themeRegex = /%%\{init: \{'theme': '[^']+'\}\}%%/;
-    const newThemeStr = `%%{init: {'theme': '${themeName}'}}%%`;
+    const themeRegex = /%%\{init: \{'theme': '[^']*'\}\}%%/;
+    
     let newCode: string;
-    if (themeRegex.test(oldCode)) {
-        newCode = oldCode.replace(themeRegex, newThemeStr);
+    if (!themeName) {
+        // Remove the theme block if empty
+        newCode = oldCode.replace(themeRegex, '').replace(/\n\s*\n/g, '\n').trim();
     } else {
-        newCode = newThemeStr + '\n' + oldCode;
+        const newThemeStr = `%%{init: {'theme': '${themeName}'}}%%`;
+        if (themeRegex.test(oldCode)) {
+            newCode = oldCode.replace(themeRegex, newThemeStr);
+        } else {
+            newCode = newThemeStr + '\n' + oldCode;
+        }
     }
     updateCode(newCode);
   }
