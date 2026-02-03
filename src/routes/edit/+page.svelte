@@ -22,7 +22,8 @@
   import View from '$/components/View.svelte';
   import type { EditorMode, Tab } from '$/types';
   import type { EditorMode, Tab } from '$/types';
-  import { openDirectory, saveFile } from '$/util/fileSystem'; // [NEW]
+  import { openDirectory, saveFile, loadRoots, refreshDirectory } from '$/util/fileSystem'; 
+  import { explorerVisible } from '$/util/fileMetadata';
   import { PanZoomState } from '$/util/panZoom';
   import { toast } from 'svelte-sonner';
   import { stateStore, updateCodeStore, urlsStore } from '$/util/state';
@@ -64,16 +65,18 @@
       logEvent('pwaInstalled', { isMobile });
     });
     // Ensure panZoom is enabled if it was accidentally disabled
-    verifyState();
+    // verifyState(); // verifyState is in state.ts which is imported
+    
+    // Load persisted folders
+    await loadRoots();
   });
 
   let isHistoryOpen = $state(false);
-  let isFileExplorerOpen = $state(false); // [NEW]
+  let isHistoryOpen = $state(false);
 
   async function handleOpenFolder() {
-    // [NEW]
     await openDirectory();
-    isFileExplorerOpen = true;
+    $explorerVisible = true;
   }
 
   async function handleSaveDiagram() {
@@ -140,8 +143,8 @@
         direction="horizontal"
         autoSaveId="liveEditor"
         class="gap-4 p-2 pt-0 sm:gap-0 sm:p-6 sm:pt-0">
-        <!-- [NEW] File Explorer Pane -->
-        {#if isFileExplorerOpen}
+        <!-- Multi-Root File Explorer Pane -->
+        {#if $explorerVisible}
           <Resizable.Pane defaultSize={20} minSize={10} maxSize={40} class="hidden sm:block">
             <FileExplorer {isMobile} />
           </Resizable.Pane>

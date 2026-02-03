@@ -6,15 +6,31 @@ export interface FileMetadata {
 }
 
 const STORAGE_KEY = 'mermert-file-metadata';
+const EXPANSION_KEY = 'mermert-explorer-expansion';
+const UI_KEY = 'mermert-ui-state';
 
-function createMetadataStore() {
-    const initialValue = browser ? JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}') : {};
-    const { subscribe, update } = writable<Record<string, FileMetadata>>(initialValue);
+function createPersistedStore<T>(key: string, defaultValue: T) {
+    const initialValue = browser ? JSON.parse(localStorage.getItem(key) || JSON.stringify(defaultValue)) : defaultValue;
+    const { subscribe, update, set } = writable<T>(initialValue);
 
     return {
         subscribe,
+        update,
+        set: (value: T) => {
+            if (browser) {
+                localStorage.setItem(key, JSON.stringify(value));
+            }
+            set(value);
+        }
+    };
+}
+
+export const fileMetadataStore = (() => {
+    const store = createPersistedStore<Record<string, FileMetadata>>(STORAGE_KEY, {});
+    return {
+        ...store,
         setIcon: (path: string, icon: string) => {
-            update(metadata => {
+            store.update(metadata => {
                 const newMetadata = { ...metadata, [path]: { ...metadata[path], icon } };
                 if (browser) {
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(newMetadata));
@@ -23,6 +39,7 @@ function createMetadataStore() {
             });
         }
     };
-}
+})();
 
-export const fileMetadataStore = createMetadataStore();
+export const expansionStore = createPersistedStore<Record<string, boolean>>(EXPANSION_KEY, {});
+export const explorerVisible = createPersistedStore<boolean>(UI_KEY, true);

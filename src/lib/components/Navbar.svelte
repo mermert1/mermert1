@@ -16,7 +16,9 @@
   import GithubIcon from '~icons/mdi/github';
   import { Switch } from '$/components/ui/switch';
   import { stateStore, updateCodeStore } from '$/util/state';
+  import { explorerVisible } from '$/util/fileMetadata';
   import DropdownNavMenu from './DropdownNavMenu.svelte';
+  import SideNavigationIcon from '~icons/material-symbols/side-navigation-outline-rounded';
 
   interface Props {
     mobileToggle?: Snippet;
@@ -58,6 +60,14 @@
   <div
     id="menu"
     class="hidden flex-nowrap items-center justify-between gap-3 overflow-hidden md:flex">
+    <Button 
+      variant="ghost" 
+      size="icon" 
+      onclick={() => $explorerVisible = !$explorerVisible} 
+      title={$explorerVisible ? "Hide Explorer" : "Show Explorer"}
+    >
+      <SideNavigationIcon />
+    </Button>
     <DropdownNavMenu icon={GithubIcon} links={githubLinks} />
     <Separator orientation="vertical" />
     {@render children()}
