@@ -1,9 +1,6 @@
-[![Join our Discord!](https://img.shields.io/static/v1?message=join%20chat&color=9cf&logo=discord&label=discord)](https://discord.gg/sKeNQX4Wtj)
-[![Netlify Status](https://api.netlify.com/api/v1/badges/27fa023d-7c73-4a3f-9791-b3b657a47100/deploy-status)](https://app.netlify.com/sites/mermaidjs/deploys)
+# MerMert
 
-# Mermaid Live Editor
-
-Edit, preview and share mermaid charts/diagrams.
+Custom Mermaid Live Editor for internal use.
 
 ## Features
 
@@ -14,7 +11,7 @@ Edit, preview and share mermaid charts/diagrams.
 
 ## Live demo
 
-You can try out a [live version](https://mermaid.live/).
+You can try out the [live version](https://mermert1.github.io/mermert1/).
 
 # Contributors are welcome!
 
