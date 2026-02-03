@@ -121,7 +121,7 @@
         variant="accent"
         size="sm"
         onclick={handleSaveDiagram}>
-        <img src="/mermert-logo.png" alt="MerMert Logo" class="size-6 rounded-sm" />
+        <img src="https://raw.githubusercontent.com/mermert1/mermert1/refs/heads/main/static/mermert-logo.png" alt="MerMert Logo" class="size-6 rounded-sm" />
         Save diagram
       </Button>
     </McWrapper>

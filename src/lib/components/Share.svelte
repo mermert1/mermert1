@@ -1,12 +1,8 @@
 <script>
   import { buttonVariants } from '$/components/ui/button';
   import * as Dialog from '$/components/ui/dialog';
-  import { Separator } from '$/components/ui/separator';
-  import { env } from '$/util/env';
-  import { urlsStore } from '$/util/state';
   import ShareIcon from '~icons/material-symbols/share';
   import CopyInput from './CopyInput.svelte';
-  import MermaidChartIcon from './MermaidChartIcon.svelte';
 </script>
 
 <Dialog.Root>
@@ -22,7 +18,7 @@
     <div class="flex flex-col gap-4">
       <div class="flex flex-col gap-2">
         <h2 class="flex items-center gap-2">
-          <img class="size-5" src="/mermert-logo.png" alt="MerMert Live Editor" />
+          <img class="size-5" src="https://raw.githubusercontent.com/mermert1/mermert1/refs/heads/main/static/mermert-logo.png" alt="MerMert Live Editor" />
           MerMert Live Editor
         </h2>
         <CopyInput value={window.location.href} />

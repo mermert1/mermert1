@@ -4,4 +4,4 @@
   let { class: className }: { class?: ClassValue } = $props();
 </script>
 
-<img class={['size-4', className]} src="/mermaidchart-logo.svg" alt="Mermaid Chart" />
+<img class={['size-4', className]} src="https://raw.githubusercontent.com/mermert1/mermert1/refs/heads/main/static/mermaidchart-logo.svg" alt="Mermaid Chart" />
