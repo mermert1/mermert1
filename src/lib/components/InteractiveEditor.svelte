@@ -2,8 +2,6 @@
   import { stateStore, updateCode } from '$/util/state';
   import { Button } from '$/components/ui/button';
   import { Input } from '$/components/ui/input';
-  import { Label } from '$/components/ui/label';
-  import * as Card from '$/components/ui/card';
   import View from '$/components/View.svelte';
   import { PanZoomState } from '$/util/panZoom';
 
@@ -74,32 +72,33 @@
       </div>
 
       {#if selectedElement}
-        <Card.Root>
-          <Card.Header>
-            <Card.Title class="text-sm uppercase text-muted-foreground">
+        <div class="rounded-xl border border-border bg-card p-4 shadow-sm">
+          <div class="mb-4">
+            <h3 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               {selectedElement.type}: {selectedElement.id}
-            </Card.Title>
-          </Card.Header>
-          <Card.Content class="flex flex-col gap-4">
+            </h3>
+          </div>
+          
+          <div class="flex flex-col gap-4">
             <div class="grid w-full items-center gap-1.5">
-              <Label for="label-edit">Label Text</Label>
+              <label for="label-edit" class="text-sm font-medium leading-none">Label Text</label>
               <Input 
                 id="label-edit" 
-                value={selectedElement.label} 
+                bind:value={selectedElement.label} 
                 oninput={(e) => updateLabel((e.target as HTMLInputElement).value)}
               />
             </div>
             
             <div class="grid w-full items-center gap-1.5">
-              <Label>Styles (Coming Soon)</Label>
+              <span class="text-sm font-medium leading-none">Styles (Coming Soon)</span>
               <div class="flex gap-2">
-                 <div class="size-6 rounded-full border bg-[#ff0000]"></div>
-                 <div class="size-6 rounded-full border bg-[#00ff00]"></div>
-                 <div class="size-6 rounded-full border bg-[#0000ff]"></div>
+                 <div class="size-6 rounded-full border border-border bg-[#ff0000] cursor-not-allowed"></div>
+                 <div class="size-6 rounded-full border border-border bg-[#00ff00] cursor-not-allowed"></div>
+                 <div class="size-6 rounded-full border border-border bg-[#0000ff] cursor-not-allowed"></div>
               </div>
             </div>
-          </Card.Content>
-        </Card.Root>
+          </div>
+        </div>
       {:else}
         <div class="flex flex-1 flex-col items-center justify-center text-center text-muted-foreground">
            <p class="text-sm">Select an element in the diagram to modify its properties.</p>
