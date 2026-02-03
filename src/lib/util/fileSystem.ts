@@ -35,8 +35,9 @@ export async function addRoot(handle: FileSystemDirectoryHandle) {
 
 export async function removeRoot(name: string) {
   rootHandles.update(roots => {
-    delete roots[name];
-    return roots;
+    const newRoots = { ...roots };
+    delete newRoots[name];
+    return newRoots;
   });
   await removeHandle(name);
   await refreshDirectory();
@@ -67,22 +68,22 @@ export async function refreshDirectory(): Promise<void> {
     if (permission === 'granted') {
       const entries = await readDirectory(handle, name, name);
       allEntries.push({
-        name,
-        kind: 'directory',
+        children: entries,
         handle,
+        kind: 'directory',
+        name,
         path: name,
-        rootName: name,
-        children: entries
+        rootName: name
       });
     } else {
       // We'll show a "needs permission" item in the UI later
       allEntries.push({
-        name: `${name} (Click to re-authorize)`,
-        kind: 'directory',
+        children: [],
         handle,
+        kind: 'directory',
+        name: `${name} (Click to re-authorize)`,
         path: name,
-        rootName: name,
-        children: []
+        rootName: name
       });
     }
   }
@@ -97,28 +98,28 @@ async function readDirectory(
   const entries: FileEntry[] = [];
 
   try {
-    // @ts-ignore
+    // @ts-expect-error
     for await (const entry of dirHandle.values()) {
       const entryPath = `${path}/${entry.name}`;
 
       if (entry.kind === 'file') {
         if (/\.(mmd|mermaid|txt|json|dia|md)$/i.test(entry.name)) {
           entries.push({
-            name: entry.name,
-            kind: 'file',
             handle: entry as FileSystemFileHandle,
+            kind: 'file',
+            name: entry.name,
             path: entryPath,
             rootName
           });
         }
       } else if (entry.kind === 'directory') {
         entries.push({
-          name: entry.name,
-          kind: 'directory',
+          children: await readDirectory(entry as FileSystemDirectoryHandle, rootName, entryPath),
           handle: entry as FileSystemDirectoryHandle,
+          kind: 'directory',
+          name: entry.name,
           path: entryPath,
-          rootName,
-          children: await readDirectory(entry as FileSystemDirectoryHandle, rootName, entryPath)
+          rootName
         });
       }
     }
@@ -157,21 +158,3 @@ export async function saveFile(content: string, suggestedName = 'diagram.dia'): 
   }
 }
 
-export async function renameEntry(entry: FileEntry, newName: string) {
-  // Note: FileSystemHandle.rename is a newer/experimental API.
-  // If it's not available, we have to copy and delete.
-  try {
-    if ('rename' in entry.handle) {
-      // @ts-ignore
-      await entry.handle.rename(newName);
-    } else {
-      console.warn('rename API not available, copy/delete fallback needed');
-      // TODO: fallback implementation if needed
-      throw new Error('Rename API not available');
-    }
-    await refreshDirectory();
-  } catch (err) {
-    console.error('Rename failed', err);
-    throw err;
-  }
-}

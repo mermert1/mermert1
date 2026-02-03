@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { fileList, readFile, refreshDirectory, openDirectory, removeRoot, renameEntry, type FileEntry } from '$lib/util/fileSystem';
+  import { fileList, readFile, refreshDirectory, openDirectory, removeRoot, type FileEntry } from '$lib/util/fileSystem';
   import { fileMetadataStore, expansionStore } from '$lib/util/fileMetadata';
   import { updateCodeStore } from '$lib/util/state';
   import FolderIcon from '~icons/material-symbols/folder-open-rounded';
@@ -9,25 +9,19 @@
   import SettingsIcon from '~icons/material-symbols/settings-outline-rounded';
   import AddFolderIcon from '~icons/material-symbols/create-new-folder-outline-rounded';
   import CloseIcon from '~icons/material-symbols/close-rounded';
-  import EditIcon from '~icons/material-symbols/edit-outline-rounded';
   import DatabaseIcon from '~icons/material-symbols/database';
   import CloudIcon from '~icons/material-symbols/cloud';
   import LockIcon from '~icons/material-symbols/lock-outline';
   import ProcessIcon from '~icons/material-symbols/settings-backup-restore-rounded';
   import * as Popover from '$/components/ui/popover';
   import { Button } from '$/components/ui/button';
-  import { Input } from '$/components/ui/input';
   import { toast } from 'svelte-sonner';
+  import type { Component } from 'svelte';
   
-  let { isMobile = false } = $props();
-  
-  let editingPath = $state<string | null>(null);
-  let editValue = $state("");
-
-  const iconMap: Record<string, any> = {
-    'Default': CodeIcon,
-    'Database': DatabaseIcon,
+  const iconMap: Record<string, Component> = {
     'Cloud': CloudIcon,
+    'Database': DatabaseIcon,
+    'Default': CodeIcon,
     'Lock': LockIcon,
     'Process': ProcessIcon
   };
@@ -55,33 +49,13 @@
     toast.success('Explorer refreshed');
   }
 
-  function startRename(entry: FileEntry) {
-    editingPath = entry.path;
-    editValue = entry.name;
-  }
-
-  async function submitRename(entry: FileEntry) {
-    if (!editValue || editValue === entry.name) {
-      editingPath = null;
-      return;
-    }
-    try {
-      await renameEntry(entry, editValue);
-      toast.success('Renamed successfully');
-    } catch (err) {
-      toast.error('Rename failed. Experimental API might not be supported in this browser.');
-    } finally {
-      editingPath = null;
-    }
-  }
-
   function stripExtension(name: string) {
     return name.replace(/\.(mmd|mermaid|txt|json|dia|md)$/i, '');
   }
 
   async function reauthorize(entry: FileEntry) {
       try {
-          // @ts-ignore
+          // @ts-expect-error
           const permission = await entry.handle.requestPermission({ mode: 'readwrite' });
           if (permission === 'granted') {
               await refreshDirectory();
@@ -166,71 +140,49 @@
             <div 
               class="group flex w-full items-center gap-2 rounded px-2 py-0.5 transition-colors hover:bg-muted/50"
               style="padding-left: {depth * 12 + 24}px"
-              class:bg-muted={editingPath === entry.path}
             >
-                {#if editingPath === entry.path}
-                  <Input 
-                    bind:value={editValue} 
-                    class="h-6 py-0 text-xs" 
-                    autofocus 
-                    onkeydown={(e) => e.key === 'Enter' && submitRename(entry)}
-                    onblur={() => submitRename(entry)}
-                  />
-                {:else}
-                  <button 
-                      class="flex flex-1 items-center gap-2 min-w-0"
-                      onclick={() => loadFile(entry)}
-                      ondblclick={() => startRename(entry)}
-                  >
-                      <div class="size-4 shrink-0 flex items-center justify-center">
-                          {#if $fileMetadataStore[entry.path]?.icon}
-                             {@const IconComp = iconMap[$fileMetadataStore[entry.path].icon] || CodeIcon}
-                             <IconComp class="size-4 text-accent opacity-100"/>
-                          {:else}
-                             <CodeIcon class="size-4 opacity-70"/>
-                          {/if}
-                      </div> 
-                      <span class="truncate text-sm">{stripExtension(entry.name)}</span>
-                  </button>
-                  
-                  <div class="flex items-center gap-0 opacity-0 group-hover:opacity-100">
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      class="size-6"
-                      onclick={() => startRename(entry)}
-                      title="Rename"
-                    >
-                      <EditIcon class="size-3" />
-                    </Button>
-
-                    <Popover.Root>
-                      <Popover.Trigger>
-                        <Button variant="ghost" size="icon" class="size-6">
-                          <SettingsIcon class="size-3" />
-                        </Button>
-                      </Popover.Trigger>
-                      <Popover.Content class="w-40 p-2" side="right" align="start">
-                        <div class="flex flex-col gap-1">
-                          <p class="mb-1 px-2 text-[10px] font-bold uppercase text-muted-foreground">Select Icon</p>
-                          {#each iconOptions as opt}
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              class="justify-start gap-2 h-8"
-                              onclick={() => {
-                                fileMetadataStore.setIcon(entry.path, opt.name);
-                              }}
-                            >
-                              <opt.icon class="size-3" />
-                              <span class="text-xs">{opt.name}</span>
-                            </Button>
-                          {/each}
-                        </div>
-                      </Popover.Content>
-                    </Popover.Root>
-                  </div>
-                {/if}
+                <button 
+                    class="flex flex-1 items-center gap-2 min-w-0"
+                    onclick={() => loadFile(entry)}
+                >
+                    <div class="size-4 shrink-0 flex items-center justify-center">
+                        {#if $fileMetadataStore[entry.path]?.icon}
+                           {@const IconComp = iconMap[$fileMetadataStore[entry.path].icon] || CodeIcon}
+                           <IconComp class="size-4 text-accent opacity-100"/>
+                        {:else}
+                           <CodeIcon class="size-4 opacity-70"/>
+                        {/if}
+                    </div> 
+                    <span class="truncate text-sm">{stripExtension(entry.name)}</span>
+                </button>
+                
+                <div class="flex items-center gap-0 opacity-0 group-hover:opacity-100">
+                  <Popover.Root>
+                    <Popover.Trigger>
+                      <Button variant="ghost" size="icon" class="size-6">
+                        <SettingsIcon class="size-3" />
+                      </Button>
+                    </Popover.Trigger>
+                    <Popover.Content class="w-40 p-2" side="right" align="start">
+                      <div class="flex flex-col gap-1">
+                        <p class="mb-1 px-2 text-[10px] font-bold uppercase text-muted-foreground">Select Icon</p>
+                        {#each iconOptions as opt (opt.name)}
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            class="justify-start gap-2 h-8"
+                            onclick={() => {
+                              fileMetadataStore.setIcon(entry.path, opt.name);
+                            }}
+                          >
+                            <opt.icon class="size-3" />
+                            <span class="text-xs">{opt.name}</span>
+                          </Button>
+                        {/each}
+                      </div>
+                    </Popover.Content>
+                  </Popover.Root>
+                </div>
             </div>
         {/if}
     </div>
