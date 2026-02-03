@@ -15,12 +15,21 @@ export async function openDirectory(): Promise<void> {
   try {
     const handle = await window.showDirectoryPicker();
     currentDirHandle.set(handle);
-    const entries = await readDirectory(handle);
-    fileList.set(entries);
+    await refreshDirectory();
   } catch (error) {
     if ((error as Error).name !== 'AbortError') {
       console.error('Error opening directory:', error);
     }
+  }
+}
+
+export async function refreshDirectory(): Promise<void> {
+  let handle: FileSystemDirectoryHandle | null = null;
+  currentDirHandle.subscribe(h => handle = h)();
+
+  if (handle) {
+    const entries = await readDirectory(handle);
+    fileList.set(entries);
   }
 }
 

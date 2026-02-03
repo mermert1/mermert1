@@ -106,7 +106,10 @@
     }
   }
 
-  function applyStyle(color: string) {
+    updateCode(newCode);
+  }
+
+  function removeStyle() {
     if (!selectedElement || selectedElement.type !== 'node') return;
     const nodeName = selectedElement.id;
     const oldCode = $stateStore.code;
@@ -114,12 +117,9 @@
     const styleRegex = new RegExp(`^style ${nodeName} [^\\n]+$`, 'm');
     let newCode: string;
     if (styleRegex.test(oldCode)) {
-        newCode = oldCode.replace(styleRegex, `style ${nodeName} fill:${color}`);
-    } else {
-        // Append style at the end
-        newCode = oldCode.trimEnd() + `\nstyle ${nodeName} fill:${color}`;
+        newCode = oldCode.replace(styleRegex, '').replace(/\n\s*\n/g, '\n');
+        updateCode(newCode);
     }
-    updateCode(newCode);
   }
 
   function updateShape(shape: 'box' | 'round' | 'diamond') {
@@ -285,9 +285,12 @@
                   </div>
 
                   <div class="space-y-1.5 pt-2">
-                    <span class="text-sm font-medium leading-none">Node Color</span>
+                    <div class="flex items-center justify-between">
+                      <span class="text-sm font-medium leading-none">Node Color</span>
+                      <Button variant="ghost" size="sm" class="h-6 px-2 text-[10px]" onclick={removeStyle}>Reset</Button>
+                    </div>
                     <div class="flex flex-wrap gap-1.5 pt-1">
-                       {#each ['#f9f9f9', '#ff9999', '#99ff99', '#9999ff', '#ffff99', '#ff99ff'] as color}
+                       {#each ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#64748b'] as color}
                          <button 
                            class="size-6 rounded-md border border-border shadow-sm transition-transform hover:scale-110" 
                            style="background-color: {color}"

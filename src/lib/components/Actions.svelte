@@ -24,8 +24,16 @@
 
   type Exporter = (context: CanvasRenderingContext2D, image: HTMLImageElement) => () => void;
 
-  const getFileName = (extension: string) =>
-    `mermaid-diagram-${dayjs().format('YYYY-MM-DD-HHmmss')}.${extension}`;
+  let imageSizeMode: 'auto' | 'width' | 'height' = $state('auto');
+  let isTransparent = $state(false);
+
+  $effect(() => {
+    if (!imageSizeMode) {
+      imageSizeMode = 'auto';
+    }
+  });
+
+  let imageSize = $state(1080);
 
   const getSvgElement = () => {
     const svgElement = document.querySelector('#container svg')?.cloneNode(true) as HTMLElement;
@@ -44,15 +52,18 @@
     if (width) {
       svg?.setAttribute('width', `${width}px`);
     }
-    // Workaround https://stackoverflow.com/questions/28690643/firefox-error-rendering-an-svg-image-to-html5-canvas-with-drawimage
 
     if (!svg) {
       svg = getSvgElement();
     }
 
-    svg.style.backgroundColor = window
-      .getComputedStyle(document.body)
-      .getPropertyValue('--background');
+    if (!isTransparent) {
+      svg.style.backgroundColor = window
+        .getComputedStyle(document.body)
+        .getPropertyValue('--background');
+    } else {
+      svg.style.backgroundColor = 'transparent';
+    }
 
     const svgString = svg.outerHTML
       .replaceAll('<br>', '<br/>')
@@ -61,14 +72,6 @@
     return toBase64(`<?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet href="${FONT_AWESOME_URL}" type="text/css"?>
 ${svgString}`);
-  };
-
-  const simulateDownload = (download: string, href: string): void => {
-    const a = document.createElement('a');
-    a.download = download;
-    a.href = href;
-    a.click();
-    a.remove();
   };
 
   const exportImage = async (event: Event, exporter: Exporter) => {
@@ -102,8 +105,12 @@ ${svgString}`);
       throw new Error('context not found');
     }
 
-    context.fillStyle = window.getComputedStyle(document.body).getPropertyValue('--background');
-    context.fillRect(0, 0, canvas.width, canvas.height);
+    if (!isTransparent) {
+      context.fillStyle = window.getComputedStyle(document.body).getPropertyValue('--background');
+      context.fillRect(0, 0, canvas.width, canvas.height);
+    } else {
+      context.clearRect(0, 0, canvas.width, canvas.height);
+    }
 
     const image = new Image();
     image.addEventListener('load', () => {
@@ -112,7 +119,6 @@ ${svgString}`);
     });
     image.src = `data:image/svg+xml;base64,${getBase64SVG(svg, canvas.width, canvas.height)}`;
     // Fallback to set panZoom to true after 2 seconds
-    // This is a workaround for the case when the image is not loaded
     setTimeout(() => {
       if (!$inputStateStore.panZoom) {
         $inputStateStore.panZoom = true;
@@ -120,6 +126,17 @@ ${svgString}`);
     }, 2000);
     event.stopPropagation();
     event.preventDefault();
+  };
+
+  const getFileName = (extension: string) =>
+    `mermaid-diagram-${dayjs().format('YYYY-MM-DD-HHmmss')}.${extension}`;
+
+  const simulateDownload = (download: string, href: string): void => {
+    const a = document.createElement('a');
+    a.download = download;
+    a.href = href;
+    a.click();
+    a.remove();
   };
 
   const downloadImage: Exporter = (context, image) => {
@@ -192,16 +209,6 @@ ${svgString}`);
     logEvent('loadGist');
   };
 
-  let imageSizeMode: 'auto' | 'width' | 'height' = $state('auto');
-
-  $effect(() => {
-    if (!imageSizeMode) {
-      imageSizeMode = 'auto';
-    }
-  });
-
-  let imageSize = $state(1080);
-
   const isNetlify = browser && window.location.host.includes('netlify');
 </script>
 
@@ -241,6 +248,15 @@ ${svgString}`);
         max="10000"
         disabled={imageSizeMode === 'auto'}
         bind:value={imageSize} />
+    </div>
+    <div class="flex items-center gap-2 px-2 py-1">
+      <input 
+        id="transparent-bg"
+        type="checkbox" 
+        bind:checked={isTransparent} 
+        class="size-4 rounded border-gray-300 text-primary focus:ring-primary"
+      />
+      <label for="transparent-bg" class="text-sm cursor-pointer whitespace-nowrap">Transparent background</label>
     </div>
     <div class="flex gap-2">
       {@render dualActionButton('PNG', onDownloadPNG, $urlsStore.png)}
