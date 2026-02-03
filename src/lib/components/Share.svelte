@@ -1,12 +1,9 @@
+<script>
   import { base } from '$app/paths';
   import { buttonVariants } from '$/components/ui/button';
   import * as Dialog from '$/components/ui/dialog';
-  import { Separator } from '$/components/ui/separator';
-  import { env } from '$/util/env';
-  import { urlsStore } from '$/util/state';
   import ShareIcon from '~icons/material-symbols/share';
   import CopyInput from './CopyInput.svelte';
-  import MermaidChartIcon from './MermaidChartIcon.svelte';
 </script>
 
 <Dialog.Root>
