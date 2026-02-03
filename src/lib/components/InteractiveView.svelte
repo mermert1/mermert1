@@ -57,43 +57,52 @@
     const oldCode = $stateStore.code;
     const oldLabel = selectedElement.label;
     
-    // CRITICAL FIX: If oldLabel is empty, a global RegExp replace('') will match every gap between characters.
     if (!oldLabel && selectedElement.type === 'label') return;
 
-    let newCode = oldCode;
+    const lines = oldCode.split('\n');
     const escapedOldLabel = oldLabel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     
-    if (selectedElement.type === 'node' && selectedElement.id !== 'unknown') {
+    const newLines = lines.map((line, index) => {
+      if (index === 0) return line; // Protect header
+
+      if (selectedElement.type === 'node' && selectedElement.id !== 'unknown') {
         const nodeId = selectedElement.id;
-        // Match node definitions: ID[Label], ID(Label), ID{Label}, etc.
         const nodeDefPattern = new RegExp(`(${nodeId})\\[(.*?)\\]|(${nodeId})\\((.*?)\\)|(${nodeId})\\{(.*?)\\}|(${nodeId})\\[\\[(.*?)\\]\\]|(${nodeId})\\>(.*?)\\]|(${nodeId})\\((.*?)\\)`, 'g');
         
-        if (nodeDefPattern.test(oldCode)) {
-            newCode = oldCode.replace(nodeDefPattern, (match, ...args) => {
-                // Find which capturing group matched the label
-                // The structure is (id)[label], (id)(label), etc.
-                // Reconstruct the match with the new label
-                if (match.includes('[')) return match.replace(/\[.*\]/, `[${newLabel}]`);
-                if (match.includes('(')) return match.replace(/\(.*\)/, `(${newLabel})`);
-                if (match.includes('{')) return match.replace(/\{.*\}/, `{${newLabel}}`);
-                return match.replace(oldLabel, newLabel);
-            });
-        } else if (oldLabel) {
-            // If No ID based definition found but we have a label, fall back to simple replacement
-             newCode = oldCode.replace(new RegExp(escapedOldLabel, 'g'), newLabel);
-        } else {
-            // Node exists as just "ID" in code, we should upgrade it to "ID[NewLabel]"
-            const soloIdPattern = new RegExp(`\\b${nodeId}\\b(?![\\[\\(\\{\\<])`, 'g');
-            newCode = oldCode.replace(soloIdPattern, `${nodeId}[${newLabel}]`);
+        if (nodeDefPattern.test(line)) {
+          return line.replace(nodeDefPattern, (match) => {
+            if (match.includes('[')) return match.replace(/\[.*\]/, `[${newLabel}]`);
+            if (match.includes('(')) return match.replace(/\(.*\)/, `(${newLabel})`);
+            if (match.includes('{')) return match.replace(/\{.*\}/, `{${newLabel}}`);
+            return match.replace(oldLabel, newLabel);
+          });
         }
-    } else if (oldLabel) {
-        // For edges or unknown nodes with a label
-        newCode = oldCode.replace(new RegExp(escapedOldLabel, 'g'), newLabel);
-    }
-    
+        
+        // If no definition, but line contains the ID and oldLabel, try replacing
+        if (new RegExp(`\\b${nodeId}\\b`).test(line) && line.includes(oldLabel)) {
+           return line.replace(new RegExp(escapedOldLabel, 'g'), newLabel);
+        }
+      } else if (selectedElement.type === 'label') {
+        // Edge labels: look for |label| pattern
+        const edgeLabelPattern = new RegExp(`\\|${escapedOldLabel}\\|`, 'g');
+        if (edgeLabelPattern.test(line)) {
+          return line.replace(edgeLabelPattern, `|${newLabel}|`);
+        }
+      }
+      
+      // Fallback: if we are sure this is the right element, but couldn't find a pattern
+      // Only do this if the line isn't the header and contains the exact old label
+      if (oldLabel && line.includes(oldLabel) && (selectedElement.type === 'label' || (selectedElement.id !== 'unknown' && line.includes(selectedElement.id)))) {
+          return line.replace(new RegExp(escapedOldLabel, 'g'), newLabel);
+      }
+
+      return line;
+    });
+
+    const newCode = newLines.join('\n');
     if (newCode !== oldCode) {
-        updateCode(newCode);
-        selectedElement.label = newLabel;
+      updateCode(newCode);
+      selectedElement.label = newLabel;
     }
   }
 
@@ -102,12 +111,13 @@
     const nodeName = selectedElement.id;
     const oldCode = $stateStore.code;
     
-    const styleRegex = new RegExp(`style ${nodeName} [^\\n]+`, 'g');
+    const styleRegex = new RegExp(`^style ${nodeName} [^\\n]+$`, 'm');
     let newCode: string;
     if (styleRegex.test(oldCode)) {
         newCode = oldCode.replace(styleRegex, `style ${nodeName} fill:${color}`);
     } else {
-        newCode = oldCode + `\nstyle ${nodeName} fill:${color}`;
+        // Append style at the end
+        newCode = oldCode.trimEnd() + `\nstyle ${nodeName} fill:${color}`;
     }
     updateCode(newCode);
   }
@@ -118,20 +128,30 @@
     const oldCode = $stateStore.code;
     const label = selectedElement.label;
     
-    // Find node definition with any bracket type
     const nodeDefPattern = new RegExp(`(${nodeId})\\[(.*?)\\]|(${nodeId})\\((.*?)\\)|(${nodeId})\\{(.*?)\\}`, 'g');
     
     let brackets = ['[', ']'];
     if (shape === 'round') brackets = ['(', ')'];
     if (shape === 'diamond') brackets = ['{', '}'];
 
-    let newCode: string;
-    if (nodeDefPattern.test(oldCode)) {
-        newCode = oldCode.replace(nodeDefPattern, `${nodeId}${brackets[0]}${label}${brackets[1]}`);
-    } else {
-        newCode = oldCode.replace(new RegExp(`\\b${nodeId}\\b`, 'g'), `${nodeId}${brackets[0]}${label}${brackets[1]}`);
+    const lines = oldCode.split('\n');
+    const newLines = lines.map((line, index) => {
+      if (index === 0) return line; // Protect header
+
+      if (nodeDefPattern.test(line)) {
+        return line.replace(nodeDefPattern, `${nodeId}${brackets[0]}${label}${brackets[1]}`);
+      } else if (new RegExp(`\\b${nodeId}\\b`).test(line)) {
+        // Only replace if it's the start of a definition or a solo ID on the line
+        // Avoid replacing ID inside other words
+        return line.replace(new RegExp(`\\b${nodeId}\\b`, 'g'), `${nodeId}${brackets[0]}${label}${brackets[1]}`);
+      }
+      return line;
+    });
+
+    const newCode = newLines.join('\n');
+    if (newCode !== oldCode) {
+      updateCode(newCode);
     }
-    updateCode(newCode);
   }
 
   function addNode() {
