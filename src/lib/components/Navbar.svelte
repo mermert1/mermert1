@@ -14,6 +14,8 @@
   import type { ComponentProps, Snippet } from 'svelte';
   import CloseIcon from '~icons/material-symbols/close-rounded';
   import GithubIcon from '~icons/mdi/github';
+  import { Switch } from '$/components/ui/switch';
+  import { stateStore, updateCodeStore } from '$/util/state';
   import DropdownNavMenu from './DropdownNavMenu.svelte';
 
   interface Props {
@@ -51,6 +53,23 @@
       {/if}
       Live Editor
     </a>
+  </div>
+
+  <div class="hidden items-center gap-2 md:flex">
+    <span
+      class={['text-sm font-medium', $stateStore.viewMode === 'code' ? 'text-accent' : 'text-muted-foreground']}>
+      Code
+    </span>
+    <Switch
+      checked={$stateStore.viewMode === 'interactive'}
+      onCheckedChange={(checked) => updateCodeStore({ viewMode: checked ? 'interactive' : 'code' })} />
+    <span
+      class={[
+        'text-sm font-medium',
+        $stateStore.viewMode === 'interactive' ? 'text-accent' : 'text-muted-foreground'
+      ]}>
+      Interactive
+    </span>
   </div>
   <div
     id="menu"

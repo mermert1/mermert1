@@ -6,6 +6,7 @@
   import FileExplorer from '$/components/FileExplorer/FileExplorer.svelte'; // [NEW]
   import IconPicker from '$/components/IconPicker/IconPicker.svelte'; // [NEW]
   import History from '$/components/History/History.svelte';
+  import InteractiveEditor from '$/components/InteractiveEditor.svelte';
   import McWrapper from '$/components/McWrapper.svelte';
   import MermaidChartIcon from '$/components/MermaidChartIcon.svelte';
   import Navbar from '$/components/Navbar.svelte';
@@ -128,61 +129,65 @@
   </Navbar>
 
   <div class="flex flex-1 flex-col overflow-hidden" bind:clientWidth={width}>
-    <div
-      class={[
-        'size-full',
-        isMobile && ['w-[200%] duration-300', isViewMode && '-translate-x-1/2']
-      ]}>
-      <Resizable.PaneGroup
-        direction="horizontal"
-        autoSaveId="liveEditor"
-        class="gap-4 p-2 pt-0 sm:gap-0 sm:p-6 sm:pt-0">
-        <!-- [NEW] File Explorer Pane -->
-        {#if isFileExplorerOpen}
-          <Resizable.Pane defaultSize={20} minSize={10} maxSize={40} class="hidden sm:block">
-            <FileExplorer {isMobile} />
+    {#if $stateStore.viewMode === 'interactive'}
+      <InteractiveEditor />
+    {:else}
+      <div
+        class={[
+          'size-full',
+          isMobile && ['w-[200%] duration-300', isViewMode && '-translate-x-1/2']
+        ]}>
+        <Resizable.PaneGroup
+          direction="horizontal"
+          autoSaveId="liveEditor"
+          class="gap-4 p-2 pt-0 sm:gap-0 sm:p-6 sm:pt-0">
+          <!-- [NEW] File Explorer Pane -->
+          {#if isFileExplorerOpen}
+            <Resizable.Pane defaultSize={20} minSize={10} maxSize={40} class="hidden sm:block">
+              <FileExplorer {isMobile} />
+            </Resizable.Pane>
+            <Resizable.Handle class="mr-1 hidden opacity-0 sm:block" />
+          {/if}
+
+          <Resizable.Pane bind:this={editorPane} defaultSize={30} minSize={15}>
+            <div class="flex h-full flex-col gap-4 sm:gap-6">
+              <Card
+                onselect={tabSelectHandler}
+                isOpen
+                tabs={editorTabs}
+                activeTabID={$stateStore.editorMode}
+                isClosable={false}>
+                {#snippet actions()}
+                  <DiagramDocButton />
+                  <IconPicker />
+                {/snippet}
+                <Editor {isMobile} />
+              </Card>
+
+              <div class="group flex flex-wrap justify-between gap-4 sm:gap-6">
+                <Preset />
+                <Actions />
+              </div>
+            </div>
           </Resizable.Pane>
           <Resizable.Handle class="mr-1 hidden opacity-0 sm:block" />
-        {/if}
-
-        <Resizable.Pane bind:this={editorPane} defaultSize={30} minSize={15}>
-          <div class="flex h-full flex-col gap-4 sm:gap-6">
-            <Card
-              onselect={tabSelectHandler}
-              isOpen
-              tabs={editorTabs}
-              activeTabID={$stateStore.editorMode}
-              isClosable={false}>
-              {#snippet actions()}
-                <DiagramDocButton />
-                <IconPicker />
-              {/snippet}
-              <Editor {isMobile} />
-            </Card>
-
-            <div class="group flex flex-wrap justify-between gap-4 sm:gap-6">
-              <Preset />
-              <Actions />
-            </div>
-          </div>
-        </Resizable.Pane>
-        <Resizable.Handle class="mr-1 hidden opacity-0 sm:block" />
-        <Resizable.Pane minSize={15} class="relative flex h-full flex-1 flex-col overflow-hidden">
-          <View {panZoomState} shouldShowGrid={$stateStore.grid} />
-          <div class="absolute top-0 right-0"><PanZoomToolbar {panZoomState} /></div>
-          <div class="absolute right-0 bottom-0"><VersionSecurityToolbar /></div>
-          <div class="absolute bottom-0 left-0 sm:left-5"><SyncRoughToolbar /></div>
-        </Resizable.Pane>
-        {#if isHistoryOpen}
-          <Resizable.Handle class="ml-1 hidden opacity-0 sm:block" />
-          <Resizable.Pane
-            minSize={15}
-            defaultSize={30}
-            class="hidden h-full flex-grow flex-col sm:flex">
-            <History />
+          <Resizable.Pane minSize={15} class="relative flex h-full flex-1 flex-col overflow-hidden">
+            <View {panZoomState} shouldShowGrid={$stateStore.grid} />
+            <div class="absolute top-0 right-0"><PanZoomToolbar {panZoomState} /></div>
+            <div class="absolute right-0 bottom-0"><VersionSecurityToolbar /></div>
+            <div class="absolute bottom-0 left-0 sm:left-5"><SyncRoughToolbar /></div>
           </Resizable.Pane>
-        {/if}
-      </Resizable.PaneGroup>
-    </div>
+          {#if isHistoryOpen}
+            <Resizable.Handle class="ml-1 hidden opacity-0 sm:block" />
+            <Resizable.Pane
+              minSize={15}
+              defaultSize={30}
+              class="hidden h-full flex-grow flex-col sm:flex">
+              <History />
+            </Resizable.Pane>
+          {/if}
+        </Resizable.PaneGroup>
+      </div>
+    {/if}
   </div>
 </div>
