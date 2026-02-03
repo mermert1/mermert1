@@ -255,5 +255,8 @@ export const verifyState = (): void => {
   if (!state.panZoom) {
     state.panZoom = true;
   }
+  if (state.viewMode === 'interactive') {
+    state.viewMode = 'code';
+  }
   updateCodeStore(state);
 };
