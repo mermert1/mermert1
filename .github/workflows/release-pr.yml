@@ -7,9 +7,10 @@ jobs:
   productionPromotion:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: master
+          fetch-depth: 0
       - name: Reset promotion branch
         run: |
           git fetch origin develop:develop
