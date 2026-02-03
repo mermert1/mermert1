@@ -9,7 +9,6 @@
   import McWrapper from '$/components/McWrapper.svelte';
   import MermaidChartIcon from '$/components/MermaidChartIcon.svelte';
   import Navbar from '$/components/Navbar.svelte';
-  import { base } from '$app/paths';
   import PanZoomToolbar from '$/components/PanZoomToolbar.svelte';
   import Preset from '$/components/Preset.svelte';
   import Share from '$/components/Share.svelte';
@@ -121,7 +120,7 @@
         variant="accent"
         size="sm"
         onclick={handleSaveDiagram}>
-        <img src="{base}/mermert-logo.png" alt="MerMert Logo" class="size-6 rounded-sm" />
+        <img src="https://raw.githubusercontent.com/mermert1/mermert1/refs/heads/main/static/mermert-logo.png" alt="MerMert Logo" class="size-6 rounded-sm" />
         Save diagram
       </Button>
     </McWrapper>

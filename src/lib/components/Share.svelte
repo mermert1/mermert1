@@ -1,5 +1,4 @@
 <script>
-  import { base } from '$app/paths';
   import { buttonVariants } from '$/components/ui/button';
   import * as Dialog from '$/components/ui/dialog';
   import ShareIcon from '~icons/material-symbols/share';
@@ -19,7 +18,7 @@
     <div class="flex flex-col gap-4">
       <div class="flex flex-col gap-2">
         <h2 class="flex items-center gap-2">
-          <img class="size-5" src="{base}/mermert-logo.png" alt="MerMert Live Editor" />
+          <img class="size-5" src="https://raw.githubusercontent.com/mermert1/mermert1/refs/heads/main/static/mermert-logo.png" alt="MerMert Live Editor" />
           MerMert Live Editor
         </h2>
         <CopyInput value={window.location.href} />

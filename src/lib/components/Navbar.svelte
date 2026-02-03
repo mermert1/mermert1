@@ -8,7 +8,6 @@
 </script>
 
 <script lang="ts">
-  import { base } from '$app/paths';
   import MainMenu from '$/components/MainMenu.svelte';
   import { Button } from '$/components/ui/button';
   import { Separator } from '$/components/ui/separator';
@@ -45,7 +44,7 @@
 <nav class="z-50 flex p-4 sm:p-6">
   <div class="flex flex-1 items-center gap-2">
     <MainMenu />
-    <img src="{base}/mermert-logo.png" alt="MerMert Logo" class="size-8 rounded-sm" />
+    <img src="https://raw.githubusercontent.com/mermert1/mermert1/refs/heads/main/static/mermert-logo.png" alt="MerMert Logo" class="size-8 rounded-sm" />
     <a href="/" class="whitespace-nowrap text-accent">
       {#if !mobileToggle}
         MerMert
