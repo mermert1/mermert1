@@ -14,7 +14,11 @@
   import type { ComponentProps, Snippet } from 'svelte';
   import CloseIcon from '~icons/material-symbols/close-rounded';
   import GithubIcon from '~icons/mdi/github';
+  import { Switch } from '$/components/ui/switch';
+  import { stateStore, updateCodeStore } from '$/util/state';
+  import { explorerVisible } from '$/util/fileMetadata';
   import DropdownNavMenu from './DropdownNavMenu.svelte';
+  import SideNavigationIcon from '~icons/material-symbols/menu-open-rounded';
 
   interface Props {
     mobileToggle?: Snippet;
@@ -49,12 +53,21 @@
       {#if !mobileToggle}
         MerMert
       {/if}
-      Live Editor
+      {$stateStore.viewMode === 'code' ? 'Code Editor' : 'Interactive Playground'}
     </a>
   </div>
+
   <div
     id="menu"
     class="hidden flex-nowrap items-center justify-between gap-3 overflow-hidden md:flex">
+    <Button 
+      variant="ghost" 
+      size="icon" 
+      onclick={() => $explorerVisible = !$explorerVisible} 
+      title={$explorerVisible ? "Hide Explorer" : "Show Explorer"}
+    >
+      <SideNavigationIcon />
+    </Button>
     <DropdownNavMenu icon={GithubIcon} links={githubLinks} />
     <Separator orientation="vertical" />
     {@render children()}

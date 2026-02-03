@@ -28,7 +28,8 @@ export const defaultState: State = {
   }),
   panZoom: true,
   rough: false,
-  updateDiagram: true
+  updateDiagram: true,
+  viewMode: 'code'
 };
 
 const urlParseFailedState = `flowchart TD
@@ -50,6 +51,7 @@ export const currentState: ValidatedState = (() => {
   return {
     ...state,
     editorMode: state.editorMode ?? 'code',
+    viewMode: state.viewMode ?? 'code',
     error: undefined,
     errorMarkers: [],
     serialized: serializeState(state)
@@ -62,6 +64,7 @@ const processState = async (state: State) => {
   const processed: ValidatedState = {
     ...state,
     editorMode: state.editorMode ?? 'code',
+    viewMode: state.viewMode ?? 'code',
     error: undefined,
     errorMarkers: [],
     serialized: ''
@@ -251,6 +254,9 @@ export const verifyState = (): void => {
   const state = get(inputStateStore);
   if (!state.panZoom) {
     state.panZoom = true;
+  }
+  if (state.viewMode === 'interactive') {
+    state.viewMode = 'code';
   }
   updateCodeStore(state);
 };

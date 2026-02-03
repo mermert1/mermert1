@@ -6,6 +6,7 @@
   import FileExplorer from '$/components/FileExplorer/FileExplorer.svelte'; // [NEW]
   import IconPicker from '$/components/IconPicker/IconPicker.svelte'; // [NEW]
   import History from '$/components/History/History.svelte';
+  import InteractiveView from '$/components/InteractiveView.svelte';
   import McWrapper from '$/components/McWrapper.svelte';
   import MermaidChartIcon from '$/components/MermaidChartIcon.svelte';
   import Navbar from '$/components/Navbar.svelte';
@@ -21,7 +22,8 @@
   import View from '$/components/View.svelte';
   import type { EditorMode, Tab } from '$/types';
   import type { EditorMode, Tab } from '$/types';
-  import { openDirectory, saveFile } from '$/util/fileSystem'; // [NEW]
+  import { openDirectory, saveFile, loadRoots, refreshDirectory } from '$/util/fileSystem'; 
+  import { explorerVisible } from '$/util/fileMetadata';
   import { PanZoomState } from '$/util/panZoom';
   import { toast } from 'svelte-sonner';
   import { stateStore, updateCodeStore, urlsStore } from '$/util/state';
@@ -62,15 +64,18 @@
     window.addEventListener('appinstalled', () => {
       logEvent('pwaInstalled', { isMobile });
     });
+    // Ensure panZoom is enabled if it was accidentally disabled
+    // verifyState(); // verifyState is in state.ts which is imported
+    
+    // Load persisted folders
+    await loadRoots();
   });
 
   let isHistoryOpen = $state(false);
-  let isFileExplorerOpen = $state(false); // [NEW]
 
   async function handleOpenFolder() {
-    // [NEW]
     await openDirectory();
-    isFileExplorerOpen = true;
+    $explorerVisible = true;
   }
 
   async function handleSaveDiagram() {
@@ -137,8 +142,8 @@
         direction="horizontal"
         autoSaveId="liveEditor"
         class="gap-4 p-2 pt-0 sm:gap-0 sm:p-6 sm:pt-0">
-        <!-- [NEW] File Explorer Pane -->
-        {#if isFileExplorerOpen}
+        <!-- Multi-Root File Explorer Pane -->
+        {#if $explorerVisible}
           <Resizable.Pane defaultSize={20} minSize={10} maxSize={40} class="hidden sm:block">
             <FileExplorer {isMobile} />
           </Resizable.Pane>
@@ -169,7 +174,7 @@
         <Resizable.Handle class="mr-1 hidden opacity-0 sm:block" />
         <Resizable.Pane minSize={15} class="relative flex h-full flex-1 flex-col overflow-hidden">
           <View {panZoomState} shouldShowGrid={$stateStore.grid} />
-          <div class="absolute top-0 right-0"><PanZoomToolbar {panZoomState} /></div>
+          <div class="absolute top-12 right-0"><PanZoomToolbar {panZoomState} /></div>
           <div class="absolute right-0 bottom-0"><VersionSecurityToolbar /></div>
           <div class="absolute bottom-0 left-0 sm:left-5"><SyncRoughToolbar /></div>
         </Resizable.Pane>

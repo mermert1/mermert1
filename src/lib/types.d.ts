@@ -32,6 +32,7 @@ export interface State {
   panZoom?: boolean;
   grid?: boolean;
   editorMode?: EditorMode;
+  viewMode?: ViewMode;
   pan?: { x: number; y: number };
   zoom?: number;
   loader?: LoaderConfig;
@@ -39,6 +40,7 @@ export interface State {
 
 export interface ValidatedState extends State {
   editorMode: EditorMode;
+  viewMode: ViewMode;
   diagramType?: string;
   error?: Error;
   errorMarkers: MarkerData[];
@@ -59,23 +61,23 @@ export interface FileLoaderConfig {
 }
 export type LoaderConfig =
   | {
-      type: 'gist';
-      config: GistLoaderConfig;
-    }
+    type: 'gist';
+    config: GistLoaderConfig;
+  }
   | {
-      type: 'files';
-      config: FileLoaderConfig;
-    };
+    type: 'files';
+    config: FileLoaderConfig;
+  };
 export type HistoryType = 'auto' | 'manual' | 'loader';
 export type HistoryEntry = { id: string; state: State; time: number; url?: string } & (
   | {
-      type: 'loader';
-      name: string;
-    }
+    type: 'loader';
+    name: string;
+  }
   | {
-      type: HistoryType;
-      name?: string;
-    }
+    type: HistoryType;
+    name?: string;
+  }
 );
 
 export type DocumentationConfig = Record<
@@ -87,6 +89,7 @@ export type DocumentationConfig = Record<
 >;
 
 export type EditorMode = 'code' | 'config';
+export type ViewMode = 'code' | 'interactive';
 
 export type Loader = (url: string) => Promise<State>;
 export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
