@@ -51,7 +51,7 @@
       {#if !mobileToggle}
         MerMert
       {/if}
-      Live Editor
+      {$stateStore.viewMode === 'code' ? 'Code Editor' : 'Interactive Playground'}
     </a>
   </div>
 
