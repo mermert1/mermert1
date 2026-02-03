@@ -1,3 +1,4 @@
+<script lang="ts">
   import { fileList, readFile, refreshDirectory, type FileEntry } from '$lib/util/fileSystem';
   import { fileMetadataStore } from '$lib/util/fileMetadata';
   import { updateCodeStore } from '$lib/util/state';
@@ -6,6 +7,10 @@
   import ChevronRight from '~icons/material-symbols/chevron-right-rounded';
   import RefreshIcon from '~icons/material-symbols/refresh-rounded';
   import SettingsIcon from '~icons/material-symbols/settings-outline-rounded';
+  import DatabaseIcon from '~icons/material-symbols/database';
+  import CloudIcon from '~icons/material-symbols/cloud';
+  import LockIcon from '~icons/material-symbols/lock-outline';
+  import ProcessIcon from '~icons/material-symbols/settings-backup-restore-rounded';
   import * as Popover from '$/components/ui/popover';
   import { Button } from '$/components/ui/button';
   
@@ -15,10 +20,10 @@
 
   const iconOptions = [
     { name: 'Default', icon: CodeIcon },
-    { name: 'Database', icon: () => import('~icons/material-symbols/database') },
-    { name: 'Cloud', icon: () => import('~icons/material-symbols/cloud') },
-    { name: 'Lock', icon: () => import('~icons/material-symbols/lock-outline') },
-    { name: 'Process', icon: () => import('~icons/material-symbols/settings-backup-restore-rounded') }
+    { name: 'Database', icon: DatabaseIcon },
+    { name: 'Cloud', icon: CloudIcon },
+    { name: 'Lock', icon: LockIcon },
+    { name: 'Process', icon: ProcessIcon }
   ];
 
   function toggleExpand(path: string) {
@@ -43,6 +48,7 @@
   async function handleRefresh() {
     await refreshDirectory();
   }
+</script>
 
 <div class="flex h-full flex-col overflow-y-auto bg-card p-4 text-card-foreground shadow-inner dark:bg-card">
   <div class="mb-4 flex items-center justify-between border-b border-border pb-2">

@@ -106,6 +106,19 @@
     }
   }
 
+  function applyStyle(color: string) {
+    if (!selectedElement || selectedElement.type !== 'node') return;
+    const nodeName = selectedElement.id;
+    const oldCode = $stateStore.code;
+    
+    const styleRegex = new RegExp(`^style ${nodeName} [^\\n]+$`, 'm');
+    let newCode: string;
+    if (styleRegex.test(oldCode)) {
+        newCode = oldCode.replace(styleRegex, `style ${nodeName} fill:${color}`);
+    } else {
+        // Append style at the end
+        newCode = oldCode.trimEnd() + `\nstyle ${nodeName} fill:${color}`;
+    }
     updateCode(newCode);
   }
 
