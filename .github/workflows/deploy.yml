@@ -32,7 +32,7 @@ jobs:
 
       - name: Build & Deploy
         env:
-          MERMAID_DOMAIN: 'mermaid.live'
+          MERMAID_DOMAIN: 'mermert1.github.io'
           MERMAID_ANALYTICS_URL: 'https://p.mermaid.live'
           MERMAID_RENDERER_URL: 'https://mermaid.ink'
           MERMAID_KROKI_RENDERER_URL: 'https://kroki.io'
