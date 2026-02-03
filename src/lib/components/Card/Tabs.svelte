@@ -14,9 +14,7 @@
     onselect?: (tab: Tab) => void;
   } = $props();
 
-  if (!activeTabID && tabs.length > 0) {
-    activeTabID = tabs[0].id;
-  }
+  let currentTabId = $derived(activeTabID || (tabs.length > 0 ? tabs[0].id : ''));
 
   const toggleTabs = (tab: Tab) => {
     return (event: Event) => {
@@ -34,7 +32,7 @@
         variant="ghost"
         class={[
           'px-2',
-          activeTabID === tab.id && 'rounded-b-none border-b-2 border-b-primary-foreground/50'
+          currentTabId === tab.id && 'rounded-b-none border-b-2 border-b-primary-foreground/50'
         ]}
         onclick={toggleTabs(tab)}
         onkeypress={toggleTabs(tab)}>

@@ -286,8 +286,9 @@
               
               <div class="flex flex-col gap-4">
                 <div class="space-y-1.5">
-                  <label class="text-sm font-medium leading-none">Label Text</label>
+                  <label for="label-text" class="text-sm font-medium leading-none">Label Text</label>
                   <Input 
+                    id="label-text"
                     value={selectedElement.label} 
                     oninput={(e) => updateLabel((e.target as HTMLInputElement).value)}
                     placeholder="Label text..."

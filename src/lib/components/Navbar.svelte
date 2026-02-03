@@ -18,7 +18,7 @@
   import { stateStore, updateCodeStore } from '$/util/state';
   import { explorerVisible } from '$/util/fileMetadata';
   import DropdownNavMenu from './DropdownNavMenu.svelte';
-  import SideNavigationIcon from '~icons/material-symbols/side-navigation-rounded';
+  import SideNavigationIcon from '~icons/material-symbols/menu-open-rounded';
 
   interface Props {
     mobileToggle?: Snippet;
