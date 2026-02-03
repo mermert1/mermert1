@@ -19,6 +19,6 @@
   {...props}
   domain={mermaidChartDomain}
   isVisible={env.isEnabledMermaidChartLinks}
-  showPopup={!isMermaidAiDomain}>
+  showPopup={false}>
   {@render children()}
 </ExternalLinkWrapper>

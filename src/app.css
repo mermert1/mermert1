@@ -5,6 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @layer base {
+
   *,
   ::after,
   ::before,
@@ -22,14 +23,14 @@
     --card-foreground: hsl(222.2 84% 4.9%);
     --popover: hsl(0 0% 100%);
     --popover-foreground: hsl(222.2 84% 4.9%);
-    --primary: hsl(240 10% 91%);
-    --primary-foreground: hsl(255 20% 15%);
+    --primary: #7289da;
+    --primary-foreground: hsl(0 0% 100%);
     --secondary: hsl(210 40% 96.1%);
     --secondary-foreground: hsl(222.2 47.4% 11.2%);
     --muted: hsl(228 24% 96%);
     --muted-foreground: hsl(215.4 16.3% 46.9%);
-    --accent: hsl(340 100% 44%);
-    --accent-foreground: hsl(210 40% 98%);
+    --accent: #7289da;
+    --accent-foreground: hsl(0 0% 100%);
     --destructive: hsl(0 72.22% 50.59%);
     --destructive-foreground: hsl(210 40% 98%);
     --border: hsl(214.3 31.8% 91.4%);
@@ -38,27 +39,28 @@
     --ring: hsl(222.2 84% 4.9%);
     --radius: 0.75rem;
   }
+
   .dark {
-    --background: hsl(222.2 84% 4.9%);
-    --foreground: hsl(210 40% 98%);
-    --card: hsl(222.2 84% 4.9%);
-    --card-foreground: hsl(210 40% 98%);
-    --popover: hsl(222.2 84% 4.9%);
-    --popover-foreground: hsl(210 40% 98%);
-    --primary: hsl(210 40% 30%);
-    --primary-foreground: hsl(222.2 47.4% 90%);
-    --secondary: hsl(217.2 32.6% 17.5%);
-    --secondary-foreground: hsl(210 40% 98%);
-    --muted: hsl(217.2 32.6% 17.5%);
-    --muted-foreground: hsl(215 20.2% 65.1%);
-    --accent: hsl(340 100% 44%);
-    --accent-foreground: hsl(210 40% 98%);
-    --destructive: hsl(0 62.8% 30.6%);
-    --destructive-foreground: hsl(210 40% 98%);
-    --border: hsl(217.2 32.6% 17.5%);
-    --border-dark: hsl(217.2 32.6% 27.5%);
-    --input: hsl(217.2 32.6% 17.5%);
-    --ring: hsl(212.7 26.8% 83.9%);
+    --background: #282b30;
+    --foreground: #dcddde;
+    --card: #282b30;
+    --card-foreground: #dcddde;
+    --popover: #2f3136;
+    --popover-foreground: #dcddde;
+    --primary: #7289da;
+    --primary-foreground: #ffffff;
+    --secondary: #2f3136;
+    --secondary-foreground: #dcddde;
+    --muted: #2f3136;
+    --muted-foreground: #72767d;
+    --accent: #7289da;
+    --accent-foreground: #ffffff;
+    --destructive: #7289da;
+    --destructive-foreground: #ffffff;
+    --border: #202225;
+    --border-dark: #202225;
+    --input: #202225;
+    --ring: #7289da;
   }
 }
 
@@ -105,6 +107,7 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply h-screen w-screen overflow-hidden bg-background text-foreground;
   }

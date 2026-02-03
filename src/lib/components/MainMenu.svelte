@@ -40,47 +40,12 @@
       renderer: mcMenuItem
     },
     {
-      label: 'Mermaid.js',
-      icon: MermaidTailIcon,
-      href: env.docsUrl,
-      renderer: menuItem
-    },
-    {
-      label: 'Documentation',
-      icon: BookIcon,
-      href: `${env.docsUrl}/intro/`,
-      renderer: menuItem
-    },
-    {
-      label: 'Community',
-      icon: CommunityIcon,
-      href: 'https://discord.gg/sKeNQX4Wtj',
-      renderer: menuItem
-    },
-    {
-      checkDiagramType: false,
-      href: $urlsStore.mermaidChart({ medium: 'main_menu' }).plugins,
-      icon: PluginIcon,
-      label: 'Plugins',
-      renderer: mcMenuItem,
-      sharesData: false
-    },
-    {
       href: '#',
       icon: ContrastIcon,
       isSectionEnd: true,
       label: 'Dark Mode',
       renderer: darkModeMenuItem
     },
-    {
-      checkDiagramType: false,
-      class: 'text-accent border-b-0',
-      href: $urlsStore.mermaidChart({ medium: 'main_menu' }).home,
-      icon: MermaidChartIcon,
-      label: 'Mermaid',
-      renderer: mcMenuItem,
-      sharesData: false
-    }
   ]);
 </script>
 

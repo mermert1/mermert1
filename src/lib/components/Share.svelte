@@ -22,27 +22,14 @@
     <div class="flex flex-col gap-4">
       <div class="flex flex-col gap-2">
         <h2 class="flex items-center gap-2">
-          <img class="size-5" src="/favicon.svg" alt="Mermaid Live Editor" />
-          Mermaid Live Editor
+          <img class="size-5" src="/mermert-logo.png" alt="MerMert Live Editor" />
+          MerMert Live Editor
         </h2>
         <CopyInput value={window.location.href} />
         <Dialog.Description>
           The content of the diagrams you create never leaves your browser.
         </Dialog.Description>
       </div>
-      {#if env.isEnabledMermaidChartLinks}
-        <Separator />
-        <div class="flex flex-col gap-2">
-          <h2 class="flex items-center gap-2">
-            <MermaidChartIcon class="size-5" />
-            Mermaid Chart Playground
-          </h2>
-          <CopyInput value={$urlsStore.mermaidChart({ medium: 'share' }).playground} />
-          <Dialog.Description>
-            Opens the Mermaid Chart Playground with Mermaid AI, Visual Editor, and more.
-          </Dialog.Description>
-        </div>
-      {/if}
     </div>
   </Dialog.Content>
 </Dialog.Root>
