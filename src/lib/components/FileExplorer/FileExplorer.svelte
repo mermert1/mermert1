@@ -18,13 +18,15 @@
   
   let expandedPaths = $state(new Set<string>());
 
-  const iconOptions = [
-    { name: 'Default', icon: CodeIcon },
-    { name: 'Database', icon: DatabaseIcon },
-    { name: 'Cloud', icon: CloudIcon },
-    { name: 'Lock', icon: LockIcon },
-    { name: 'Process', icon: ProcessIcon }
-  ];
+  const iconMap: Record<string, any> = {
+    'Default': CodeIcon,
+    'Database': DatabaseIcon,
+    'Cloud': CloudIcon,
+    'Lock': LockIcon,
+    'Process': ProcessIcon
+  };
+
+  const iconOptions = Object.entries(iconMap).map(([name, icon]) => ({ name, icon }));
 
   function toggleExpand(path: string) {
     if (expandedPaths.has(path)) {
@@ -100,10 +102,10 @@
                     class="flex flex-1 items-center gap-2 text-left text-sm"
                     onclick={() => loadFile(entry)}
                 >
-                    <div class="size-4 shrink-0">
+                    <div class="size-4 shrink-0 flex items-center justify-center">
                         {#if $fileMetadataStore[entry.path]?.icon}
-                           <!-- This would need a smarter icon renderer, but for now we'll just show the default if custom is set -->
-                           <CodeIcon class="size-4 text-accent opacity-100"/>
+                           {@const IconComp = iconMap[$fileMetadataStore[entry.path].icon] || CodeIcon}
+                           <IconComp class="size-4 text-accent opacity-100"/>
                         {:else}
                            <CodeIcon class="size-4 opacity-70"/>
                         {/if}
@@ -125,7 +127,9 @@
                           variant="ghost" 
                           size="sm" 
                           class="justify-start gap-2 h-8"
-                          onclick={() => fileMetadataStore.setIcon(entry.path, opt.name)}
+                          onclick={() => {
+                            fileMetadataStore.setIcon(entry.path, opt.name);
+                          }}
                         >
                           <opt.icon class="size-3" />
                           <span class="text-xs">{opt.name}</span>
