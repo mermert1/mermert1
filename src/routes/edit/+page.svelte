@@ -72,7 +72,6 @@
   });
 
   let isHistoryOpen = $state(false);
-  let isHistoryOpen = $state(false);
 
   async function handleOpenFolder() {
     await openDirectory();
