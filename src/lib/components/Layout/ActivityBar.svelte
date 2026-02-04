@@ -3,6 +3,7 @@
   import { cn } from '$/utils';
   import FolderIcon from '~icons/material-symbols/folder-open-rounded';
   import ExportIcon from '~icons/material-symbols/download-rounded';
+  import TemplateIcon from '~icons/material-symbols/account-tree-outline-rounded';
   import SettingsIcon from '~icons/material-symbols/settings-outline-rounded';
   import HistoryIcon from '~icons/material-symbols/history';
 
@@ -15,6 +16,7 @@
 
   const primaryActions = [
     { id: 'explorer', icon: FolderIcon, label: 'Explorer' },
+    { id: 'templates', icon: TemplateIcon, label: 'Templates' },
     { id: 'export', icon: ExportIcon, label: 'Export' }
   ];
 

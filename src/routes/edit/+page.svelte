@@ -12,6 +12,7 @@
   import PanZoomToolbar from '$/components/PanZoomToolbar.svelte';
   import Share from '$/components/Share.svelte';
   import Settings from '$/components/Layout/Settings.svelte';
+  import TemplatePane from '$/components/Layout/TemplatePane.svelte';
   import View from '$/components/View.svelte';
   import { Button } from '$/components/ui/button';
   import * as Resizable from '$/components/ui/resizable';
@@ -146,7 +147,9 @@
                 ? 'Export'
                 : activeSideBarView === 'history'
                   ? 'History'
-                  : 'Settings'}>
+                  : activeSideBarView === 'templates'
+                    ? 'Templates'
+                    : 'Settings'}>
             {#if activeSideBarView === 'explorer'}
               <div class="p-2">
                 <Button
@@ -163,6 +166,10 @@
             {:else if activeSideBarView === 'history'}
               <div class="h-full overflow-y-auto">
                 <History />
+              </div>
+            {:else if activeSideBarView === 'templates'}
+              <div class="h-full overflow-y-auto">
+                <TemplatePane />
               </div>
             {:else if activeSideBarView === 'settings'}
               <Settings />
