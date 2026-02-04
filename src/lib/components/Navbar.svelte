@@ -13,7 +13,7 @@
   import { Separator } from '$/components/ui/separator';
   import type { ComponentProps, Snippet } from 'svelte';
   import { stateStore } from '$/util/state';
-  import { explorerVisible } from '$/util/fileMetadata';
+  import { explorerVisible } from '$/util/fileMetadata.svelte';
   import DropdownNavMenu from './DropdownNavMenu.svelte';
   import SideNavigationIcon from '~icons/material-symbols/menu-open-rounded';
 

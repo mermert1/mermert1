@@ -12,7 +12,7 @@
     activeFileHandle,
     type FileEntry
   } from '$lib/util/fileSystem';
-  import { fileMetadataStore, fileMetadata, expansionStore } from '$lib/util/fileMetadata';
+  import { fileMetadataStore, fileMetadata, expansionStore } from '$lib/util/fileMetadata.svelte';
   import { stateStore, updateCodeStore } from '$lib/util/state';
   import FolderIcon from '~icons/material-symbols/folder-open-rounded';
   import ChevronRight from '~icons/material-symbols/chevron-right-rounded';
