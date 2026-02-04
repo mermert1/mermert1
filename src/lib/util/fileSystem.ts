@@ -201,13 +201,41 @@ export async function readFile(fileHandle: FileSystemFileHandle): Promise<string
 
 export async function writeFile(fileHandle: FileSystemFileHandle, content: string): Promise<void> {
   try {
+    // Permission check - queryPermission doesn't require user gesture
+    // @ts-expect-error - File System API types are experimental
+    const permission = await fileHandle.queryPermission({ mode: 'readwrite' });
+    if (permission !== 'granted') {
+      console.warn('Write permission not granted for:', fileHandle.name);
+      throw new Error('Permission denied');
+    }
+
     const writable = await fileHandle.createWritable();
     await writable.write(content);
     await writable.close();
+    console.log('Successfully wrote to:', fileHandle.name);
   } catch (error) {
     console.error('Error writing file:', error);
     throw error;
   }
+}
+
+export async function saveActiveFile(content: string): Promise<boolean> {
+  const handle = get(activeFileHandle);
+  if (!handle) return false;
+
+  try {
+    // requestPermission MUST be called from a user gesture (like a button click)
+    // @ts-expect-error - File System API types are experimental
+    const permission = await handle.requestPermission({ mode: 'readwrite' });
+    if (permission === 'granted') {
+      await writeFile(handle, content);
+      return true;
+    }
+  } catch (error) {
+    console.error('Error saving active file:', error);
+    toast.error('Failed to save to file. Check console for details.');
+  }
+  return false;
 }
 
 export async function saveFile(content: string, suggestedName = 'diagram.dia'): Promise<boolean> {

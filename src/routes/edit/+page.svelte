@@ -68,9 +68,19 @@
 
   async function handleSaveDiagram() {
     const code = $stateStore.code;
+    // Try to save to active file first
+    const saved = await saveActiveFile(code);
+    if (saved) {
+      toast.success('Diagram saved successfully');
+      saveStatus = 'saved';
+      return;
+    }
+
+    // Fallback to Save As
     try {
       if (await saveFile(code)) {
         toast.success('Diagram saved successfully');
+        saveStatus = 'saved';
       }
     } catch {
       // Error handled in saveFile
@@ -79,23 +89,29 @@
 
   // Editor resize logic removed
 
-  import { activeFileHandle, writeFile } from '$/util/fileSystem';
+  import { activeFileHandle, saveActiveFile, writeFile } from '$/util/fileSystem';
   import { debounce } from 'lodash-es';
 
   // Autosave Logic
-  type SaveStatus = 'saved' | 'saving' | 'unsaved';
+  type SaveStatus = 'saved' | 'saving' | 'unsaved' | 'blocked';
   let saveStatus = $state<SaveStatus>('saved');
 
   const autosave = debounce(async (code: string) => {
     const handle = $activeFileHandle;
     if (handle) {
-      saveStatus = 'saving';
       try {
-        await writeFile(handle, code);
-        saveStatus = 'saved';
+        // Only attempt if we likely have permission
+        const permission = await handle.queryPermission({ mode: 'readwrite' });
+        if (permission === 'granted') {
+          saveStatus = 'saving';
+          await writeFile(handle, code);
+          saveStatus = 'saved';
+        } else {
+          saveStatus = 'blocked';
+        }
       } catch (error) {
         console.error('Autosave failed:', error);
-        saveStatus = 'unsaved'; // Keep as unsaved if failed
+        saveStatus = 'unsaved';
       }
     }
   }, 1000);
@@ -186,6 +202,10 @@
                     <span class="animate-pulse text-xs text-muted-foreground">Saving...</span>
                   {:else if saveStatus === 'unsaved'}
                     <span class="text-xs text-amber-500">Unsaved</span>
+                  {:else if saveStatus === 'blocked'}
+                    <span
+                      class="text-xs text-rose-500"
+                      title="Click Save button to grant permission">Permission Needed</span>
                   {:else}
                     <span class="text-xs text-muted-foreground">Saved</span>
                   {/if}
