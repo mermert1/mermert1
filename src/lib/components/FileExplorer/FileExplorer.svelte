@@ -21,7 +21,7 @@
   import CloudIcon from '~icons/material-symbols/cloud';
   import LockIcon from '~icons/material-symbols/lock-outline';
   import ProcessIcon from '~icons/material-symbols/settings-backup-restore-rounded';
-  import CloseIcon from '~icons/material-symbols/close-rounded';
+  import XIcon from '~icons/material-symbols/close-rounded';
   import DocumentIcon from '~icons/material-symbols/description-outline-rounded';
   import FileAddIcon from '~icons/material-symbols/note-add-outline-rounded';
   import * as Popover from '$/components/ui/popover';
@@ -163,7 +163,7 @@
               removeRoot(entry.rootName);
             }}
             title="Close Folder">
-            <CloseIcon class="size-3" />
+            <XIcon class="size-3" />
           </Button>
         {/if}
       </div>
@@ -205,7 +205,7 @@
               removeFile(entry.path);
             }}
             title="Remove File">
-            <CloseIcon class="size-3" />
+            <XIcon class="size-3" />
           </Button>
         {/if}
 

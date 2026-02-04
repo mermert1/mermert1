@@ -50,8 +50,8 @@
     }
   ];
 
-  let width = $state(0);
-  let isMobile = $derived(width < 768);
+  let width = $state(1200);
+  let isMobile = $derived(width > 0 && width < 768);
 
   onMount(async () => {
     await initHandler();
@@ -115,7 +115,7 @@
 
 <svelte:window bind:innerWidth={width} />
 
-{#if isMobile}
+{#if width > 0 && isMobile}
   <MobileLayout {isMobile} />
 {:else}
   <div class="flex h-screen w-screen flex-col overflow-hidden bg-background">
