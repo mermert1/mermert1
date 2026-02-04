@@ -7,7 +7,7 @@
     removeRoot,
     type FileEntry
   } from '$lib/util/fileSystem';
-  import { fileMetadataStore, expansionStore, explorerVisible } from '$lib/util/fileMetadata';
+  import { fileMetadataStore, expansionStore } from '$lib/util/fileMetadata';
   import { updateCodeStore } from '$lib/util/state';
   import FolderIcon from '~icons/material-symbols/folder-open-rounded';
   import CodeIcon from '~icons/material-symbols/code-rounded';
@@ -15,7 +15,6 @@
   import RefreshIcon from '~icons/material-symbols/refresh-rounded';
   import SettingsIcon from '~icons/material-symbols/settings-outline-rounded';
   import AddFolderIcon from '~icons/material-symbols/create-new-folder-outline-rounded';
-  import CloseIcon from '~icons/material-symbols/close-rounded';
   import DatabaseIcon from '~icons/material-symbols/database';
   import CloudIcon from '~icons/material-symbols/cloud';
   import LockIcon from '~icons/material-symbols/lock-outline';
@@ -113,18 +112,6 @@
         {/if}
       </div>
     </div>
-  </div>
-
-  <!-- Vertical Navbar -->
-  <div class="flex w-10 flex-col items-center gap-2 border-l border-border bg-muted/10 py-2">
-    <Button
-      variant="ghost"
-      size="icon"
-      class="size-8 text-muted-foreground hover:text-foreground"
-      onclick={() => ($explorerVisible = false)}
-      title="Hide Explorer">
-      <CloseIcon class="size-4" />
-    </Button>
   </div>
 </div>
 

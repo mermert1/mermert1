@@ -15,7 +15,7 @@ const config = {
       fallback: '404.html'
     }),
     paths: {
-      base: '/mermert1'
+      base: ''
     }
   }
 };
