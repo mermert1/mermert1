@@ -1,3 +1,4 @@
+import { toast } from 'svelte-sonner';
 import { get, writable } from 'svelte/store';
 import { getHandles, removeHandle, saveHandle } from './idb';
 
@@ -15,12 +16,19 @@ export const fileList = writable<FileEntry[]>([]);
 export const activeFileHandle = writable<FileSystemFileHandle | null>(null);
 
 export async function openDirectory(): Promise<void> {
+  if (!('showDirectoryPicker' in window)) {
+    toast.error(
+      'File System Access API is not supported in this browser. Try Chrome, Edge, or Opera.'
+    );
+    return;
+  }
   try {
     const handle = await window.showDirectoryPicker();
     await addRoot(handle);
   } catch (error) {
     if ((error as Error).name !== 'AbortError') {
       console.error('Error opening directory:', error);
+      toast.error('Failed to open directory. Check console for details.');
     }
   }
 }
@@ -100,8 +108,6 @@ async function readDirectory(
   const entries: FileEntry[] = [];
 
   try {
-    // @ts-expect-error: TS compiler conflicts with newer File System Access API types
-
     for await (const entry of dirHandle.values()) {
       const entryPath = `${path}/${entry.name}`;
 
