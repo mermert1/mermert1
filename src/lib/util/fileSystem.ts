@@ -17,6 +17,7 @@ export const fileList = writable<FileEntry[]>([]);
 export const activeFileHandle = writable<FileSystemFileHandle | null>(null);
 export type SaveStatus = 'saved' | 'saving' | 'unsaved' | 'blocked';
 export const saveStatus = writable<SaveStatus>('saved');
+export const lastSavedCode = writable<string>('');
 
 export async function openDirectory(): Promise<void> {
   if (!('showDirectoryPicker' in window)) {
@@ -210,7 +211,9 @@ async function readDirectory(
 export async function readFile(fileHandle: FileSystemFileHandle): Promise<string> {
   activeFileHandle.set(fileHandle); // Set active handle on read
   const file = await fileHandle.getFile();
-  return await file.text();
+  const text = await file.text();
+  lastSavedCode.set(text); // Sync last saved code on load
+  return text;
 }
 
 export async function writeFile(fileHandle: FileSystemFileHandle, content: string): Promise<void> {
@@ -232,6 +235,7 @@ export async function writeFile(fileHandle: FileSystemFileHandle, content: strin
     await writable.write(content);
     await writable.close();
     saveStatus.set('saved');
+    lastSavedCode.set(content); // Update last saved code on success
     console.log('Successfully wrote to:', fileHandle.name);
   } catch (error) {
     console.error('Error writing file:', error);

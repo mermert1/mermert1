@@ -89,13 +89,22 @@
 
   // Editor resize logic removed
 
-  import { activeFileHandle, saveActiveFile, saveStatus, writeFile } from '$/util/fileSystem';
+  import {
+    activeFileHandle,
+    lastSavedCode,
+    saveActiveFile,
+    saveStatus,
+    writeFile
+  } from '$/util/fileSystem';
   import { debounce } from 'lodash-es';
+
+  // State
+  const isDirty = $derived($stateStore.code !== $lastSavedCode);
 
   // Autosave Logic
   const autosave = debounce(async (code: string) => {
     const handle = $activeFileHandle;
-    if (handle) {
+    if (handle && code !== $lastSavedCode) {
       try {
         // Only attempt if we likely have permission
         // @ts-expect-error - File System API types are experimental
@@ -112,10 +121,7 @@
   }, 60000);
 
   $effect(() => {
-    if ($activeFileHandle && $stateStore.code) {
-      if ($saveStatus === 'saved') {
-        saveStatus.set('unsaved');
-      }
+    if ($activeFileHandle && isDirty) {
       autosave($stateStore.code);
     }
   });
@@ -187,22 +193,26 @@
               <!-- Breadcrumbs or simple title -->
               <div class="flex items-center gap-2">
                 <MainMenu />
-                <span class="text-sm font-semibold">Graphi</span>
+                <span class="text-sm font-semibold">
+                  {$activeFileHandle?.name || 'Untitled'}
+                  {#if isDirty}
+                    <span class="ml-1 text-muted-foreground/50">●</span>
+                  {/if}
+                </span>
               </div>
 
               <div class="flex items-center gap-2">
                 <Share />
-                <div class="flex items-center gap-2 px-2">
+                <div class="flex items-center gap-2 px-2 text-xs">
+                  {#if isDirty}
+                    <span class="text-muted-foreground" title="Unsaved changes">●</span>
+                  {/if}
+
                   {#if $saveStatus === 'saving'}
-                    <span class="animate-pulse text-xs text-muted-foreground">Saving...</span>
-                  {:else if $saveStatus === 'unsaved'}
-                    <span class="text-xs text-amber-500">Unsaved</span>
+                    <span class="animate-pulse text-muted-foreground">Saving...</span>
                   {:else if $saveStatus === 'blocked'}
-                    <span
-                      class="text-xs text-rose-500"
-                      title="Click Save button to grant permission">Permission Needed</span>
-                  {:else}
-                    <span class="text-xs text-muted-foreground">Saved</span>
+                    <span class="text-rose-500" title="Click Save button to grant permission"
+                      >Permission Needed</span>
                   {/if}
                 </div>
                 <Button variant="ghost" size="icon" onclick={handleSaveDiagram} title="Save">
