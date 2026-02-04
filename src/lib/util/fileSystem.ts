@@ -88,7 +88,7 @@ export async function addRoot(handle: FileSystemDirectoryHandle) {
   await refreshDirectory();
 }
 
-export async function removeRoot(name: string) {
+export async function removeRoot(name: string, shouldRefresh = true) {
   rootHandles.update((roots) => {
     const newRoots = { ...roots };
     // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
@@ -96,7 +96,9 @@ export async function removeRoot(name: string) {
     return newRoots;
   });
   await removeHandle(name);
-  await refreshDirectory();
+  if (shouldRefresh) {
+    await refreshDirectory();
+  }
 }
 
 export async function removeFile(path: string) {
@@ -161,13 +163,30 @@ export async function refreshDirectory(): Promise<void> {
       }
     } catch (error) {
       console.error(`Error accessing root ${name}:`, error);
-      // If the entry is gone, remove it from roots
+      // If the entry is gone or inaccessible, we should consider removing it or at least not showing it as "needs reauth"
+      const err = error as Error;
       if (
-        (error as Error).name === 'NotFoundError' ||
-        (error as Error).message.includes('not found')
+        err.name === 'NotFoundError' ||
+        err.name === 'InvalidStateError' ||
+        err.name === 'NotAllowedError' || // Sometimes stale handles throw this
+        err.message.toLowerCase().includes('not found') ||
+        err.message.toLowerCase().includes('inaccessible') ||
+        err.message.toLowerCase().includes('no longer valid') ||
+        err.message.toLowerCase().includes('could not find')
       ) {
-        console.warn(`Root ${name} not found, removing from explorer.`);
-        removeRoot(name);
+        console.warn(`Root ${name} is invalid or gone, removing from explorer.`);
+        // We call removeRoot with shouldRefresh = false to avoid recursion
+        await removeRoot(name, false);
+      } else {
+        // For other errors (like permission denied), still show it but maybe with an error status
+        allEntries.push({
+          children: [],
+          handle: roots[name],
+          kind: 'directory',
+          name: `${name} (Error accessing)`,
+          path: name,
+          rootName: name
+        });
       }
     }
   }

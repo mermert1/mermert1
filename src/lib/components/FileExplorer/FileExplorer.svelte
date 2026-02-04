@@ -119,6 +119,17 @@
       }
     } catch (err) {
       console.error('Re-auth failed', err);
+      const error = err as Error;
+      if (
+        error.name === 'NotFoundError' ||
+        error.message.toLowerCase().includes('not found') ||
+        error.message.toLowerCase().includes('inaccessible')
+      ) {
+        toast.error(`Folder "${entry.rootName}" not found. Removing from explorer.`);
+        await removeRoot(entry.rootName);
+      } else {
+        toast.error(`Failed to gain permission for "${entry.rootName}": ${error.message}`);
+      }
     }
   }
 </script>
@@ -209,7 +220,10 @@
           <Button
             variant="ghost"
             size="icon"
-            class="size-6 opacity-0 group-hover:opacity-100"
+            class={cn(
+              'size-6 opacity-0 group-hover:opacity-100',
+              (entry.name.includes('re-authorize') || entry.name.includes('Error')) && 'opacity-100'
+            )}
             onclick={(e) => {
               e.stopPropagation();
               removeRoot(entry.rootName);
