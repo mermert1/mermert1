@@ -33,7 +33,7 @@
   import type { Component } from 'svelte';
   import { cn } from '$/utils';
 
-  export let isMobile = false;
+  let { isMobile = false } = $props();
 
   // Local UI state for popovers (Svelte 5 $state)
   let popoverOpen = $state<Record<string, boolean>>({});
