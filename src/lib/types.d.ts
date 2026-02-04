@@ -61,23 +61,23 @@ export interface FileLoaderConfig {
 }
 export type LoaderConfig =
   | {
-    type: 'gist';
-    config: GistLoaderConfig;
-  }
+      type: 'gist';
+      config: GistLoaderConfig;
+    }
   | {
-    type: 'files';
-    config: FileLoaderConfig;
-  };
+      type: 'files';
+      config: FileLoaderConfig;
+    };
 export type HistoryType = 'auto' | 'manual' | 'loader';
 export type HistoryEntry = { id: string; state: State; time: number; url?: string } & (
   | {
-    type: 'loader';
-    name: string;
-  }
+      type: 'loader';
+      name: string;
+    }
   | {
-    type: HistoryType;
-    name?: string;
-  }
+      type: HistoryType;
+      name?: string;
+    }
 );
 
 export type DocumentationConfig = Record<
@@ -88,7 +88,7 @@ export type DocumentationConfig = Record<
   }
 >;
 
-export type EditorMode = 'code' | 'config';
+export type EditorMode = 'code' | 'config' | 'tutorial';
 export type ViewMode = 'code' | 'interactive';
 
 export type Loader = (url: string) => Promise<State>;
