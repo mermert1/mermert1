@@ -13,6 +13,7 @@
   import Share from '$/components/Share.svelte';
   import Settings from '$/components/Layout/Settings.svelte';
   import TemplatePane from '$/components/Layout/TemplatePane.svelte';
+  import Credits from '$/components/Layout/Credits.svelte';
   import View from '$/components/View.svelte';
   import { Button } from '$/components/ui/button';
   import * as Resizable from '$/components/ui/resizable';
@@ -149,6 +150,7 @@
     <div class="flex flex-1 overflow-hidden">
       <!-- Activity Bar -->
       <ActivityBar
+        {isMobile}
         activeView={activeSideBarView}
         onViewChange={(view) => {
           if (view === activeSideBarView && activeSideBarView !== '') {
@@ -171,8 +173,10 @@
                     ? 'History'
                     : activeSideBarView === 'templates'
                       ? 'Templates'
-                      : 'Settings'}>
-              {#if activeSideBarView === 'explorer'}
+                      : activeSideBarView === 'credits'
+                        ? 'Credits'
+                        : 'Settings'}>
+              {#if activeSideBarView === 'explorer' && !isMobile}
                 <div class="p-2">
                   <FileExplorer {isMobile} />
                 </div>
@@ -186,6 +190,8 @@
                 <div class="h-full overflow-y-auto">
                   <TemplatePane />
                 </div>
+              {:else if activeSideBarView === 'credits'}
+                <Credits />
               {:else if activeSideBarView === 'settings'}
                 <Settings />
               {/if}

@@ -10,7 +10,7 @@
 <div class="flex h-full flex-col gap-6 overflow-y-auto p-6 text-sm leading-relaxed">
   <div class="flex items-center gap-3 border-b pb-4">
     <RocketIcon class="size-6 text-primary" />
-    <h2 class="text-xl font-bold tracking-tight italic">Getting Started with MerMert</h2>
+    <h2 class="text-xl font-bold tracking-tight italic">Getting Started with Graphi</h2>
   </div>
 
   <section class="space-y-4">
@@ -30,7 +30,7 @@
       <h3>File Management</h3>
     </div>
     <p class="text-muted-foreground">
-      Open local folders to edit your project's diagrams directly. MerMert tracks <strong
+      Open local folders to edit your project's diagrams directly. Graphi tracks <strong
         >unsaved changes</strong> with a bright dot (●) indicator.
     </p>
   </section>

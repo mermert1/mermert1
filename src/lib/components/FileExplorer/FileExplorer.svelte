@@ -269,25 +269,33 @@
                 <SettingsIcon class="size-3" />
               </Button>
             </Popover.Trigger>
-            <Popover.Content class="w-40 p-2" side="right" align="start">
-              <div class="flex flex-col gap-1">
-                <p class="mb-1 px-2 text-[10px] font-bold text-muted-foreground uppercase">
+            <Popover.Content class="w-64 p-3" side="right" align="start">
+              <div class="flex flex-col gap-3">
+                <p
+                  class="px-1 text-[10px] font-bold tracking-widest text-muted-foreground uppercase">
                   Select Icon
                 </p>
-                {#each iconOptions as opt (opt.name)}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    class="h-8 justify-start gap-2"
-                    onclick={() => {
-                      console.log(`User selected icon: ${opt.name} for ${entry.path}`);
-                      fileMetadataStore.setIcon(entry.path, opt.name);
-                      popoverOpen[entry.path] = false; // Close popover
-                    }}>
-                    <opt.icon class="size-3" />
-                    <span class="text-xs">{opt.name}</span>
-                  </Button>
-                {/each}
+                <div class="grid grid-cols-4 gap-2">
+                  {#each iconOptions as opt (opt.name)}
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      class={cn(
+                        'size-12 border-2 transition-all hover:bg-accent hover:text-accent-foreground',
+                        (fileMetadata[entry.path]?.icon === opt.name ||
+                          (!fileMetadata[entry.path]?.icon && opt.name === 'Default')) &&
+                          'border-primary bg-primary/5 shadow-inner'
+                      )}
+                      onclick={() => {
+                        console.log(`User selected icon: ${opt.name} for ${entry.path}`);
+                        fileMetadataStore.setIcon(entry.path, opt.name);
+                        popoverOpen[entry.path] = false; // Close popover
+                      }}
+                      title={opt.name}>
+                      <opt.icon class="size-6 shrink-0" />
+                    </Button>
+                  {/each}
+                </div>
               </div>
             </Popover.Content>
           </Popover.Root>

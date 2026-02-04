@@ -42,6 +42,10 @@
     </div>
   </div>
 
+  <div class="hidden text-[10px] font-bold tracking-widest uppercase opacity-70 sm:block">
+    developed by Batu Atakan Erol with ♥️
+  </div>
+
   <div class="flex items-center gap-2">
     <Button
       variant="ghost"

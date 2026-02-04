@@ -6,22 +6,25 @@
   import TemplateIcon from '~icons/material-symbols/account-tree';
   import SettingsIcon from '~icons/material-symbols/settings';
   import HistoryIcon from '~icons/material-symbols/history';
+  import CreditIcon from '~icons/material-symbols/person-outline';
 
   interface Props {
     activeView: string;
     onViewChange: (view: string) => void;
+    isMobile?: boolean;
   }
 
-  let { activeView, onViewChange }: Props = $props();
+  let { activeView, onViewChange, isMobile = false }: Props = $props();
 
-  const primaryActions = [
-    { id: 'explorer', icon: FolderIcon, label: 'Explorer' },
+  const primaryActions = $derived([
+    ...(!isMobile ? [{ id: 'explorer', icon: FolderIcon, label: 'Explorer' }] : []),
     { id: 'templates', icon: TemplateIcon, label: 'Templates' },
     { id: 'export', icon: ExportIcon, label: 'Export' }
-  ];
+  ]);
 
   const secondaryActions = [
     { id: 'history', icon: HistoryIcon, label: 'History' },
+    { id: 'credits', icon: CreditIcon, label: 'Credits' },
     { id: 'settings', icon: SettingsIcon, label: 'Settings' }
   ];
 </script>
