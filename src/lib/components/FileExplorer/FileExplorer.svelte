@@ -231,7 +231,9 @@
         {/if}
 
         <div class="flex items-center gap-0 opacity-0 group-hover:opacity-100">
-          <Popover.Root bind:open={popoverOpen[entry.path]}>
+          <Popover.Root
+            open={popoverOpen[entry.path] || false}
+            onOpenChange={(v) => (popoverOpen[entry.path] = v)}>
             <Popover.Trigger>
               <Button variant="ghost" size="icon" class="size-6">
                 <SettingsIcon class="size-3" />
