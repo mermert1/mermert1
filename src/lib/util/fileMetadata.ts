@@ -36,13 +36,18 @@ export const fileMetadataStore = (() => {
   return {
     ...store,
     setIcon: (path: string, icon: string | null) => {
+      console.log(`Setting icon for ${path} to ${icon}`);
       store.update((metadata) => {
         const newMetadata = { ...metadata };
         if (!icon || icon === 'Default') {
           // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
           delete newMetadata[path];
         } else {
-          newMetadata[path] = { ...metadata[path], icon };
+          // Always spread to ensure a new reference for reactivity
+          newMetadata[path] = {
+            ...newMetadata[path],
+            icon
+          };
         }
         return newMetadata;
       });

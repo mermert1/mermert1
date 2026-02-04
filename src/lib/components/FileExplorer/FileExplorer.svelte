@@ -229,30 +229,34 @@
 
         <div class="flex items-center gap-0 opacity-0 group-hover:opacity-100">
           <Popover.Root>
-            <Popover.Trigger>
-              <Button variant="ghost" size="icon" class="size-6">
-                <SettingsIcon class="size-3" />
-              </Button>
-            </Popover.Trigger>
-            <Popover.Content class="w-40 p-2" side="right" align="start">
-              <div class="flex flex-col gap-1">
-                <p class="mb-1 px-2 text-[10px] font-bold text-muted-foreground uppercase">
-                  Select Icon
-                </p>
-                {#each iconOptions as opt (opt.name)}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    class="h-8 justify-start gap-2"
-                    onclick={() => {
-                      fileMetadataStore.setIcon(entry.path, opt.name);
-                    }}>
-                    <opt.icon class="size-3" />
-                    <span class="text-xs">{opt.name}</span>
-                  </Button>
-                {/each}
-              </div>
-            </Popover.Content>
+            {#snippet children({ open })}
+              <Popover.Trigger>
+                <Button variant="ghost" size="icon" class="size-6">
+                  <SettingsIcon class="size-3" />
+                </Button>
+              </Popover.Trigger>
+              <Popover.Content class="w-40 p-2" side="right" align="start">
+                <div class="flex flex-col gap-1">
+                  <p class="mb-1 px-2 text-[10px] font-bold text-muted-foreground uppercase">
+                    Select Icon
+                  </p>
+                  {#each iconOptions as opt (opt.name)}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      class="h-8 justify-start gap-2"
+                      onclick={() => {
+                        console.log(`User selected icon: ${opt.name} for ${entry.path}`);
+                        fileMetadataStore.setIcon(entry.path, opt.name);
+                        open.set(false); // Close popover after selection
+                      }}>
+                      <opt.icon class="size-3" />
+                      <span class="text-xs">{opt.name}</span>
+                    </Button>
+                  {/each}
+                </div>
+              </Popover.Content>
+            {/snippet}
           </Popover.Root>
         </div>
       </div>
