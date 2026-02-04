@@ -12,7 +12,7 @@
     activeFileHandle,
     type FileEntry
   } from '$lib/util/fileSystem';
-  import { fileMetadataStore, expansionStore } from '$lib/util/fileMetadata';
+  import { fileMetadataStore, fileMetadata, expansionStore } from '$lib/util/fileMetadata';
   import { stateStore, updateCodeStore } from '$lib/util/state';
   import FolderIcon from '~icons/material-symbols/folder-open-rounded';
   import ChevronRight from '~icons/material-symbols/chevron-right-rounded';
@@ -35,6 +35,9 @@
 
   export let isMobile = false;
 
+  // Local UI state for popovers (Svelte 5 $state)
+  let popoverOpen = $state<Record<string, boolean>>({});
+
   const iconMap: Record<string, Component> = {
     Cloud: CloudIcon,
     Database: DatabaseIcon,
@@ -46,8 +49,7 @@
   const iconOptions = Object.entries(iconMap).map(([name, icon]) => ({ name, icon }));
 
   function toggleExpand(path: string) {
-    const current = $expansionStore[path];
-    expansionStore.set({ ...$expansionStore, [path]: !current });
+    expansionStore[path] = !expansionStore[path];
   }
 
   async function loadFile(entry: FileEntry) {
@@ -166,7 +168,7 @@
               : toggleExpand(entry.path)}>
           <span
             class="text-muted-foreground transition-transform duration-200"
-            class:rotate-90={$expansionStore[entry.path]}>
+            class:rotate-90={expansionStore[entry.path]}>
             <ChevronRight class="size-4" />
           </span>
           <FolderIcon class="size-4 shrink-0 text-primary opacity-80" />
@@ -187,7 +189,7 @@
           </Button>
         {/if}
       </div>
-      {#if $expansionStore[entry.path] && entry.children}
+      {#if expansionStore[entry.path] && entry.children}
         <div class="flex flex-col">
           {#each entry.children as child (child.path)}
             {@render fileItem(child, depth + 1)}
@@ -203,8 +205,9 @@
         style="padding-left: {depth * 12 + 24}px">
         <button class="flex min-w-0 flex-1 items-center gap-2" onclick={() => loadFile(entry)}>
           <div class="flex size-4 shrink-0 items-center justify-center">
-            {#if $fileMetadataStore[entry.path]?.icon}
-              {@const IconComp = iconMap[$fileMetadataStore[entry.path].icon] || DocumentIcon}
+            {#if fileMetadata[entry.path]?.icon}
+              {@const IconComp =
+                iconMap[fileMetadata[entry.path].icon ?? 'Default'] || DocumentIcon}
               <IconComp class="size-4 text-accent opacity-100" />
             {:else}
               <DocumentIcon class="size-4 text-primary opacity-60" />
@@ -228,35 +231,33 @@
         {/if}
 
         <div class="flex items-center gap-0 opacity-0 group-hover:opacity-100">
-          <Popover.Root>
-            {#snippet children({ open })}
-              <Popover.Trigger>
-                <Button variant="ghost" size="icon" class="size-6">
-                  <SettingsIcon class="size-3" />
-                </Button>
-              </Popover.Trigger>
-              <Popover.Content class="w-40 p-2" side="right" align="start">
-                <div class="flex flex-col gap-1">
-                  <p class="mb-1 px-2 text-[10px] font-bold text-muted-foreground uppercase">
-                    Select Icon
-                  </p>
-                  {#each iconOptions as opt (opt.name)}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      class="h-8 justify-start gap-2"
-                      onclick={() => {
-                        console.log(`User selected icon: ${opt.name} for ${entry.path}`);
-                        fileMetadataStore.setIcon(entry.path, opt.name);
-                        open.set(false); // Close popover after selection
-                      }}>
-                      <opt.icon class="size-3" />
-                      <span class="text-xs">{opt.name}</span>
-                    </Button>
-                  {/each}
-                </div>
-              </Popover.Content>
-            {/snippet}
+          <Popover.Root bind:open={popoverOpen[entry.path]}>
+            <Popover.Trigger>
+              <Button variant="ghost" size="icon" class="size-6">
+                <SettingsIcon class="size-3" />
+              </Button>
+            </Popover.Trigger>
+            <Popover.Content class="w-40 p-2" side="right" align="start">
+              <div class="flex flex-col gap-1">
+                <p class="mb-1 px-2 text-[10px] font-bold text-muted-foreground uppercase">
+                  Select Icon
+                </p>
+                {#each iconOptions as opt (opt.name)}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    class="h-8 justify-start gap-2"
+                    onclick={() => {
+                      console.log(`User selected icon: ${opt.name} for ${entry.path}`);
+                      fileMetadataStore.setIcon(entry.path, opt.name);
+                      popoverOpen[entry.path] = false; // Close popover
+                    }}>
+                    <opt.icon class="size-3" />
+                    <span class="text-xs">{opt.name}</span>
+                  </Button>
+                {/each}
+              </div>
+            </Popover.Content>
           </Popover.Root>
         </div>
       </div>

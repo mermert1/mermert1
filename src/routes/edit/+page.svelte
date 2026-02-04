@@ -196,7 +196,7 @@
                 <span class="text-sm font-semibold">
                   {$activeFileHandle?.name || 'Untitled'}
                   {#if isDirty}
-                    <span class="ml-1 text-muted-foreground/50">●</span>
+                    <span class="ml-1 text-foreground">●</span>
                   {/if}
                 </span>
               </div>
@@ -205,7 +205,7 @@
                 <Share />
                 <div class="flex items-center gap-2 px-2 text-xs">
                   {#if isDirty}
-                    <span class="text-muted-foreground" title="Unsaved changes">●</span>
+                    <span class="text-foreground" title="Unsaved changes">●</span>
                   {/if}
 
                   {#if $saveStatus === 'saving'}
