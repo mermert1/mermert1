@@ -5,7 +5,6 @@
   import ExportIcon from '~icons/material-symbols/download';
   import TemplateIcon from '~icons/material-symbols/account-tree';
   import SettingsIcon from '~icons/material-symbols/settings';
-  import HistoryIcon from '~icons/material-symbols/history';
   import CreditIcon from '~icons/material-symbols/person-outline';
 
   interface Props {
@@ -22,7 +21,6 @@
   ];
 
   const secondaryActions = [
-    { id: 'history', icon: HistoryIcon, label: 'History' },
     { id: 'credits', icon: CreditIcon, label: 'Credits' },
     { id: 'settings', icon: SettingsIcon, label: 'Settings' }
   ];
