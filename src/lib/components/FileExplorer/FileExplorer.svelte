@@ -15,7 +15,6 @@
   import { fileMetadataStore, expansionStore } from '$lib/util/fileMetadata';
   import { stateStore, updateCodeStore } from '$lib/util/state';
   import FolderIcon from '~icons/material-symbols/folder-open-rounded';
-  import CodeIcon from '~icons/material-symbols/code-rounded';
   import ChevronRight from '~icons/material-symbols/chevron-right-rounded';
   import RefreshIcon from '~icons/material-symbols/refresh-rounded';
   import SettingsIcon from '~icons/material-symbols/settings-outline-rounded';
@@ -39,7 +38,7 @@
   const iconMap: Record<string, Component> = {
     Cloud: CloudIcon,
     Database: DatabaseIcon,
-    Default: CodeIcon,
+    Default: DocumentIcon,
     Lock: LockIcon,
     Process: ProcessIcon
   };
@@ -205,12 +204,10 @@
         <button class="flex min-w-0 flex-1 items-center gap-2" onclick={() => loadFile(entry)}>
           <div class="flex size-4 shrink-0 items-center justify-center">
             {#if $fileMetadataStore[entry.path]?.icon}
-              {@const IconComp = iconMap[$fileMetadataStore[entry.path].icon] || CodeIcon}
+              {@const IconComp = iconMap[$fileMetadataStore[entry.path].icon] || DocumentIcon}
               <IconComp class="size-4 text-accent opacity-100" />
-            {:else if entry.rootName === 'files'}
-              <DocumentIcon class="size-4 text-primary opacity-80" />
             {:else}
-              <CodeIcon class="size-4 opacity-70" />
+              <DocumentIcon class="size-4 text-primary opacity-60" />
             {/if}
           </div>
           <span class="truncate text-sm">{stripExtension(entry.name)}</span>
