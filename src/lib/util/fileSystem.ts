@@ -99,9 +99,17 @@ export async function removeRoot(name: string) {
   await refreshDirectory();
 }
 
-export function removeFile(path: string) {
-  individualFiles.update((files) => files.filter((f) => f.path !== path));
-  void refreshDirectory();
+export async function removeFile(path: string) {
+  individualFiles.update((files) => {
+    const file = files.find((f) => f.path === path);
+    // If the active file is being removed, clear it
+    if (file && get(activeFileHandle) === file.handle) {
+      activeFileHandle.set(null);
+      saveStatus.set('saved');
+    }
+    return files.filter((f) => f.path !== path);
+  });
+  await refreshDirectory();
 }
 
 export async function loadRoots() {

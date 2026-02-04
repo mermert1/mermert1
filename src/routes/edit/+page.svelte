@@ -99,7 +99,7 @@
   import { debounce } from 'lodash-es';
 
   // State
-  const isDirty = $derived($stateStore.code !== $lastSavedCode);
+  const isDirty = $derived(!!$activeFileHandle && $stateStore.code !== $lastSavedCode);
 
   // Autosave Logic
   const autosave = debounce(async (code: string) => {
@@ -196,7 +196,7 @@
                 <span class="text-sm font-semibold">
                   {$activeFileHandle?.name || 'Untitled'}
                   {#if isDirty}
-                    <span class="ml-1 text-foreground">●</span>
+                    <span class="ml-1 text-[#333333] dark:text-white">●</span>
                   {/if}
                 </span>
               </div>
@@ -205,7 +205,7 @@
                 <Share />
                 <div class="flex items-center gap-2 px-2 text-xs">
                   {#if isDirty}
-                    <span class="text-foreground" title="Unsaved changes">●</span>
+                    <span class="text-[#333333] dark:text-white" title="Unsaved changes">●</span>
                   {/if}
 
                   {#if $saveStatus === 'saving'}
