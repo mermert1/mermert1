@@ -47,14 +47,6 @@
         class="rounded-full px-8 py-6 text-lg shadow-lg transition-all hover:scale-105 hover:shadow-xl">
         Go to Editor
       </Button>
-      <Button
-        href="https://github.com/mermaid-js/mermaid-live-editor"
-        variant="outline"
-        size="lg"
-        target="_blank"
-        class="rounded-full px-8 py-6 text-lg">
-        GitHub
-      </Button>
     </div>
 
     <div
