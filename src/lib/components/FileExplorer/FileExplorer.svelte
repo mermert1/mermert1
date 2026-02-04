@@ -4,7 +4,9 @@
     readFile,
     refreshDirectory,
     openDirectory,
+    openFiles,
     removeRoot,
+    removeFile,
     type FileEntry
   } from '$lib/util/fileSystem';
   import { fileMetadataStore, expansionStore } from '$lib/util/fileMetadata';
@@ -19,10 +21,14 @@
   import CloudIcon from '~icons/material-symbols/cloud';
   import LockIcon from '~icons/material-symbols/lock-outline';
   import ProcessIcon from '~icons/material-symbols/settings-backup-restore-rounded';
+  import CloseIcon from '~icons/material-symbols/close-rounded';
+  import DocumentIcon from '~icons/material-symbols/description-outline-rounded';
+  import FileAddIcon from '~icons/material-symbols/note-add-outline-rounded';
   import * as Popover from '$/components/ui/popover';
   import { Button } from '$/components/ui/button';
   import { toast } from 'svelte-sonner';
   import type { Component } from 'svelte';
+  import { cn } from '$/utils';
 
   export let isMobile = false;
 
@@ -83,6 +89,9 @@
         <h3 class="text-sm font-bold tracking-wider text-muted-foreground uppercase">Explorer</h3>
       </div>
       <div class="flex gap-1">
+        <Button variant="ghost" size="icon" class="size-7" onclick={openFiles} title="Open File(s)">
+          <FileAddIcon class="size-4" />
+        </Button>
         <Button
           variant="ghost"
           size="icon"
@@ -104,10 +113,15 @@
         {/each}
         {#if $fileList.length === 0}
           <div class="px-4 py-8 text-center text-sm text-muted-foreground">
-            <p class="mb-4">No folders open.</p>
-            <Button variant="outline" size="sm" class="w-full" onclick={openDirectory}>
-              Open Folder
-            </Button>
+            <p class="mb-4">No folders or files open.</p>
+            <div class="flex flex-col gap-2">
+              <Button variant="outline" size="sm" class="w-full" onclick={openDirectory}>
+                Open Folder
+              </Button>
+              <Button variant="outline" size="sm" class="w-full" onclick={openFiles}>
+                Open File(s)
+              </Button>
+            </div>
           </div>
         {/if}
       </div>
@@ -172,12 +186,28 @@
             {#if $fileMetadataStore[entry.path]?.icon}
               {@const IconComp = iconMap[$fileMetadataStore[entry.path].icon] || CodeIcon}
               <IconComp class="size-4 text-accent opacity-100" />
+            {:else if entry.rootName === 'files'}
+              <DocumentIcon class="size-4 text-primary opacity-80" />
             {:else}
               <CodeIcon class="size-4 opacity-70" />
             {/if}
           </div>
           <span class="truncate text-sm">{stripExtension(entry.name)}</span>
         </button>
+
+        {#if entry.rootName === 'files'}
+          <Button
+            variant="ghost"
+            size="icon"
+            class="size-6 opacity-0 group-hover:opacity-100"
+            onclick={(e) => {
+              e.stopPropagation();
+              removeFile(entry.path);
+            }}
+            title="Remove File">
+            <CloseIcon class="size-3" />
+          </Button>
+        {/if}
 
         <div class="flex items-center gap-0 opacity-0 group-hover:opacity-100">
           <Popover.Root>

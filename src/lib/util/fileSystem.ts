@@ -12,6 +12,7 @@ export interface FileEntry {
 }
 
 export const rootHandles = writable<Record<string, FileSystemDirectoryHandle>>({});
+export const individualFiles = writable<FileEntry[]>([]);
 export const fileList = writable<FileEntry[]>([]);
 export const activeFileHandle = writable<FileSystemFileHandle | null>(null);
 
@@ -30,6 +31,45 @@ export async function openDirectory(): Promise<void> {
     if ((error as Error).name !== 'AbortError') {
       console.error('Error opening directory:', error);
       toast.error('Failed to open directory. Check console for details.');
+    }
+  }
+}
+
+export async function openFiles(): Promise<void> {
+  if (!('showOpenFilePicker' in window)) {
+    toast.error(
+      'File System Access API is not supported in this browser. Try Chrome, Edge, or Opera.'
+    );
+    return;
+  }
+  try {
+    // @ts-expect-error - File System API types are experimental
+    const handles = await window.showOpenFilePicker({
+      multiple: true,
+      types: [
+        {
+          description: 'Mermaid Diagrams',
+          accept: {
+            'text/plain': ['.mmd', '.mermaid', '.txt', '.dia', '.md']
+          }
+        }
+      ]
+    });
+
+    const newEntries: FileEntry[] = handles.map((handle) => ({
+      handle,
+      kind: 'file',
+      name: handle.name,
+      path: `files/${handle.name}`,
+      rootName: 'files'
+    }));
+
+    individualFiles.update((files) => [...files, ...newEntries]);
+    await refreshDirectory();
+  } catch (error) {
+    if ((error as Error).name !== 'AbortError') {
+      console.error('Error opening files:', error);
+      toast.error('Failed to open files.');
     }
   }
 }
@@ -54,6 +94,11 @@ export async function removeRoot(name: string) {
   });
   await removeHandle(name);
   await refreshDirectory();
+}
+
+export function removeFile(path: string) {
+  individualFiles.update((files) => files.filter((f) => f.path !== path));
+  void refreshDirectory();
 }
 
 export async function loadRoots() {
@@ -103,7 +148,7 @@ export async function refreshDirectory(): Promise<void> {
       });
     }
   }
-  fileList.set(allEntries);
+  fileList.set([...allEntries, ...get(individualFiles)]);
 }
 
 async function readDirectory(
