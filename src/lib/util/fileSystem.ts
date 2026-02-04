@@ -24,6 +24,7 @@ export async function openDirectory(): Promise<void> {
   }
   try {
     const handle = await window.showDirectoryPicker();
+    console.log('Directory handle selected:', handle.name);
     await addRoot(handle);
   } catch (error) {
     if ((error as Error).name !== 'AbortError') {
@@ -34,8 +35,10 @@ export async function openDirectory(): Promise<void> {
 }
 
 export async function addRoot(handle: FileSystemDirectoryHandle) {
+  console.log('Adding root:', handle.name);
   rootHandles.update((roots) => {
     roots[handle.name] = handle;
+    console.log('Updated rootHandles', Object.keys(roots));
     return roots;
   });
   await saveHandle(handle.name, handle);
@@ -70,13 +73,16 @@ export async function loadRoots() {
 
 export async function refreshDirectory(): Promise<void> {
   const roots = get(rootHandles);
+  console.log('Refreshing directory. Roots:', Object.keys(roots));
   const allEntries: FileEntry[] = [];
 
   for (const [name, handle] of Object.entries(roots)) {
     // Check permission - on load it might be 'prompt'
     const permission = await handle.queryPermission({ mode: 'readwrite' });
+    console.log(`Permission for ${name}:`, permission);
     if (permission === 'granted') {
       const entries = await readDirectory(handle, name, name);
+      console.log(`Entries found for ${name}:`, entries.length);
       allEntries.push({
         children: entries,
         handle,

@@ -17,8 +17,7 @@
   import { Button } from '$/components/ui/button';
   import * as Resizable from '$/components/ui/resizable';
   import type { EditorMode, Tab } from '$/types';
-  import { explorerVisible } from '$/util/fileMetadata';
-  import { loadRoots, openDirectory, saveFile } from '$/util/fileSystem';
+  import { loadRoots, saveFile } from '$/util/fileSystem';
   import { PanZoomState } from '$/util/panZoom';
   import { stateStore, updateCodeStore } from '$/util/state';
   import { logEvent } from '$/util/stats';
@@ -26,7 +25,6 @@
   import { onMount } from 'svelte';
   import { toast } from 'svelte-sonner';
   import CodeIcon from '~icons/custom/code';
-  import FolderIcon from '~icons/material-symbols/folder-open-rounded';
   import SaveIcon from '~icons/material-symbols/save-outline-rounded';
   import GearIcon from '~icons/material-symbols/settings-outline-rounded';
   import Card from '$/components/Card/Card.svelte';
@@ -66,12 +64,6 @@
   // let isHistoryOpen = $state(false); // Removed, using sidebar
 
   let activeSideBarView = $state('explorer'); // Default to explorer
-
-  async function handleOpenFolder() {
-    await openDirectory();
-    $explorerVisible = true;
-    activeSideBarView = 'explorer';
-  }
 
   async function handleSaveDiagram() {
     const code = $stateStore.code;
@@ -152,13 +144,6 @@
                     : 'Settings'}>
             {#if activeSideBarView === 'explorer'}
               <div class="p-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  class="mb-2 w-full justify-start"
-                  onclick={handleOpenFolder}>
-                  <FolderIcon class="mr-2" /> Open Folder
-                </Button>
                 <FileExplorer {isMobile} />
               </div>
             {:else if activeSideBarView === 'export'}
