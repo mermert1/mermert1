@@ -18,8 +18,11 @@
     <div class="flex flex-col gap-4">
       <div class="flex flex-col gap-2">
         <h2 class="flex items-center gap-2">
-          <img class="size-5" src="https://raw.githubusercontent.com/mermert1/mermert1/refs/heads/main/static/mermert-logo.png" alt="MerMert Live Editor" />
-          MerMert Live Editor
+          <img
+            class="size-5"
+            src="https://raw.githubusercontent.com/mermert1/Assets/refs/heads/main/graphilogo.png"
+            alt="Graphi" />
+          Graphi
         </h2>
         <CopyInput value={window.location.href} />
         <Dialog.Description>

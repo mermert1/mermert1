@@ -6,6 +6,8 @@
   import CollapseAllIcon from '~icons/material-symbols/collapse-all-rounded';
   import Tabs from './Tabs.svelte';
 
+  import { cn } from '$/utils';
+
   interface Props {
     isClosable?: boolean;
     isOpen?: boolean;
@@ -20,6 +22,7 @@
     onselect?: (tab: Tab) => void;
     actions?: Snippet;
     children: Snippet;
+    class?: string;
   }
 
   let {
@@ -32,7 +35,8 @@
     icon,
     onselect,
     actions,
-    children
+    children,
+    class: className
   }: Props = $props();
 
   const toggleCardOpen = () => {
@@ -45,11 +49,12 @@
 </script>
 
 <div
-  class={[
-    'card flex h-fit flex-col overflow-hidden rounded-2xl border-2 border-muted',
+  class={cn(
+    'card flex flex-col overflow-hidden rounded-2xl border-2 border-muted',
     isOpen && 'isOpen flex-grow',
-    isStackable ? 'flex-1 group-has-[.isOpen]:w-full group-has-[.isOpen]:flex-none' : 'w-full'
-  ]}>
+    isStackable ? 'flex-1 group-has-[.isOpen]:w-full group-has-[.isOpen]:flex-none' : 'w-full',
+    className
+  )}>
   <div
     role="toolbar"
     tabindex="0"

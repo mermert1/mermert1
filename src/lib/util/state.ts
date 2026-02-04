@@ -1,5 +1,6 @@
 import { C } from '$/constants';
 import type { ErrorHash, MarkerData, State, ValidatedState } from '$/types';
+import { replaceState } from '$app/navigation';
 import { debounce } from 'lodash-es';
 import type { MermaidConfig } from 'mermaid';
 import { derived, get, writable, type Readable } from 'svelte/store';
@@ -16,12 +17,12 @@ import { errorDebug, formatJSON, MCBaseURL } from './util';
 
 export const defaultState: State = {
   code: `flowchart TD
-    A[Christmas] -->|Get money| B(Go shopping)
-    B --> C{Let me think}
-    C -->|One| D[Laptop]
-    C -->|Two| E[iPhone]
-    C -->|Three| F[fa:fa-car Car]
-  `,
+A[Christmas]-- >| Get money | B(Go shopping)
+B-- > C{Let me think }
+C-- >| One | D[Laptop]
+C-- >| Two | E[iPhone]
+C-- >| Three | F[fa: fa - car Car]
+`,
   grid: true,
   mermaid: formatJSON({
     theme: 'default'
@@ -33,14 +34,14 @@ export const defaultState: State = {
 };
 
 const urlParseFailedState = `flowchart TD
-    A[Loading URL failed. We can try to figure out why.] -->|Decode JSON| B(Please check the console to see the JSON and error details.)
-    B --> C{Is the JSON correct?}
-    C -->|Yes| D(Please Click here to Raise an issue in github.<br/>Including the broken link in the issue <br/> will speed up the fix.)
-    C -->|No| E{Did someone <br/>send you this link?}
-    E -->|Yes| F[Ask them to send <br/>you the complete link]
-    E -->|No| G{Did you copy <br/> the complete URL?}
-    G --> |Yes| D
-    G --> |"No :("| H(Try using the Timeline tab in History <br/>from same browser you used to create the diagram.)
+A[Loading URL failed.We can try to figure out why.]-->| Decode JSON | B(Please check the console to see the JSON and error details.)
+B-- > C{Is the JSON correct ?}
+C-- >| Yes | D(Please Click here to Raise an issue in github.< br /> Including the broken link in the issue < br /> will speed up the fix.)
+C-- >| No | E{Did someone < br /> send you this link ?}
+E-- >| Yes | F[Ask them to send < br /> you the complete link]
+E-- >| No | G{Did you copy < br /> the complete URL ?}
+G-- > | Yes | D
+G-- > | "No :(" | H(Try using the Timeline tab in History < br /> from same browser you used to create the diagram.)
     click D href "https://github.com/mermaid-js/mermaid-live-editor/issues/new?assignees=&labels=bug&template=bug_report.md&title=Broken%20link" "Raise issue"`;
 
 // inputStateStore handles all updates and is shared externally when exporting via URL, History, etc.
@@ -51,10 +52,10 @@ export const currentState: ValidatedState = (() => {
   return {
     ...state,
     editorMode: state.editorMode ?? 'code',
-    viewMode: state.viewMode ?? 'code',
     error: undefined,
     errorMarkers: [],
-    serialized: serializeState(state)
+    serialized: serializeState(state),
+    viewMode: state.viewMode ?? 'code'
   };
 })();
 
@@ -64,10 +65,10 @@ const processState = async (state: State) => {
   const processed: ValidatedState = {
     ...state,
     editorMode: state.editorMode ?? 'code',
-    viewMode: state.viewMode ?? 'code',
     error: undefined,
     errorMarkers: [],
-    serialized: ''
+    serialized: '',
+    viewMode: state.viewMode ?? 'code'
   };
   // No changes should be done to fields part of `state`.
   try {
@@ -134,9 +135,11 @@ export const stateStore: Readable<ValidatedState> = derived(
 
 export const urlsStore = derived([stateStore], ([{ code, serialized }]) => {
   const { krokiRendererUrl, rendererUrl } = env;
-  const png = rendererUrl ? `${rendererUrl}/img/${serialized}?type=png` : '';
+  const png = rendererUrl ? `${rendererUrl} /img/${serialized}?type = png` : '';
   return {
-    kroki: krokiRendererUrl ? `${krokiRendererUrl}/mermaid/svg/${pakoSerde.serialize(code)}` : '',
+    kroki: krokiRendererUrl
+      ? `${krokiRendererUrl} /mermaid/svg / ${pakoSerde.serialize(code)} `
+      : '',
     mdCode: png
       ? `[![](${png})](${window.location.protocol}//${window.location.host}${window.location.pathname}#${serialized})`
       : '',
@@ -238,7 +241,8 @@ export const toggleDarkTheme = (dark: boolean): void => {
 
 export const initURLSubscription = (): void => {
   const updateHash = debounce((hash) => {
-    history.replaceState(undefined, '', `#${hash}`);
+    // eslint-disable-next-line svelte/no-navigation-without-resolve
+    replaceState(`#${hash}`, {});
   }, 250);
 
   stateStore.subscribe(({ serialized }) => {

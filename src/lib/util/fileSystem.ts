@@ -12,6 +12,7 @@ export interface FileEntry {
 
 export const rootHandles = writable<Record<string, FileSystemDirectoryHandle>>({});
 export const fileList = writable<FileEntry[]>([]);
+export const activeFileHandle = writable<FileSystemFileHandle | null>(null);
 
 export async function openDirectory(): Promise<void> {
   try {
@@ -25,7 +26,7 @@ export async function openDirectory(): Promise<void> {
 }
 
 export async function addRoot(handle: FileSystemDirectoryHandle) {
-  rootHandles.update(roots => {
+  rootHandles.update((roots) => {
     roots[handle.name] = handle;
     return roots;
   });
@@ -34,8 +35,9 @@ export async function addRoot(handle: FileSystemDirectoryHandle) {
 }
 
 export async function removeRoot(name: string) {
-  rootHandles.update(roots => {
+  rootHandles.update((roots) => {
     const newRoots = { ...roots };
+    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
     delete newRoots[name];
     return newRoots;
   });
@@ -98,7 +100,8 @@ async function readDirectory(
   const entries: FileEntry[] = [];
 
   try {
-    // @ts-expect-error
+    // @ts-expect-error: TS compiler conflicts with newer File System Access API types
+
     for await (const entry of dirHandle.values()) {
       const entryPath = `${path}/${entry.name}`;
 
@@ -134,27 +137,42 @@ async function readDirectory(
 }
 
 export async function readFile(fileHandle: FileSystemFileHandle): Promise<string> {
+  activeFileHandle.set(fileHandle); // Set active handle on read
   const file = await fileHandle.getFile();
   return await file.text();
 }
 
-export async function saveFile(content: string, suggestedName = 'diagram.dia'): Promise<void> {
+export async function writeFile(fileHandle: FileSystemFileHandle, content: string): Promise<void> {
+  try {
+    const writable = await fileHandle.createWritable();
+    await writable.write(content);
+    await writable.close();
+  } catch (error) {
+    console.error('Error writing file:', error);
+    throw error;
+  }
+}
+
+export async function saveFile(content: string, suggestedName = 'diagram.dia'): Promise<boolean> {
   try {
     const handle = await window.showSaveFilePicker({
       suggestedName,
-      types: [{
-        description: 'Mermaid Diagram',
-        accept: { 'text/vnd.mermaid': ['.dia'] },
-      }],
+      types: [
+        {
+          description: 'Mermaid Diagram',
+          accept: { 'text/vnd.mermaid': ['.dia'] }
+        }
+      ]
     });
     const writable = await handle.createWritable();
     await writable.write(content);
     await writable.close();
+    return true;
   } catch (error) {
     if ((error as Error).name !== 'AbortError') {
       console.error('Error saving file:', error);
       throw error;
     }
   }
+  return false;
 }
-

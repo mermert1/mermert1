@@ -2,21 +2,14 @@
   import McWrapper from '$/components/McWrapper.svelte';
   import * as Popover from '$/components/ui/popover';
   import { Switch } from '$/components/ui/switch';
-  import { env } from '$/util/env';
   import { urlsStore } from '$/util/state';
   import { cn } from '$/utils';
   import { mode, setMode } from 'mode-watcher';
   import type { Component, Snippet } from 'svelte';
-  import MermaidTailIcon from '~icons/custom/mermaid-tail';
-  import AddIcon from '~icons/material-symbols/add-2-rounded';
-  import BookIcon from '~icons/material-symbols/book-2-outline-rounded';
+  import AddIcon from '~icons/material-symbols/add-rounded';
   import DuplicateIcon from '~icons/material-symbols/content-copy-outline-rounded';
   import ContrastIcon from '~icons/material-symbols/contrast';
-  import PluginIcon from '~icons/material-symbols/electrical-services-rounded';
-  import MenuIcon from '~icons/material-symbols/menu-rounded';
-  import CommunityIcon from '~icons/material-symbols/person-play-outline-rounded';
   import PlaygroundIcon from '~icons/material-symbols/shape-line-outline';
-  import MermaidChartIcon from './MermaidChartIcon.svelte';
 
   interface MenuItem {
     label: string;
@@ -29,28 +22,32 @@
     renderer: (item: Omit<MenuItem, 'renderer'>) => ReturnType<Snippet>;
   }
 
-  const menuItems: MenuItem[] = $derived([
-    { label: 'New', icon: AddIcon, href: $urlsStore.new, renderer: menuItem },
-    { label: 'Duplicate', icon: DuplicateIcon, href: window.location.href, renderer: menuItem },
-    {
-      href: $urlsStore.mermaidChart({ medium: 'main_menu' }).playground,
-      icon: PlaygroundIcon,
-      isSectionEnd: true,
-      label: 'Edit in Playground',
-      renderer: mcMenuItem
-    },
-    {
-      href: '#',
-      icon: ContrastIcon,
-      isSectionEnd: true,
-      label: 'Dark Mode',
-      renderer: darkModeMenuItem
-    },
-  ]);
+  const menuItems = $derived.by(() => {
+    const urls = $urlsStore;
+    return [
+      { label: 'New', icon: AddIcon, href: urls.new, renderer: menuItem },
+      { label: 'Duplicate', icon: DuplicateIcon, href: window.location.href, renderer: menuItem },
+      {
+        href: urls.mermaidChart({ medium: 'main_menu' }).playground,
+        icon: PlaygroundIcon,
+        isSectionEnd: true,
+        label: 'Edit in Playground',
+        renderer: mcMenuItem
+      },
+      {
+        href: '#',
+        icon: ContrastIcon,
+        isSectionEnd: true,
+        label: 'Dark Mode',
+        renderer: darkModeMenuItem
+      }
+    ];
+  });
 </script>
 
 {#snippet menuItem(options: MenuItem)}
   <a
+    data-sveltekit-reload
     href={options.href}
     target="_blank"
     class={cn(
@@ -92,7 +89,10 @@
 
 <Popover.Root>
   <Popover.Trigger class="shrink-0">
-    <MenuIcon class="size-6" />
+    <img
+      src="https://raw.githubusercontent.com/mermert1/Assets/refs/heads/main/graphilogo.png"
+      alt="Graphi"
+      class="size-8 object-contain" />
   </Popover.Trigger>
   <Popover.Content align="start" class="flex flex-col overflow-hidden border-2 p-0" sideOffset={16}>
     {#each menuItems as { renderer, ...item } (item.label)}
