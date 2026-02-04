@@ -10,15 +10,30 @@
     saveActiveFile,
     saveStatus,
     activeFileHandle,
+    activeVirtualFileId,
+    lastSavedCode,
     type FileEntry
   } from '$lib/util/fileSystem';
+  import {
+    siteFiles,
+    loadSiteWorkspace,
+    createVirtualFile,
+    createVirtualFolder,
+    deleteVirtualItem,
+    moveVirtualItem,
+    updateVirtualItem
+  } from '$lib/util/siteWorkspace.svelte';
+  import * as Resizable from '$/components/ui/resizable';
+  import { onMount } from 'svelte';
+  import MoreIcon from '~icons/material-symbols/more-vert';
   import { fileMetadataStore, fileMetadata, expansionStore } from '$lib/util/fileMetadata.svelte';
   import { stateStore, updateCodeStore } from '$lib/util/state';
-  import FolderIcon from '~icons/material-symbols/folder-open-rounded';
-  import ChevronRight from '~icons/material-symbols/chevron-right-rounded';
-  import RefreshIcon from '~icons/material-symbols/refresh-rounded';
-  import SettingsIcon from '~icons/material-symbols/settings-outline-rounded';
-  import AddFolderIcon from '~icons/material-symbols/create-new-folder-outline-rounded';
+  import FolderIcon from '~icons/material-symbols/folder-open';
+  import ChevronRight from '~icons/material-symbols/chevron-right';
+  import RefreshIcon from '~icons/material-symbols/refresh';
+  import SettingsIcon from '~icons/material-symbols/settings';
+  import AddFolderIcon from '~icons/material-symbols/create-new-folder';
+  import AddFileIcon from '~icons/material-symbols/note-add';
   import DatabaseIcon from '~icons/material-symbols/database';
   import CloudIcon from '~icons/material-symbols/cloud';
   import LockIcon from '~icons/material-symbols/lock';
@@ -40,10 +55,12 @@
   import AccountIcon from '~icons/material-symbols/account-circle';
   import XIcon from '~icons/material-symbols/close';
   import DocumentIcon from '~icons/material-symbols/description';
-  import FileAddIcon from '~icons/material-symbols/note-add';
   import SaveIcon from '~icons/material-symbols/save';
   import * as Popover from '$/components/ui/popover';
   import { Button } from '$/components/ui/button';
+  import { exportToZip } from '$lib/util/exportWorkspace';
+  import ExportSelectionDialog from '$/components/Layout/ExportSelectionDialog.svelte';
+  import DownloadIcon from '~icons/material-symbols/download';
   import { toast } from 'svelte-sonner';
   import type { Component } from 'svelte';
   import { cn } from '$/utils';
@@ -52,6 +69,7 @@
 
   // Local UI state for popovers (Svelte 5 $state)
   let popoverOpen = $state<Record<string, boolean>>({});
+  let isExportDialogOpen = $state(false);
 
   const iconMap: Record<string, Component> = {
     Account: AccountIcon,
@@ -82,21 +100,93 @@
     expansionStore[path] = !expansionStore[path];
   }
 
+  onMount(async () => {
+    await loadSiteWorkspace();
+  });
+
   async function loadFile(entry: FileEntry) {
     if (entry.kind !== 'file') return;
     try {
       const content = await readFile(entry.handle as FileSystemFileHandle);
       updateCodeStore({ code: content });
+      activeVirtualFileId.set(null); // Clear virtual state
     } catch (err) {
       console.error('Failed to read file', err);
       toast.error('Failed to read file. You might need to re-authorize the folder.');
     }
   }
 
+  async function loadVirtualFile(fileId: string) {
+    const file = siteFiles.find((f) => f.id === fileId);
+    if (file) {
+      activeVirtualFileId.set(file.id);
+      activeFileHandle.set(null); // Clear local state
+      lastSavedCode.set(file.content);
+      updateCodeStore({ code: file.content });
+    }
+  }
+
+  // Drag and Drop Logic
+  let draggedItemId = $state<string | null>(null);
+  let dragHoverItemId = $state<string | null>(null);
+
+  function handleDragStart(e: DragEvent, id: string) {
+    draggedItemId = id;
+    if (e.dataTransfer) {
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', id);
+    }
+  }
+
+  function handleDragOver(e: DragEvent, targetId: string) {
+    e.preventDefault();
+    if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+    if (draggedItemId !== targetId) {
+      dragHoverItemId = targetId;
+    }
+  }
+
+  async function handleDrop(e: DragEvent, targetId: string) {
+    e.preventDefault();
+    const id = draggedItemId;
+    draggedItemId = null;
+    dragHoverItemId = null;
+
+    if (!id || id === targetId) return;
+
+    const targetItem = siteFiles.find((f) => f.id === targetId);
+    if (targetItem && targetItem.isFolder) {
+      // Move into folder
+      await moveVirtualItem(id, targetId);
+    } else {
+      // Move to same level as target
+      const targetParent = targetItem ? targetItem.parentPath : 'root';
+      const order = targetItem ? targetItem.order : siteFiles.length;
+      await moveVirtualItem(id, targetParent, order);
+    }
+  }
+
+  function handleDragLeave() {
+    dragHoverItemId = null;
+  }
+
   async function handleRefresh() {
     await refreshDirectory();
     toast.success('Explorer refreshed');
   }
+
+  // Virtual Site Tree Logic
+  const siteTree = $derived.by(() => {
+    const map: Record<string, any> = { root: { children: [] } };
+    siteFiles.forEach((file) => {
+      map[file.id] = { ...file, children: [] };
+    });
+    siteFiles.forEach((file) => {
+      const parent = map[file.parentPath] || map['root'];
+      parent.children.push(map[file.id]);
+    });
+    return map['root'].children;
+  });
 
   async function handleManualSave() {
     const code = $stateStore.code;
@@ -134,63 +224,230 @@
   }
 </script>
 
-<div
-  class="flex h-full flex-row border-r border-border bg-card text-card-foreground shadow-inner dark:bg-card">
-  <div class="flex min-w-0 flex-1 flex-col">
-    <div class="flex items-center justify-between border-b border-border p-3">
-      <div class="flex items-center gap-2">
-        <FolderIcon class="size-5 text-primary" />
-        <h3 class="text-sm font-bold tracking-wider text-muted-foreground uppercase">Explorer</h3>
+<div class="flex h-full w-full flex-col bg-card">
+  <Resizable.PaneGroup direction="vertical">
+    <!-- SITE FILES (CLOUD) -->
+    <Resizable.Pane defaultSize={40} minSize={20}>
+      <div class="flex h-full flex-col border-b">
+        <div class="flex items-center justify-between border-b bg-muted/30 p-2">
+          <div class="flex items-center gap-1.5 px-1">
+            <CloudIcon class="size-4 text-accent" />
+            <h3 class="text-[10px] font-bold tracking-[0.2em] text-muted-foreground uppercase">
+              Cloud Workspace
+            </h3>
+          </div>
+          <div class="flex gap-0.5">
+            <Button
+              variant="ghost"
+              size="icon"
+              class="size-6"
+              onclick={() => createVirtualFolder('New Folder')}
+              title="New Folder">
+              <AddFolderIcon class="size-3.5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              class="size-6"
+              onclick={() => createVirtualFile('Untitled Diagram', 'flowchart TD\n  Start --> Stop')}
+              title="New Diagram">
+              <AddFileIcon class="size-3.5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              class="size-6"
+              onclick={() => (isExportDialogOpen = true)}
+              title="Export Cloud Workspace">
+              <DownloadIcon class="size-3.5" />
+            </Button>
+          </div>
+        </div>
+        <div class="flex-1 overflow-y-auto p-1">
+          {#if siteTree.length === 0}
+            <div class="flex h-32 flex-col items-center justify-center text-center p-4">
+              <p class="text-[10px] text-muted-foreground italic">No cloud diagrams yet.</p>
+            </div>
+          {:else}
+            <div class="flex flex-col gap-0.5">
+              {#each siteTree as item (item.id)}
+                {@render virtualItem(item, 0)}
+              {/each}
+            </div>
+          {/if}
+        </div>
       </div>
-      <div class="flex gap-1">
-        <Button
-          variant="ghost"
-          size="icon"
-          class="size-7"
-          disabled={!$activeFileHandle || $saveStatus === 'saving'}
-          onclick={handleManualSave}
-          title="Save Active File">
-          <SaveIcon class="size-4" />
-        </Button>
-        <Button variant="ghost" size="icon" class="size-7" onclick={openFiles} title="Open File(s)">
-          <FileAddIcon class="size-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          class="size-7"
-          onclick={openDirectory}
-          title="Add Folder">
-          <AddFolderIcon class="size-4" />
-        </Button>
-        <Button variant="ghost" size="icon" class="size-7" onclick={handleRefresh} title="Refresh">
-          <RefreshIcon class="size-4" />
-        </Button>
-      </div>
-    </div>
+    </Resizable.Pane>
 
-    <div class="flex-1 overflow-y-auto p-2">
-      <div class="flex flex-col gap-1">
-        {#each $fileList as entry (entry.path)}
-          {@render fileItem(entry, 0)}
-        {/each}
-        {#if $fileList.length === 0}
-          <div class="px-4 py-8 text-center text-sm text-muted-foreground">
-            <p class="mb-4">No folders or files open.</p>
-            <div class="flex flex-col gap-2">
-              <Button variant="outline" size="sm" class="w-full" onclick={openDirectory}>
+    <Resizable.Handle />
+
+    <!-- PC FILES -->
+    <Resizable.Pane defaultSize={60} minSize={20}>
+      <div class="flex h-full flex-col">
+        <div class="flex items-center justify-between border-b bg-muted/30 p-2">
+          <div class="flex items-center gap-1.5 px-1">
+            <FolderIcon class="size-4 text-primary" />
+            <h3 class="text-[10px] font-bold tracking-[0.2em] text-muted-foreground uppercase">
+              Your PC
+            </h3>
+          </div>
+          <div class="flex gap-0.5">
+            <Button
+              variant="ghost"
+              size="icon"
+              class="size-6"
+              onclick={handleRefresh}
+              title="Refresh Explorer">
+              <RefreshIcon class="size-3.5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              class="size-6"
+              onclick={openDirectory}
+              title="Open Folder">
+              <AddFolderIcon class="size-3.5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              class="size-6"
+              onclick={openFiles}
+              title="Open File(s)">
+              <AddFileIcon class="size-3.5" />
+            </Button>
+          </div>
+        </div>
+        <div class="flex-1 overflow-y-auto p-1 text-card-foreground">
+          {#if $fileList.length === 0}
+            <div class="flex h-32 flex-col items-center justify-center gap-4 text-center p-4">
+              <div class="opacity-40">
+                <FolderIcon class="mx-auto size-8 mb-2" />
+                <p class="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">
+                  Not Linked
+                </p>
+              </div>
+              <Button variant="outline" size="sm" class="h-8 text-[10px] uppercase font-bold" onclick={openDirectory}>
                 Open Folder
               </Button>
-              <Button variant="outline" size="sm" class="w-full" onclick={openFiles}>
-                Open File(s)
-              </Button>
             </div>
+          {:else}
+            <div class="flex flex-col gap-0.5">
+              {#each $fileList as entry (entry.path)}
+                {@render fileItem(entry, 0)}
+              {/each}
+            </div>
+          {/if}
+        </div>
+      </div>
+    </Resizable.Pane>
+  </Resizable.PaneGroup>
+
+  <ExportSelectionDialog open={isExportDialogOpen} onOpenChange={(v) => (isExportDialogOpen = v)} />
+</div>
+
+{#snippet virtualItem(item: any, depth: number)}
+  <div class="flex flex-col">
+    <div
+      draggable="true"
+      ondragstart={(e) => handleDragStart(e, item.id)}
+      ondragover={(e) => handleDragOver(e, item.id)}
+      ondrop={(e) => handleDrop(e, item.id)}
+      ondragleave={handleDragLeave}
+      class={cn(
+        'group flex w-full items-center gap-2 rounded px-2 transition-colors hover:bg-muted/50',
+        $activeVirtualFileId === item.id && 'bg-accent/15 ring-1 ring-accent/30',
+        dragHoverItemId === item.id && 'bg-accent/30 outline-dashed outline-1 outline-accent'
+      )}
+      style="padding-left: {depth * 12 + 8}px">
+      <button
+        class="flex flex-1 items-center gap-2 overflow-hidden py-1.5"
+        onclick={() => (item.isFolder ? toggleExpand(item.id) : loadVirtualFile(item.id))}>
+        {#if item.isFolder}
+          <span
+            class="text-muted-foreground"
+            class:rotate-90={expansionStore[item.id]}>
+            <ChevronRight class="size-3.5" />
+          </span>
+          <FolderIcon class="size-3.5 shrink-0 text-accent opacity-80" />
+        {:else}
+          <div class="size-3.5 shrink-0" style="margin-left: 17.5px">
+            <DocumentIcon class="size-3.5 text-accent opacity-60" />
           </div>
         {/if}
-      </div>
+        <span class="truncate text-xs font-semibold">{item.name}</span>
+      </button>
+
+      {#if isMobile}
+        <Popover.Root>
+          <Popover.Trigger>
+            <Button variant="ghost" size="icon" class="size-7">
+              <MoreIcon class="size-4" />
+            </Button>
+          </Popover.Trigger>
+          <Popover.Content class="w-40 p-2" side="right" align="start">
+            <div class="flex flex-col gap-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                class="justify-start gap-2"
+                onclick={() => {
+                  const newName = prompt('New name:', item.name);
+                  if (newName) {
+                    item.name = newName;
+                    updateVirtualItem(item);
+                  }
+                }}>
+                <SettingsIcon class="size-4" />
+                Rename
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                class="justify-start gap-2 text-destructive hover:text-destructive"
+                onclick={() => deleteVirtualItem(item.id)}>
+                <XIcon class="size-4" />
+                Delete
+              </Button>
+            </div>
+          </Popover.Content>
+        </Popover.Root>
+      {:else}
+        <div class="flex items-center opacity-0 group-hover:opacity-100">
+          <Button
+            variant="ghost"
+            size="icon"
+            class="size-6"
+            onclick={() => {
+              const newName = prompt('New name:', item.name);
+              if (newName) {
+                item.name = newName;
+                updateVirtualItem(item);
+              }
+            }}
+            title="Rename">
+            <SettingsIcon class="size-3" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            class="size-6 hover:text-destructive"
+            onclick={() => deleteVirtualItem(item.id)}
+            title="Delete">
+            <XIcon class="size-3" />
+          </Button>
+        </div>
+      {/if}
     </div>
+    {#if item.isFolder && expansionStore[item.id] && item.children}
+      <div class="flex flex-col">
+        {#each item.children as child (child.id)}
+          {@render virtualItem(child, depth + 1)}
+        {/each}
+      </div>
+    {/if}
   </div>
-</div>
+{/snippet}
 
 {#snippet fileItem(entry: FileEntry, depth: number)}
   <div class="flex flex-col">
@@ -222,7 +479,7 @@
             size="icon"
             class={cn(
               'size-6 opacity-0 group-hover:opacity-100',
-              (entry.name.includes('re-authorize') || entry.name.includes('Error')) && 'opacity-100'
+              (isMobile || entry.name.includes('re-authorize') || entry.name.includes('Error')) && 'opacity-100'
             )}
             onclick={(e) => {
               e.stopPropagation();
@@ -244,7 +501,8 @@
       <div
         class={cn(
           'group flex w-full items-center gap-2 rounded px-2 transition-colors hover:bg-muted/50',
-          isMobile ? 'py-1.5' : 'py-0.5'
+          isMobile ? 'py-1.5' : 'py-0.5',
+          $activeFileHandle === entry.handle && 'bg-accent/15 ring-1 ring-accent/30'
         )}
         style="padding-left: {depth * 12 + 24}px">
         <button class="flex min-w-0 flex-1 items-center gap-2" onclick={() => loadFile(entry)}>
@@ -264,7 +522,10 @@
           <Button
             variant="ghost"
             size="icon"
-            class="size-6 opacity-0 group-hover:opacity-100"
+            class={cn(
+              "size-6 opacity-0 group-hover:opacity-100",
+              isMobile && "opacity-100"
+            )}
             onclick={(e) => {
               e.stopPropagation();
               removeFile(entry.path);
@@ -274,7 +535,10 @@
           </Button>
         {/if}
 
-        <div class="flex items-center gap-0 opacity-0 group-hover:opacity-100">
+        <div class={cn(
+          "flex items-center gap-0 opacity-0 group-hover:opacity-100",
+          isMobile && "opacity-100"
+        )}>
           <Popover.Root
             open={popoverOpen[entry.path] || false}
             onOpenChange={(v) => (popoverOpen[entry.path] = v)}>

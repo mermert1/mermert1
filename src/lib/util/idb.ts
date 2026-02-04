@@ -2,12 +2,16 @@ import { openDB, type IDBPDatabase } from 'idb';
 
 const DB_NAME = 'mermert-handles';
 const STORE_NAME = 'roots';
+const SITE_STORE_NAME = 'site-files';
 
 export async function getDB(): Promise<IDBPDatabase> {
-    return openDB(DB_NAME, 1, {
+    return openDB(DB_NAME, 2, {
         upgrade(db) {
             if (!db.objectStoreNames.contains(STORE_NAME)) {
                 db.createObjectStore(STORE_NAME);
+            }
+            if (!db.objectStoreNames.contains(SITE_STORE_NAME)) {
+                db.createObjectStore(SITE_STORE_NAME);
             }
         },
     });
@@ -36,4 +40,30 @@ export async function removeHandle(name: string) {
 export async function clearHandles() {
     const db = await getDB();
     await db.clear(STORE_NAME);
+}
+
+// Site Files (Virtual)
+export interface VirtualFile {
+    id: string;
+    name: string;
+    content: string;
+    parentPath: string; // "root" or a folder path
+    isFolder: boolean;
+    order: number;
+}
+
+export async function saveSiteFile(file: VirtualFile) {
+    const db = await getDB();
+    await db.put(SITE_STORE_NAME, file, file.id);
+}
+
+export async function getSiteFiles(): Promise<VirtualFile[]> {
+    const db = await getDB();
+    const files = await db.getAll(SITE_STORE_NAME);
+    return files as VirtualFile[];
+}
+
+export async function removeSiteFile(id: string) {
+    const db = await getDB();
+    await db.delete(SITE_STORE_NAME, id);
 }

@@ -15,6 +15,7 @@ export const rootHandles = writable<Record<string, FileSystemDirectoryHandle>>({
 export const individualFiles = writable<FileEntry[]>([]);
 export const fileList = writable<FileEntry[]>([]);
 export const activeFileHandle = writable<FileSystemFileHandle | null>(null);
+export const activeVirtualFileId = writable<string | null>(null);
 export type SaveStatus = 'saved' | 'saving' | 'unsaved' | 'blocked';
 export const saveStatus = writable<SaveStatus>('saved');
 export const lastSavedCode = writable<string>('');
@@ -273,6 +274,21 @@ export async function writeFile(fileHandle: FileSystemFileHandle, content: strin
 
 export async function saveActiveFile(content: string): Promise<boolean> {
   const handle = get(activeFileHandle);
+  const virtualId = get(activeVirtualFileId);
+
+  if (virtualId) {
+    const { siteFiles, updateVirtualItem } = await import('./siteWorkspace.svelte');
+    const file = siteFiles.find((f) => f.id === virtualId);
+    if (file) {
+      saveStatus.set('saving');
+      file.content = content;
+      await updateVirtualItem(file);
+      lastSavedCode.set(content);
+      saveStatus.set('saved');
+      return true;
+    }
+  }
+
   if (!handle) return false;
 
   try {

@@ -99,6 +99,7 @@
 
   import {
     activeFileHandle,
+    activeVirtualFileId,
     lastSavedCode,
     saveActiveFile,
     saveStatus,
@@ -107,11 +108,20 @@
   import { debounce } from 'lodash-es';
 
   // State
-  const isDirty = $derived(!!$activeFileHandle && $stateStore.code !== $lastSavedCode);
+  const isDirty = $derived(
+    (!!$activeFileHandle || !!$activeVirtualFileId) && $stateStore.code !== $lastSavedCode
+  );
 
   // Autosave Logic
   const autosave = debounce(async (code: string) => {
     const handle = $activeFileHandle;
+    const virtualId = $activeVirtualFileId;
+
+    if (virtualId) {
+      await saveActiveFile(code);
+      return;
+    }
+
     if (handle && code !== $lastSavedCode) {
       try {
         // Only attempt if we likely have permission
@@ -129,7 +139,7 @@
   }, 60000);
 
   $effect(() => {
-    if ($activeFileHandle && isDirty) {
+    if ((!!$activeFileHandle || !!$activeVirtualFileId) && isDirty) {
       autosave($stateStore.code);
     }
   });
@@ -177,7 +187,7 @@
                         ? 'Credits'
                         : 'Settings'}>
               {#if activeSideBarView === 'explorer' && !isMobile}
-                <div class="p-2">
+                <div class="h-full p-2">
                   <FileExplorer {isMobile} />
                 </div>
               {:else if activeSideBarView === 'export'}

@@ -11,16 +11,15 @@
   interface Props {
     activeView: string;
     onViewChange: (view: string) => void;
-    isMobile?: boolean;
   }
 
-  let { activeView, onViewChange, isMobile = false }: Props = $props();
+  let { activeView, onViewChange }: Props = $props();
 
-  const primaryActions = $derived([
-    ...(!isMobile ? [{ id: 'explorer', icon: FolderIcon, label: 'Explorer' }] : []),
+  const primaryActions = [
+    { id: 'explorer', icon: FolderIcon, label: 'Explorer' },
     { id: 'templates', icon: TemplateIcon, label: 'Templates' },
     { id: 'export', icon: ExportIcon, label: 'Export' }
-  ]);
+  ];
 
   const secondaryActions = [
     { id: 'history', icon: HistoryIcon, label: 'History' },
