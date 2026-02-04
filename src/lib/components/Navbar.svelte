@@ -60,8 +60,8 @@
     <Button
       variant="ghost"
       size="icon"
-      onclick={() => ($explorerVisible = !$explorerVisible)}
-      title={$explorerVisible ? 'Hide Explorer' : 'Show Explorer'}>
+      onclick={() => (explorerVisible.visible = !explorerVisible.visible)}
+      title={explorerVisible.visible ? 'Hide Explorer' : 'Show Explorer'}>
       <SideNavigationIcon />
     </Button>
     <DropdownNavMenu icon={GithubIcon} links={githubLinks} />
