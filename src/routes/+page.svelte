@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { base } from '$app/paths';
   import { Button } from '$/components/ui/button';
   import { onMount } from 'svelte';
 
@@ -42,7 +43,7 @@
 
     <div class="mt-8 flex flex-col gap-4 sm:flex-row">
       <Button
-        href="/edit"
+        href="{base}/edit/"
         size="lg"
         class="rounded-full px-8 py-6 text-lg shadow-lg transition-all hover:scale-105 hover:shadow-xl">
         Go to Editor
