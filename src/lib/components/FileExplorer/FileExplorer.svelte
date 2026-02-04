@@ -8,6 +8,7 @@
     removeRoot,
     removeFile,
     saveActiveFile,
+    saveStatus,
     activeFileHandle,
     type FileEntry
   } from '$lib/util/fileSystem';
@@ -104,7 +105,7 @@
           variant="ghost"
           size="icon"
           class="size-7"
-          disabled={!$activeFileHandle}
+          disabled={!$activeFileHandle || $saveStatus === 'saving'}
           onclick={handleManualSave}
           title="Save Active File">
           <SaveIcon class="size-4" />

@@ -15,6 +15,8 @@ export const rootHandles = writable<Record<string, FileSystemDirectoryHandle>>({
 export const individualFiles = writable<FileEntry[]>([]);
 export const fileList = writable<FileEntry[]>([]);
 export const activeFileHandle = writable<FileSystemFileHandle | null>(null);
+export type SaveStatus = 'saved' | 'saving' | 'unsaved' | 'blocked';
+export const saveStatus = writable<SaveStatus>('saved');
 
 export async function openDirectory(): Promise<void> {
   if (!('showDirectoryPicker' in window)) {
@@ -122,30 +124,42 @@ export async function refreshDirectory(): Promise<void> {
   const allEntries: FileEntry[] = [];
 
   for (const [name, handle] of Object.entries(roots)) {
-    // Check permission - on load it might be 'prompt'
-    const permission = await handle.queryPermission({ mode: 'readwrite' });
-    console.log(`Permission for ${name}:`, permission);
-    if (permission === 'granted') {
-      const entries = await readDirectory(handle, name, name);
-      console.log(`Entries found for ${name}:`, entries.length);
-      allEntries.push({
-        children: entries,
-        handle,
-        kind: 'directory',
-        name,
-        path: name,
-        rootName: name
-      });
-    } else {
-      // We'll show a "needs permission" item in the UI later
-      allEntries.push({
-        children: [],
-        handle,
-        kind: 'directory',
-        name: `${name} (Click to re-authorize)`,
-        path: name,
-        rootName: name
-      });
+    try {
+      // Permission check - also serves as a check if the handle is still valid
+      const permission = await handle.queryPermission({ mode: 'readwrite' });
+      console.log(`Permission for ${name}:`, permission);
+      if (permission === 'granted') {
+        const entries = await readDirectory(handle, name, name);
+        console.log(`Entries found for ${name}:`, entries.length);
+        allEntries.push({
+          children: entries,
+          handle,
+          kind: 'directory',
+          name,
+          path: name,
+          rootName: name
+        });
+      } else {
+        // We'll show a "needs permission" item in the UI later
+        allEntries.push({
+          children: [],
+          handle,
+          kind: 'directory',
+          name: `${name} (Click to re-authorize)`,
+          path: name,
+          rootName: name
+        });
+      }
+    } catch (error) {
+      console.error(`Error accessing root ${name}:`, error);
+      // If the entry is gone, remove it from roots
+      if (
+        (error as Error).name === 'NotFoundError' ||
+        (error as Error).message.includes('not found')
+      ) {
+        console.warn(`Root ${name} not found, removing from explorer.`);
+        removeRoot(name);
+      }
     }
   }
   fileList.set([...allEntries, ...get(individualFiles)]);
@@ -201,20 +215,27 @@ export async function readFile(fileHandle: FileSystemFileHandle): Promise<string
 
 export async function writeFile(fileHandle: FileSystemFileHandle, content: string): Promise<void> {
   try {
+    console.log(`Writing to ${fileHandle.name}, content length: ${content.length}`);
+    console.log(`Snippet: ${content.substring(0, 50)}...`);
+
     // Permission check - queryPermission doesn't require user gesture
     // @ts-expect-error - File System API types are experimental
     const permission = await fileHandle.queryPermission({ mode: 'readwrite' });
     if (permission !== 'granted') {
       console.warn('Write permission not granted for:', fileHandle.name);
+      saveStatus.set('blocked');
       throw new Error('Permission denied');
     }
 
+    saveStatus.set('saving');
     const writable = await fileHandle.createWritable();
     await writable.write(content);
     await writable.close();
+    saveStatus.set('saved');
     console.log('Successfully wrote to:', fileHandle.name);
   } catch (error) {
     console.error('Error writing file:', error);
+    saveStatus.set('unsaved');
     throw error;
   }
 }

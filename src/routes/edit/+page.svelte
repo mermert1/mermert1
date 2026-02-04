@@ -72,7 +72,7 @@
     const saved = await saveActiveFile(code);
     if (saved) {
       toast.success('Diagram saved successfully');
-      saveStatus = 'saved';
+      saveStatus.set('saved');
       return;
     }
 
@@ -80,7 +80,7 @@
     try {
       if (await saveFile(code)) {
         toast.success('Diagram saved successfully');
-        saveStatus = 'saved';
+        saveStatus.set('saved');
       }
     } catch {
       // Error handled in saveFile
@@ -89,37 +89,32 @@
 
   // Editor resize logic removed
 
-  import { activeFileHandle, saveActiveFile, writeFile } from '$/util/fileSystem';
+  import { activeFileHandle, saveActiveFile, saveStatus, writeFile } from '$/util/fileSystem';
   import { debounce } from 'lodash-es';
 
   // Autosave Logic
-  type SaveStatus = 'saved' | 'saving' | 'unsaved' | 'blocked';
-  let saveStatus = $state<SaveStatus>('saved');
-
   const autosave = debounce(async (code: string) => {
     const handle = $activeFileHandle;
     if (handle) {
       try {
         // Only attempt if we likely have permission
+        // @ts-expect-error - File System API types are experimental
         const permission = await handle.queryPermission({ mode: 'readwrite' });
         if (permission === 'granted') {
-          saveStatus = 'saving';
           await writeFile(handle, code);
-          saveStatus = 'saved';
         } else {
-          saveStatus = 'blocked';
+          saveStatus.set('blocked');
         }
       } catch (error) {
         console.error('Autosave failed:', error);
-        saveStatus = 'unsaved';
       }
     }
   }, 60000);
 
   $effect(() => {
     if ($activeFileHandle && $stateStore.code) {
-      if (saveStatus === 'saved') {
-        saveStatus = 'unsaved';
+      if ($saveStatus === 'saved') {
+        saveStatus.set('unsaved');
       }
       autosave($stateStore.code);
     }
@@ -198,11 +193,11 @@
               <div class="flex items-center gap-2">
                 <Share />
                 <div class="flex items-center gap-2 px-2">
-                  {#if saveStatus === 'saving'}
+                  {#if $saveStatus === 'saving'}
                     <span class="animate-pulse text-xs text-muted-foreground">Saving...</span>
-                  {:else if saveStatus === 'unsaved'}
+                  {:else if $saveStatus === 'unsaved'}
                     <span class="text-xs text-amber-500">Unsaved</span>
-                  {:else if saveStatus === 'blocked'}
+                  {:else if $saveStatus === 'blocked'}
                     <span
                       class="text-xs text-rose-500"
                       title="Click Save button to grant permission">Permission Needed</span>
