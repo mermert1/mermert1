@@ -8,12 +8,12 @@
   import dayjsRelativeTime from 'dayjs/plugin/relativeTime';
   import { onMount } from 'svelte';
   import { get } from 'svelte/store';
-  import BookmarkIcon from '~icons/material-symbols/bookmark-outline-rounded';
-  import TrashAltIcon from '~icons/material-symbols/delete-outline-rounded';
-  import DownloadIcon from '~icons/material-symbols/download-rounded';
-  import SaveIcon from '~icons/material-symbols/save-outline-rounded';
-  import UndoIcon from '~icons/material-symbols/settings-backup-restore-rounded';
-  import UploadIcon from '~icons/material-symbols/upload-rounded';
+  import BookmarkIcon from '~icons/material-symbols/bookmark';
+  import TrashAltIcon from '~icons/material-symbols/delete';
+  import DownloadIcon from '~icons/material-symbols/download';
+  import SaveIcon from '~icons/material-symbols/save';
+  import UndoIcon from '~icons/material-symbols/settings-backup-restore';
+  import UploadIcon from '~icons/material-symbols/upload';
   import HistoryIcon from '~icons/mdi/clock-outline';
   import GitAltIcon from '~icons/mdi/git';
   import { Button } from '../ui/button';

@@ -21,12 +21,27 @@
   import AddFolderIcon from '~icons/material-symbols/create-new-folder-outline-rounded';
   import DatabaseIcon from '~icons/material-symbols/database';
   import CloudIcon from '~icons/material-symbols/cloud';
-  import LockIcon from '~icons/material-symbols/lock-outline';
-  import ProcessIcon from '~icons/material-symbols/settings-backup-restore-rounded';
-  import XIcon from '~icons/material-symbols/close-rounded';
-  import DocumentIcon from '~icons/material-symbols/description-outline-rounded';
-  import FileAddIcon from '~icons/material-symbols/note-add-outline-rounded';
-  import SaveIcon from '~icons/material-symbols/save-outline-rounded';
+  import LockIcon from '~icons/material-symbols/lock';
+  import ProcessIcon from '~icons/material-symbols/settings-backup-restore';
+  import BugIcon from '~icons/material-symbols/bug-report';
+  import StarIcon from '~icons/material-symbols/star';
+  import HeartIcon from '~icons/material-symbols/favorite';
+  import LibraryIcon from '~icons/material-symbols/library-books';
+  import HistoryIcon from '~icons/material-symbols/history';
+  import TerminalIcon from '~icons/material-symbols/terminal';
+  import CheckIcon from '~icons/material-symbols/check-circle';
+  import WarningIcon from '~icons/material-symbols/warning';
+  import RocketIcon from '~icons/material-symbols/rocket-launch';
+  import WorkIcon from '~icons/material-symbols/business-center';
+  import HomeIcon from '~icons/material-symbols/home';
+  import SchoolIcon from '~icons/material-symbols/school';
+  import MedicalIcon from '~icons/material-symbols/medical-services';
+  import ConstructionIcon from '~icons/material-symbols/construction';
+  import AccountIcon from '~icons/material-symbols/account-circle';
+  import XIcon from '~icons/material-symbols/close';
+  import DocumentIcon from '~icons/material-symbols/description';
+  import FileAddIcon from '~icons/material-symbols/note-add';
+  import SaveIcon from '~icons/material-symbols/save';
   import * as Popover from '$/components/ui/popover';
   import { Button } from '$/components/ui/button';
   import { toast } from 'svelte-sonner';
@@ -39,11 +54,26 @@
   let popoverOpen = $state<Record<string, boolean>>({});
 
   const iconMap: Record<string, Component> = {
+    Account: AccountIcon,
+    Bug: BugIcon,
+    Check: CheckIcon,
     Cloud: CloudIcon,
+    Construction: ConstructionIcon,
     Database: DatabaseIcon,
     Default: DocumentIcon,
+    Heart: HeartIcon,
+    History: HistoryIcon,
+    Home: HomeIcon,
+    Library: LibraryIcon,
     Lock: LockIcon,
-    Process: ProcessIcon
+    Medical: MedicalIcon,
+    Process: ProcessIcon,
+    Rocket: RocketIcon,
+    School: SchoolIcon,
+    Star: StarIcon,
+    Terminal: TerminalIcon,
+    Warning: WarningIcon,
+    Work: WorkIcon
   };
 
   const iconOptions = Object.entries(iconMap).map(([name, icon]) => ({ name, icon }));

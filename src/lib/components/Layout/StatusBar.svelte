@@ -10,8 +10,8 @@
   import { TID } from '$/constants';
   import { defaultState, inputStateStore } from '$/util/state';
   import { mode, setMode } from 'mode-watcher';
-  import RoughIcon from '~icons/material-symbols/draw-outline-rounded';
-  import BackgroundIcon from '~icons/material-symbols/grid-4x4-rounded';
+  import RoughIcon from '~icons/material-symbols/draw';
+  import BackgroundIcon from '~icons/material-symbols/grid-4x4';
 
   if ($inputStateStore.grid === undefined) {
     // Handle cases where old states were saved without grid option

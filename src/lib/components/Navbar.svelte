@@ -16,6 +16,7 @@
   import { explorerVisible } from '$/util/fileMetadata.svelte';
   import DropdownNavMenu from './DropdownNavMenu.svelte';
   import SideNavigationIcon from '~icons/material-symbols/menu-open-rounded';
+  import GithubIcon from '~icons/mdi/github';
 
   interface Props {
     mobileToggle?: Snippet;

@@ -3,7 +3,6 @@
   import Editor from '$/components/Editor.svelte';
   import FileExplorer from '$/components/FileExplorer/FileExplorer.svelte';
   import History from '$/components/History/History.svelte';
-  import IconPicker from '$/components/IconPicker/IconPicker.svelte';
   import ActivityBar from '$/components/Layout/ActivityBar.svelte';
   import ExportPane from '$/components/Layout/ExportPane.svelte';
   import MobileLayout from '$/components/Layout/MobileLayout.svelte';
@@ -17,7 +16,7 @@
   import View from '$/components/View.svelte';
   import { Button } from '$/components/ui/button';
   import * as Resizable from '$/components/ui/resizable';
-  import type { EditorMode, Tab } from '$/types';
+  import type { Tab } from '$/types';
   import { loadRoots, saveFile } from '$/util/fileSystem';
   import { PanZoomState } from '$/util/panZoom';
   import { stateStore, updateCodeStore } from '$/util/state';
@@ -26,15 +25,18 @@
   import { onMount } from 'svelte';
   import { toast } from 'svelte-sonner';
   import CodeIcon from '~icons/custom/code';
-  import SaveIcon from '~icons/material-symbols/save-outline-rounded';
-  import GearIcon from '~icons/material-symbols/settings-outline-rounded';
+  import SaveIcon from '~icons/material-symbols/save';
+  import GearIcon from '~icons/material-symbols/settings';
   import Card from '$/components/Card/Card.svelte';
+
+  import HelpIcon from '~icons/material-symbols/help';
+  import Tutorial from '$/components/Layout/Tutorial.svelte';
 
   const panZoomState = new PanZoomState();
 
   const tabSelectHandler = (tab: Tab) => {
-    const editorMode: EditorMode = tab.id === 'code' ? 'code' : 'config';
-    updateCodeStore({ editorMode });
+    // @ts-expect-error - editorMode is a subset of tab.id
+    updateCodeStore({ editorMode: tab.id });
   };
 
   const editorTabs: Tab[] = [
@@ -47,6 +49,11 @@
       icon: GearIcon,
       id: 'config',
       title: 'Config'
+    },
+    {
+      icon: HelpIcon,
+      id: 'tutorial',
+      title: 'Learning'
     }
   ];
 
@@ -232,9 +239,12 @@
                   class="h-full rounded-none border-0">
                   {#snippet actions()}
                     <DiagramDocButton />
-                    <IconPicker />
                   {/snippet}
-                  <Editor {isMobile} />
+                  {#if $stateStore.editorMode === 'tutorial'}
+                    <Tutorial />
+                  {:else}
+                    <Editor {isMobile} />
+                  {/if}
                 </Card>
               </div>
 

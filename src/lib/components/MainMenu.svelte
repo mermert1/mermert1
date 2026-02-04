@@ -6,10 +6,10 @@
   import { cn } from '$/utils';
   import { mode, setMode } from 'mode-watcher';
   import type { Component, Snippet } from 'svelte';
-  import AddIcon from '~icons/material-symbols/add-rounded';
-  import DuplicateIcon from '~icons/material-symbols/content-copy-outline-rounded';
+  import AddIcon from '~icons/material-symbols/add';
+  import DuplicateIcon from '~icons/material-symbols/content-copy';
   import ContrastIcon from '~icons/material-symbols/contrast';
-  import PlaygroundIcon from '~icons/material-symbols/shape-line-outline';
+  import PlaygroundIcon from '~icons/material-symbols/shape-line';
 
   interface MenuItem {
     label: string;

@@ -1,10 +1,10 @@
 <script lang="ts">
   import { Button } from '$/components/ui/button';
   import { cn } from '$/utils';
-  import FolderIcon from '~icons/material-symbols/folder-open-rounded';
-  import ExportIcon from '~icons/material-symbols/download-rounded';
-  import TemplateIcon from '~icons/material-symbols/account-tree-outline-rounded';
-  import SettingsIcon from '~icons/material-symbols/settings-outline-rounded';
+  import FolderIcon from '~icons/material-symbols/folder-open';
+  import ExportIcon from '~icons/material-symbols/download';
+  import TemplateIcon from '~icons/material-symbols/account-tree';
+  import SettingsIcon from '~icons/material-symbols/settings';
   import HistoryIcon from '~icons/material-symbols/history';
 
   interface Props {
