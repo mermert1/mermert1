@@ -7,10 +7,12 @@
     openFiles,
     removeRoot,
     removeFile,
+    saveActiveFile,
+    activeFileHandle,
     type FileEntry
   } from '$lib/util/fileSystem';
   import { fileMetadataStore, expansionStore } from '$lib/util/fileMetadata';
-  import { updateCodeStore } from '$lib/util/state';
+  import { stateStore, updateCodeStore } from '$lib/util/state';
   import FolderIcon from '~icons/material-symbols/folder-open-rounded';
   import CodeIcon from '~icons/material-symbols/code-rounded';
   import ChevronRight from '~icons/material-symbols/chevron-right-rounded';
@@ -24,6 +26,7 @@
   import XIcon from '~icons/material-symbols/close-rounded';
   import DocumentIcon from '~icons/material-symbols/description-outline-rounded';
   import FileAddIcon from '~icons/material-symbols/note-add-outline-rounded';
+  import SaveIcon from '~icons/material-symbols/save-outline-rounded';
   import * as Popover from '$/components/ui/popover';
   import { Button } from '$/components/ui/button';
   import { toast } from 'svelte-sonner';
@@ -63,6 +66,14 @@
     toast.success('Explorer refreshed');
   }
 
+  async function handleManualSave() {
+    const code = $stateStore.code;
+    const saved = await saveActiveFile(code);
+    if (saved) {
+      toast.success('Saved to file');
+    }
+  }
+
   function stripExtension(name: string) {
     return name.replace(/\.(mmd|mermaid|txt|json|dia|md)$/i, '');
   }
@@ -89,6 +100,15 @@
         <h3 class="text-sm font-bold tracking-wider text-muted-foreground uppercase">Explorer</h3>
       </div>
       <div class="flex gap-1">
+        <Button
+          variant="ghost"
+          size="icon"
+          class="size-7"
+          disabled={!$activeFileHandle}
+          onclick={handleManualSave}
+          title="Save Active File">
+          <SaveIcon class="size-4" />
+        </Button>
         <Button variant="ghost" size="icon" class="size-7" onclick={openFiles} title="Open File(s)">
           <FileAddIcon class="size-4" />
         </Button>

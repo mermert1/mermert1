@@ -114,7 +114,7 @@
         saveStatus = 'unsaved';
       }
     }
-  }, 1000);
+  }, 60000);
 
   $effect(() => {
     if ($activeFileHandle && $stateStore.code) {
