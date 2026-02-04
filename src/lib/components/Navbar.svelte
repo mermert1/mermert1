@@ -1,5 +1,5 @@
 <script lang="ts" module>
-  import { logEvent, plausible } from '$lib/util/stats';
+  import { logEvent } from '$lib/util/stats';
   import { version } from 'mermaid/package.json';
 
   void logEvent('version', {
@@ -12,10 +12,7 @@
   import { Button } from '$/components/ui/button';
   import { Separator } from '$/components/ui/separator';
   import type { ComponentProps, Snippet } from 'svelte';
-  import CloseIcon from '~icons/material-symbols/close-rounded';
-  import GithubIcon from '~icons/mdi/github';
-  import { Switch } from '$/components/ui/switch';
-  import { stateStore, updateCodeStore } from '$/util/state';
+  import { stateStore } from '$/util/state';
   import { explorerVisible } from '$/util/fileMetadata';
   import DropdownNavMenu from './DropdownNavMenu.svelte';
   import SideNavigationIcon from '~icons/material-symbols/menu-open-rounded';
@@ -40,15 +37,15 @@
       href: 'https://github.com/mermaid-js/mermaid-cli'
     }
   ];
-
-
 </script>
-
 
 <nav class="z-50 flex p-4 sm:p-6">
   <div class="flex flex-1 items-center gap-2">
     <MainMenu />
-    <img src="https://raw.githubusercontent.com/mermert1/mermert1/refs/heads/main/static/mermert-logo.png" alt="MerMert Logo" class="size-8 rounded-sm" />
+    <img
+      src="https://raw.githubusercontent.com/mermert1/mermert1/refs/heads/main/static/mermert-logo.png"
+      alt="MerMert Logo"
+      class="size-8 rounded-sm" />
     <a href="/" class="whitespace-nowrap text-accent">
       {#if !mobileToggle}
         MerMert
@@ -60,12 +57,11 @@
   <div
     id="menu"
     class="hidden flex-nowrap items-center justify-between gap-3 overflow-hidden md:flex">
-    <Button 
-      variant="ghost" 
-      size="icon" 
-      onclick={() => $explorerVisible = !$explorerVisible} 
-      title={$explorerVisible ? "Hide Explorer" : "Show Explorer"}
-    >
+    <Button
+      variant="ghost"
+      size="icon"
+      onclick={() => ($explorerVisible = !$explorerVisible)}
+      title={$explorerVisible ? 'Hide Explorer' : 'Show Explorer'}>
       <SideNavigationIcon />
     </Button>
     <DropdownNavMenu icon={GithubIcon} links={githubLinks} />

@@ -63,7 +63,7 @@
       <Button
         variant="outline"
         size="sm"
-        class="h-auto w-full justify-start py-2 text-left text-xs whitespace-normal"
+        class="h-auto w-full justify-start py-3 text-left text-xs whitespace-normal"
         onclick={() => loadSampleDiagram(sample)}>
         {sample}
       </Button>

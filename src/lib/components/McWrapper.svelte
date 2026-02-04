@@ -12,7 +12,6 @@
   > = $props();
 
   const mermaidChartDomain = 'mermaid.ai';
-  const isMermaidAiDomain = env.domain === mermaidChartDomain;
 </script>
 
 <ExternalLinkWrapper

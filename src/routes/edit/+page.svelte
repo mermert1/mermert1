@@ -6,6 +6,7 @@
   import IconPicker from '$/components/IconPicker/IconPicker.svelte';
   import ActivityBar from '$/components/Layout/ActivityBar.svelte';
   import ExportPane from '$/components/Layout/ExportPane.svelte';
+  import MobileLayout from '$/components/Layout/MobileLayout.svelte';
   import SideBar from '$/components/Layout/SideBar.svelte';
   import StatusBar from '$/components/Layout/StatusBar.svelte';
   import MainMenu from '$/components/MainMenu.svelte';
@@ -50,7 +51,7 @@
   ];
 
   let width = $state(0);
-  let isMobile = $derived(width < 640);
+  let isMobile = $derived(width < 768);
 
   onMount(async () => {
     await initHandler();
@@ -112,112 +113,118 @@
   // and move title to titlebar. For now, we keep a slim header.
 </script>
 
-<div class="flex h-screen w-screen flex-col overflow-hidden bg-background">
-  <!-- Top Bar / Title Bar (Optional, can be merged into Activity Bar top or kept separate) -->
-  <!-- Using a simplified header for standard app feel -->
+<svelte:window bind:innerWidth={width} />
 
-  <div class="flex flex-1 overflow-hidden">
-    <!-- Activity Bar -->
-    <ActivityBar
-      {activeSideBarView}
-      onViewChange={(view) => {
-        if (view === activeSideBarView && activeSideBarView !== '') {
-          // Optional: collapse logic if desired
-        } else {
-          activeSideBarView = view;
-        }
-      }} />
+{#if isMobile}
+  <MobileLayout {isMobile} />
+{:else}
+  <div class="flex h-screen w-screen flex-col overflow-hidden bg-background">
+    <!-- Top Bar / Title Bar (Optional, can be merged into Activity Bar top or kept separate) -->
+    <!-- Using a simplified header for standard app feel -->
 
-    <!-- Resizable Content Area -->
-    <Resizable.PaneGroup direction="horizontal" class="flex-1 overflow-hidden">
-      {#if activeSideBarView}
-        <Resizable.Pane defaultSize={20} minSize={15} maxSize={40} collapsible={false}>
-          <SideBar
-            title={activeSideBarView === 'explorer'
-              ? 'Explorer'
-              : activeSideBarView === 'export'
-                ? 'Export'
-                : activeSideBarView === 'history'
-                  ? 'History'
-                  : activeSideBarView === 'templates'
-                    ? 'Templates'
-                    : 'Settings'}>
-            {#if activeSideBarView === 'explorer'}
-              <div class="p-2">
-                <FileExplorer {isMobile} />
+    <div class="flex flex-1 overflow-hidden">
+      <!-- Activity Bar -->
+      <ActivityBar
+        activeView={activeSideBarView}
+        onViewChange={(view) => {
+          if (view === activeSideBarView && activeSideBarView !== '') {
+            // Optional: collapse logic if desired
+          } else {
+            activeSideBarView = view;
+          }
+        }} />
+
+      <!-- Resizable Content Area -->
+      <Resizable.PaneGroup direction="horizontal" class="flex-1 overflow-hidden">
+        {#if activeSideBarView}
+          <Resizable.Pane defaultSize={20} minSize={15} maxSize={40} collapsible={false}>
+            <SideBar
+              title={activeSideBarView === 'explorer'
+                ? 'Explorer'
+                : activeSideBarView === 'export'
+                  ? 'Export'
+                  : activeSideBarView === 'history'
+                    ? 'History'
+                    : activeSideBarView === 'templates'
+                      ? 'Templates'
+                      : 'Settings'}>
+              {#if activeSideBarView === 'explorer'}
+                <div class="p-2">
+                  <FileExplorer {isMobile} />
+                </div>
+              {:else if activeSideBarView === 'export'}
+                <ExportPane />
+              {:else if activeSideBarView === 'history'}
+                <div class="h-full overflow-y-auto">
+                  <History />
+                </div>
+              {:else if activeSideBarView === 'templates'}
+                <div class="h-full overflow-y-auto">
+                  <TemplatePane />
+                </div>
+              {:else if activeSideBarView === 'settings'}
+                <Settings />
+              {/if}
+            </SideBar>
+          </Resizable.Pane>
+          <Resizable.Handle />
+        {/if}
+
+        <Resizable.Pane defaultSize={80}>
+          <div class="flex h-full flex-col overflow-hidden">
+            <div class="flex h-10 shrink-0 items-center justify-between border-b px-4">
+              <!-- Breadcrumbs or simple title -->
+              <div class="flex items-center gap-2">
+                <MainMenu />
+                <span class="text-sm font-semibold">Graphi</span>
               </div>
-            {:else if activeSideBarView === 'export'}
-              <ExportPane />
-            {:else if activeSideBarView === 'history'}
-              <div class="h-full overflow-y-auto">
-                <History />
+
+              <div class="flex items-center gap-2">
+                <Share />
+                <div class="flex items-center gap-2 px-2">
+                  {#if saveStatus === 'saving'}
+                    <span class="animate-pulse text-xs text-muted-foreground">Saving...</span>
+                  {:else if saveStatus === 'unsaved'}
+                    <span class="text-xs text-amber-500">Unsaved</span>
+                  {:else}
+                    <span class="text-xs text-muted-foreground">Saved</span>
+                  {/if}
+                </div>
+                <Button variant="ghost" size="icon" onclick={handleSaveDiagram} title="Save">
+                  <SaveIcon class="size-5" />
+                </Button>
               </div>
-            {:else if activeSideBarView === 'templates'}
-              <div class="h-full overflow-y-auto">
-                <TemplatePane />
+            </div>
+
+            <div class="relative flex flex-1 flex-row overflow-hidden">
+              <div class="flex h-full w-1/2 flex-col border-r">
+                <Card
+                  onselect={tabSelectHandler}
+                  isOpen
+                  tabs={editorTabs}
+                  activeTabID={$stateStore.editorMode}
+                  isClosable={false}
+                  class="h-full rounded-none border-0">
+                  {#snippet actions()}
+                    <DiagramDocButton />
+                    <IconPicker />
+                  {/snippet}
+                  <Editor {isMobile} />
+                </Card>
               </div>
-            {:else if activeSideBarView === 'settings'}
-              <Settings />
-            {/if}
-          </SideBar>
+
+              <div class="relative h-full w-1/2 bg-muted/10">
+                <View {panZoomState} shouldShowGrid={$stateStore.grid} />
+                <div class="absolute right-4 bottom-4 flex flex-col gap-2">
+                  <PanZoomToolbar {panZoomState} />
+                </div>
+              </div>
+            </div>
+          </div>
         </Resizable.Pane>
-        <Resizable.Handle />
-      {/if}
+      </Resizable.PaneGroup>
+    </div>
 
-      <Resizable.Pane defaultSize={80}>
-        <div class="flex h-full flex-col overflow-hidden">
-          <div class="flex h-10 shrink-0 items-center justify-between border-b px-4">
-            <!-- Breadcrumbs or simple title -->
-            <div class="flex items-center gap-2">
-              <MainMenu />
-              <span class="text-sm font-semibold">Graphi</span>
-            </div>
-
-            <div class="flex items-center gap-2">
-              <Share />
-              <div class="flex items-center gap-2 px-2">
-                {#if saveStatus === 'saving'}
-                  <span class="animate-pulse text-xs text-muted-foreground">Saving...</span>
-                {:else if saveStatus === 'unsaved'}
-                  <span class="text-xs text-amber-500">Unsaved</span>
-                {:else}
-                  <span class="text-xs text-muted-foreground">Saved</span>
-                {/if}
-              </div>
-              <Button variant="ghost" size="icon" onclick={handleSaveDiagram} title="Save">
-                <SaveIcon class="size-5" />
-              </Button>
-            </div>
-          </div>
-
-          <div class="relative flex flex-1 flex-row overflow-hidden">
-            <div class="flex h-full w-1/2 flex-col border-r">
-              <Card
-                onselect={tabSelectHandler}
-                isOpen
-                tabs={editorTabs}
-                activeTabID={$stateStore.editorMode}
-                isClosable={false}
-                class="h-full rounded-none border-0">
-                {#snippet actions()}
-                  <DiagramDocButton />
-                  <IconPicker />
-                {/snippet}
-                <Editor {isMobile} />
-              </Card>
-            </div>
-
-            <div class="relative h-full w-1/2 bg-muted/10">
-              <View {panZoomState} shouldShowGrid={$stateStore.grid} />
-              <div class="absolute right-4 bottom-4 flex flex-col gap-2">
-                <PanZoomToolbar {panZoomState} />
-              </div>
-            </div>
-          </div>
-        </div>
-      </Resizable.Pane>
-    </Resizable.PaneGroup>
+    <StatusBar />
   </div>
-
-  <StatusBar />
-</div>
+{/if}

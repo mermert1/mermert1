@@ -119,7 +119,10 @@
   <div class="flex flex-col">
     {#if entry.kind === 'directory'}
       <div
-        class="group flex w-full items-center gap-1 rounded px-2 py-1 text-left text-sm transition-colors hover:bg-muted/50"
+        class={cn(
+          'group flex w-full items-center gap-1 rounded px-2 transition-colors hover:bg-muted/50',
+          isMobile ? 'py-2' : 'py-1'
+        )}
         style="padding-left: {depth * 12 + 8}px">
         <button
           class="flex flex-1 items-center gap-1 overflow-hidden"
@@ -159,7 +162,10 @@
       {/if}
     {:else}
       <div
-        class="group flex w-full items-center gap-2 rounded px-2 py-0.5 transition-colors hover:bg-muted/50"
+        class={cn(
+          'group flex w-full items-center gap-2 rounded px-2 transition-colors hover:bg-muted/50',
+          isMobile ? 'py-1.5' : 'py-0.5'
+        )}
         style="padding-left: {depth * 12 + 24}px">
         <button class="flex min-w-0 flex-1 items-center gap-2" onclick={() => loadFile(entry)}>
           <div class="flex size-4 shrink-0 items-center justify-center">
