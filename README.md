@@ -1,6 +1,6 @@
-# MerMert
+# Graphi
 
-Custom Mermaid Live Editor for internal use.
+Custom Mermaid Live Editor with VS Code like feel for internal use.
 
 ## Features
 
