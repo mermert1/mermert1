@@ -1,0 +1,28 @@
+{
+  "name": "graphi-installer",
+  "version": "1.0.0",
+  "main": "main.js",
+  "private": true,
+  "dependencies": {
+    "fs-extra": "^11.2.0"
+  },
+  "devDependencies": {
+    "electron": "^28.1.0",
+    "electron-builder": "^24.9.1"
+  },
+  "build": {
+    "appId": "com.graphi.installer",
+    "productName": "Graphi Desktop Setup",
+    "win": {
+      "target": "portable",
+      "icon": "../graphi-icon.ico"
+    },
+    "files": [
+      "main.js",
+      "index.html",
+      "index.css",
+      "renderer.js",
+      "resources/app_files/**/*"
+    ]
+  }
+}

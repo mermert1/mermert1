@@ -123,20 +123,37 @@ try {
 
 // 7. Package the application
 try {
-  if (args.includes('--use-builder')) {
-    console.log('🏗️ Packaging application with electron-builder...');
-    // electron-builder uses the configured 'build' section in package.json
-    // It is better for creating installers (.exe, .dmg, .deb)
-    const platformFlag =
-      targetPlatform === 'darwin' ? '--mac' : targetPlatform === 'win32' ? '--win' : '--linux';
-    const cmd = `npx electron-builder ${platformFlag} --x64`;
+  if (args.includes('--custom-installer')) {
+    console.log('✨ Building Custom Premium Installer...');
 
-    console.log(`Executing: ${cmd}`);
-    execSync(cmd, { stdio: 'inherit' });
+    // A. Build main app as 'dir' (unpacked)
+    console.log('   1. Building main application (unpacked)...');
+    execSync('npx electron-builder --win --dir', { stdio: 'inherit' });
 
-    console.log(`✅ Installer Build Complete for ${targetPlatform}!`);
-    console.log(`Artifacts are in ${path.join(process.cwd(), 'dist')}`);
-  } else {
+    const mainAppDir = path.join(process.cwd(), 'dist', 'win-unpacked');
+    const installerResourcesDir = path.join(process.cwd(), 'installer', 'resources', 'app_files');
+
+    // B. Copy main app to installer resources
+    console.log('   2. Copying main application to installer staging...');
+    if (fs.existsSync(installerResourcesDir)) {
+      fs.rmSync(installerResourcesDir, { recursive: true, force: true });
+    }
+    fs.mkdirSync(installerResourcesDir, { recursive: true });
+
+    // We use fs.cpSync for recursive copy
+    fs.cpSync(mainAppDir, installerResourcesDir, { recursive: true });
+
+    // C. Build the installer app
+    console.log('   3. Packaging Custom Installer...');
+    execSync('npx electron-builder --win', {
+      cwd: path.join(process.cwd(), 'installer'),
+      stdio: 'inherit'
+    });
+
+    console.log('✅ Premium Custom Installer Build Complete!');
+    console.log(`Artifact is in: ${path.join(process.cwd(), 'installer', 'dist')}`);
+  } else if (args.includes('--use-builder')) {
+    // ... existing builders logic ...
     console.log('🎁 Packaging application with electron-packager...');
     let iconArg = '';
     if (targetPlatform === 'darwin') {

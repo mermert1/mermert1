@@ -50,17 +50,21 @@ jobs:
         working-directory: ./DesktopApp
         run: |
           npm install
-          node build_clean.js --platform=${{ matrix.platform }} --use-builder
+          if [ "${{ matrix.platform }}" = "win32" ]; then
+            node build_clean.js --platform=win32 --custom-installer
+          else
+            node build_clean.js --platform=${{ matrix.platform }} --use-builder
+          fi
 
       - name: Prepare Artifact (Windows)
         if: matrix.os == 'windows-latest'
         shell: pwsh
         run: |
-          $installer = Get-ChildItem -Path "DesktopApp/dist/*.exe" | Select-Object -First 1
+          $installer = Get-ChildItem -Path "DesktopApp/installer/dist/*.exe" | Select-Object -First 1
           if ($installer) {
             Move-Item -Path $installer.FullName -Destination "${{ matrix.artifact_name }}" -Force
           } else {
-            Write-Error "Installer (.exe) not found"
+            Write-Error "Custom Installer (.exe) not found in installer/dist/"
             exit 1
           }
 
