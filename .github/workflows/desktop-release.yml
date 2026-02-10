@@ -46,7 +46,7 @@ jobs:
       - name: Build Desktop Application
         working-directory: ./DesktopApp
         run: |
-          pnpm install
+          npm install
           node build_clean.js --platform=${{ matrix.platform }}
 
       - name: Zip Artifact (Windows)
