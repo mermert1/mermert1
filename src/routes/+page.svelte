@@ -72,7 +72,7 @@
         <div class="flex flex-wrap justify-center gap-4">
           <!-- Windows Download -->
           <Button
-            href="https://github.com/mermert1/mermert1/releases/tag/win"
+            href="https://github.com/mermert1/mermert1/releases/latest/download/Graphi-Desktop-Windows.zip"
             target="_blank"
             variant="secondary"
             size="lg"
@@ -95,7 +95,7 @@
 
           <!-- macOS Download -->
           <Button
-            href="https://github.com/mermert1/mermert1/releases/tag/mac"
+            href="https://github.com/mermert1/mermert1/releases/latest/download/Graphi-Desktop-macOS.zip"
             target="_blank"
             variant="secondary"
             class="flex min-w-[200px] items-center gap-2 border-2 border-primary/20 bg-background/50 backdrop-blur transition-all hover:border-primary/50 hover:bg-primary/10">
@@ -117,7 +117,7 @@
 
           <!-- Linux Download -->
           <Button
-            href="https://github.com/mermert1/mermert1/releases/tag/linux"
+            href="https://github.com/mermert1/mermert1/releases/latest/download/Graphi-Desktop-Linux.zip"
             target="_blank"
             variant="secondary"
             class="flex min-w-[200px] items-center gap-2 border-2 border-primary/20 bg-background/50 backdrop-blur transition-all hover:border-primary/50 hover:bg-primary/10">
