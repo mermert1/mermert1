@@ -1,0 +1,65 @@
+{
+  "name": "graphi-desktop-app",
+  "version": "1.0.0",
+  "description": "Desktop version of Graphi Live Editor",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "package": "electron-packager . \"Graphi Desktop\" --platform=win32 --arch=x64 --icon=graphi-icon.ico --out=dist-packager --overwrite --asar --ignore=\"^/dist\" --ignore=\"^/dist-packager\" --ignore=\"^/.git\"",
+    "build:clean": "node build_clean.js",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "keywords": [
+    "Electron",
+    "Graphi",
+    "Desktop"
+  ],
+  "author": "Graphi Team",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.1.0",
+    "electron-builder": "^24.9.1",
+    "electron-packager": "^17.1.2",
+    "png-to-ico": "^3.0.1"
+  },
+  "dependencies": {
+    "electron-serve": "^1.2.0"
+  },
+  "build": {
+    "appId": "com.graphi.desktop",
+    "productName": "Graphi Desktop",
+    "afterSign": null,
+    "files": [
+      "main.js",
+      "package.json",
+      {
+        "from": "../docs",
+        "to": "docs",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "directories": {
+      "output": "dist",
+      "buildResources": "assets"
+    },
+    "win": {
+      "target": "portable",
+      "icon": "graphi-icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "electron"
+    ]
+  }
+}

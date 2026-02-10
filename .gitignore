@@ -7,7 +7,7 @@
 /coverage
 /docs
 /functions
-/node_modules
+node_modules
 /snapshots.js
 
 # Playwright
@@ -15,3 +15,11 @@
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Desktop App
+DesktopApp/dist/
+DesktopApp/dist-packager/
+DesktopApp/build_staging/
+DesktopApp/docs/
+DesktopApp/node_modules/
+DesktopApp/*.log

@@ -50,6 +50,92 @@
       </Button>
     </div>
 
+    <!-- Desktop Download Section -->
+    <div
+      class="mt-12 flex animate-in flex-col items-center gap-6 delay-150 duration-700 slide-in-from-bottom-5 fade-in">
+      <div class="relative">
+        <h2 class="text-2xl font-bold tracking-tight">Get Graphi for Desktop</h2>
+        <div
+          class="absolute -inset-1 -z-10 rounded-lg bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 opacity-50 blur-xl">
+        </div>
+      </div>
+
+      <div class="flex flex-wrap justify-center gap-4">
+        <!-- Windows Download -->
+        <Button
+          href="https://github.com/mermert1/mermert1/releases/latest"
+          target="_blank"
+          variant="secondary"
+          size="lg"
+          class="flex min-w-[200px] items-center gap-2 border-2 border-primary/20 bg-background/50 backdrop-blur transition-all hover:border-primary/50 hover:bg-primary/10">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
+          <div class="flex flex-col items-start leading-none">
+            <span class="font-bold">Windows</span>
+            <span class="text-xs font-normal text-muted-foreground">Download .zip</span>
+          </div>
+        </Button>
+
+        <!-- macOS Download (Disabled) -->
+        <Button
+          disabled
+          variant="outline"
+          class="flex min-w-[200px] cursor-not-allowed items-center gap-2 opacity-60">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10H12V2z" /></svg>
+          <div class="flex flex-col items-start leading-none">
+            <span class="font-bold">macOS</span>
+            <span class="text-xs">Coming Soon</span>
+          </div>
+        </Button>
+
+        <!-- Linux Download (Disabled) -->
+        <Button
+          disabled
+          variant="outline"
+          class="flex min-w-[200px] cursor-not-allowed items-center gap-2 opacity-60">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            ><rect x="2" y="3" width="20" height="14" rx="2" ry="2" /><line
+              x1="8"
+              y1="21"
+              x2="16"
+              y2="21" /><line x1="12" y1="17" x2="12" y2="21" /></svg>
+          <div class="flex flex-col items-start leading-none">
+            <span class="font-bold">Linux</span>
+            <span class="text-xs">Coming Soon</span>
+          </div>
+        </Button>
+      </div>
+      <p class="w-full max-w-sm text-sm text-muted-foreground">
+        Working offline? Download the desktop app to use Graphi without an internet connection.
+      </p>
+    </div>
+
     <div
       class="mt-16 grid w-full grid-cols-1 gap-8 text-center text-sm text-muted-foreground sm:grid-cols-3">
       <div class="flex flex-col items-center gap-2">
