@@ -48,6 +48,7 @@ jobs:
 
       - name: Build Desktop Application
         working-directory: ./DesktopApp
+        shell: bash
         run: |
           npm install
           if [ "${{ matrix.platform }}" = "win32" ]; then

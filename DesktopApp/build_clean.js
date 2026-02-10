@@ -135,22 +135,28 @@ try {
     console.log('✅ Premium Custom Installer (Downloader) Build Complete!');
     console.log(`Artifact is in: ${path.join(process.cwd(), 'installer', 'dist')}`);
   } else if (args.includes('--use-builder')) {
-    // ... existing builders logic ...
+    console.log('🏗️ Packaging application with electron-builder...');
+    const platformFlag =
+      targetPlatform === 'darwin' ? '--mac' : targetPlatform === 'win32' ? '--win' : '--linux';
+    const dirFlag = args.includes('--dir') ? '--dir' : '';
+    const cmd = `npx electron-builder ${platformFlag} --x64 ${dirFlag}`;
+
+    console.log(`Executing: ${cmd}`);
+    execSync(cmd, { stdio: 'inherit' });
+
+    console.log(`✅ Installer Build Complete for ${targetPlatform}!`);
+    console.log(`Artifacts are in ${path.join(process.cwd(), 'dist')}`);
+  } else {
     console.log('🎁 Packaging application with electron-packager...');
     let iconArg = '';
     if (targetPlatform === 'darwin') {
-      iconArg = `--icon=graphi-icon.icns`; // Use local icns
+      iconArg = `--icon=graphi-icon.icns`;
     } else if (targetPlatform === 'win32') {
       iconArg = `--icon=graphi-icon.ico`;
     }
 
     const cmd = `npx electron-packager "${STAGING_DIR}" "Graphi Desktop" --platform=${targetPlatform} --arch=${targetArch} ${iconArg} --out="${PACKAGER_DIR}" --overwrite`;
-
-    console.log(`Executing: ${cmd}`);
     execSync(cmd, { stdio: 'inherit' });
-
-    console.log(`✅ Build Complete for ${targetPlatform}!`);
-    console.log(`Artifacts are in ${PACKAGER_DIR}`);
   }
 } catch (e) {
   console.error('Packaging failed:', e);
