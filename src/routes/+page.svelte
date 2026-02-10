@@ -63,7 +63,7 @@
       <div class="flex flex-wrap justify-center gap-4">
         <!-- Windows Download -->
         <Button
-          href="https://github.com/mermert1/mermert1/releases/latest"
+          href="https://github.com/mermert1/mermert1/releases/tag/win"
           target="_blank"
           variant="secondary"
           size="lg"
