@@ -37,7 +37,11 @@
   "build": {
     "appId": "com.graphi.desktop",
     "productName": "Graphi Desktop",
-    "afterSign": null,
+    "copyright": "Copyright © 2024 Graphi Team",
+    "directories": {
+      "output": "dist",
+      "buildResources": "assets"
+    },
     "files": [
       "main.js",
       "package.json",
@@ -49,19 +53,53 @@
         ]
       }
     ],
-    "directories": {
-      "output": "dist",
-      "buildResources": "assets"
-    },
     "win": {
-      "target": "portable",
-      "icon": "graphi-icon.png"
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "graphi-icon.ico"
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
-      "createStartMenuShortcut": true
+      "createStartMenuShortcut": true,
+      "shortcutName": "Graphi Desktop",
+      "installerIcon": "graphi-icon.ico",
+      "uninstallerIcon": "graphi-icon.ico"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "graphi-icon.icns",
+      "category": "public.app-category.graphics-design"
+    },
+    "dmg": {
+      "contents": [
+        {
+          "x": 410,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        },
+        {
+          "x": 130,
+          "y": 150,
+          "type": "file"
+        }
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Graphics",
+      "icon": "graphi-icon.png"
     }
   },
   "pnpm": {

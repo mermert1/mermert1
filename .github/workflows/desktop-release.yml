@@ -50,19 +50,46 @@ jobs:
         working-directory: ./DesktopApp
         run: |
           npm install
-          node build_clean.js --platform=${{ matrix.platform }}
+          node build_clean.js --platform=${{ matrix.platform }} --use-builder
 
       - name: Zip Artifact (Windows)
         if: matrix.os == 'windows-latest'
         shell: pwsh
         run: |
-          Compress-Archive -Path "DesktopApp/dist-packager/*" -DestinationPath "${{ matrix.artifact_name }}" -Force
+          # electron-builder outputs to DesktopApp/dist
+          $installer = Get-ChildItem -Path "DesktopApp/dist/*.exe" | Select-Object -First 1
+          if ($installer) {
+            # We zip the installer just to stay consistent with the download links
+            Compress-Archive -Path $installer.FullName -DestinationPath "${{ matrix.artifact_name }}" -Force
+          } else {
+            Write-Error "Installer (.exe) not found in DesktopApp/dist"
+            exit 1
+          }
 
-      - name: Zip Artifact (macOS/Linux)
-        if: matrix.os != 'windows-latest'
+      - name: Zip Artifact (macOS)
+        if: matrix.os == 'macos-latest'
         run: |
-          cd DesktopApp/dist-packager
-          zip -r "../../${{ matrix.artifact_name }}" .
+          # electron-builder outputs to DesktopApp/dist
+          INSTALLER=$(ls DesktopApp/dist/*.dmg | head -n 1)
+          if [ -f "$INSTALLER" ]; then
+            # We zip the DMG to match the artifact_name expected by the website
+            zip -j "${{ matrix.artifact_name }}" "$INSTALLER"
+          else
+            echo "Installer (.dmg) not found in DesktopApp/dist"
+            exit 1
+          fi
+
+      - name: Zip Artifact (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          # electron-builder outputs to DesktopApp/dist
+          INSTALLER=$(ls DesktopApp/dist/*.AppImage | head -n 1)
+          if [ -f "$INSTALLER" ]; then
+            zip -j "${{ matrix.artifact_name }}" "$INSTALLER"
+          else
+            echo "Installer (.AppImage) not found in DesktopApp/dist"
+            exit 1
+          fi
 
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v1
