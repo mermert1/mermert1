@@ -3,6 +3,8 @@ const { app, BrowserWindow, ipcMain, shell } = require('electron');
 const path = require('path');
 const fs = require('fs-extra');
 const { execSync } = require('child_process');
+const axios = require('axios');
+const AdmZip = require('adm-zip');
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -26,19 +28,33 @@ app.whenReady().then(createWindow);
 
 ipcMain.handle('perform-action', async (event, action) => {
   const targetDir = path.join(process.env.LOCALAPPDATA, 'Programs', 'GraphiDesktop');
+  const assetUrl =
+    'https://github.com/mermert1/mermert1/releases/latest/download/Graphi-Desktop-Windows-Assets.zip';
 
   try {
     if (action === 'install' || action === 'repair') {
-      console.log(`Starting ${action}...`);
-      const sourceDir = path.join(__dirname, 'resources', 'app_files');
-
-      if (!fs.existsSync(sourceDir)) {
-        throw new Error('Application files not found in installer package.');
-      }
+      console.log(`Starting ${action} (Downloader Mode)...`);
 
       await fs.ensureDir(targetDir);
-      await fs.copy(sourceDir, targetDir, { overwrite: true });
 
+      // 1. Download the ZIP file
+      const tempZipPath = path.join(targetDir, 'assets.zip');
+      const response = await axios({
+        url: assetUrl,
+        method: 'GET',
+        responseType: 'arraybuffer'
+      });
+
+      await fs.writeFile(tempZipPath, Buffer.from(response.data));
+
+      // 2. Unzip the contents
+      const zip = new AdmZip(tempZipPath);
+      zip.extractAllTo(targetDir, true);
+
+      // 3. Cleanup ZIP
+      await fs.remove(tempZipPath);
+
+      // 4. Create Shortcut (Windows specific)
       if (process.platform === 'win32') {
         const psCommand = `
           $WshShell = New-Object -ComObject WScript.Shell

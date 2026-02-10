@@ -4,6 +4,8 @@
   "main": "main.js",
   "private": true,
   "dependencies": {
+    "adm-zip": "^0.5.16",
+    "axios": "^1.13.5",
     "fs-extra": "^11.2.0"
   },
   "devDependencies": {
@@ -21,8 +23,7 @@
       "main.js",
       "index.html",
       "index.css",
-      "renderer.js",
-      "resources/app_files/**/*"
+      "renderer.js"
     ]
   }
 }

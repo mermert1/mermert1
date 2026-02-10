@@ -51,20 +51,27 @@ jobs:
         run: |
           npm install
           if [ "${{ matrix.platform }}" = "win32" ]; then
+            # 1. Build main app assets (unpacked)
+            node build_clean.js --platform=win32 --use-builder --dir
+            # 2. Build custom premium installer
             node build_clean.js --platform=win32 --custom-installer
           else
             node build_clean.js --platform=${{ matrix.platform }} --use-builder
           fi
 
-      - name: Prepare Artifact (Windows)
+      - name: Prepare Artifacts (Windows)
         if: matrix.os == 'windows-latest'
         shell: pwsh
         run: |
-          $installer = Get-ChildItem -Path "DesktopApp/installer/dist/*.exe" | Select-Object -First 1
-          if ($installer) {
-            Move-Item -Path $installer.FullName -Destination "${{ matrix.artifact_name }}" -Force
+          # 1. Zip the app assets for the downloader
+          Compress-Archive -Path "DesktopApp/dist/win-unpacked/*" -DestinationPath "Graphi-Desktop-Windows-Assets.zip" -Force
+          
+          # 2. Get the premium installer
+          $customInstaller = Get-ChildItem -Path "DesktopApp/installer/dist/*.exe" | Select-Object -First 1
+          if ($customInstaller) {
+            Move-Item -Path $customInstaller.FullName -Destination "${{ matrix.artifact_name }}" -Force
           } else {
-            Write-Error "Custom Installer (.exe) not found in installer/dist/"
+            Write-Error "Premium Installer not found"
             exit 1
           }
 
@@ -94,6 +101,8 @@ jobs:
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: ${{ matrix.artifact_name }}
+          files: |
+            ${{ matrix.artifact_name }}
+            Graphi-Desktop-Windows-Assets.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
