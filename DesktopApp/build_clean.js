@@ -87,10 +87,21 @@ filesToCopy.forEach((file) => {
 
 // 5. Copy docs folder
 console.log('📚 Copying docs folder...');
-if (fs.existsSync('docs')) {
-  fs.cpSync('docs', path.join(STAGING_DIR, 'docs'), { recursive: true });
+let docsSrc = 'docs';
+if (!fs.existsSync(docsSrc)) {
+  const parentDocs = path.join('..', 'docs');
+  if (fs.existsSync(parentDocs)) {
+    docsSrc = parentDocs;
+  }
+}
+
+if (fs.existsSync(docsSrc)) {
+  console.log(`Using docs from: ${path.resolve(docsSrc)}`);
+  fs.cpSync(docsSrc, path.join(STAGING_DIR, 'docs'), { recursive: true });
 } else {
-  console.error('ERROR: docs folder not found! Build the web app first.');
+  console.error(
+    `ERROR: docs folder not found! Searched in "docs" and "../docs". (CWD: ${process.cwd()})`
+  );
   process.exit(1);
 }
 
