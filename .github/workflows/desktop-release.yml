@@ -18,13 +18,13 @@ jobs:
         include:
           - os: windows-latest
             platform: win32
-            artifact_name: Graphi-Desktop-Windows.zip
+            artifact_name: Graphi-Desktop-Windows.exe
           - os: macos-latest
             platform: darwin
-            artifact_name: Graphi-Desktop-macOS.zip
+            artifact_name: Graphi-Desktop-macOS.dmg
           - os: ubuntu-latest
             platform: linux
-            artifact_name: Graphi-Desktop-Linux.zip
+            artifact_name: Graphi-Desktop-Linux.AppImage
 
     steps:
       - name: Checkout Code
@@ -52,42 +52,37 @@ jobs:
           npm install
           node build_clean.js --platform=${{ matrix.platform }} --use-builder
 
-      - name: Zip Artifact (Windows)
+      - name: Prepare Artifact (Windows)
         if: matrix.os == 'windows-latest'
         shell: pwsh
         run: |
-          # electron-builder outputs to DesktopApp/dist
           $installer = Get-ChildItem -Path "DesktopApp/dist/*.exe" | Select-Object -First 1
           if ($installer) {
-            # We zip the installer just to stay consistent with the download links
-            Compress-Archive -Path $installer.FullName -DestinationPath "${{ matrix.artifact_name }}" -Force
+            Move-Item -Path $installer.FullName -Destination "${{ matrix.artifact_name }}" -Force
           } else {
-            Write-Error "Installer (.exe) not found in DesktopApp/dist"
+            Write-Error "Installer (.exe) not found"
             exit 1
           }
 
-      - name: Zip Artifact (macOS)
+      - name: Prepare Artifact (macOS)
         if: matrix.os == 'macos-latest'
         run: |
-          # electron-builder outputs to DesktopApp/dist
           INSTALLER=$(ls DesktopApp/dist/*.dmg | head -n 1)
           if [ -f "$INSTALLER" ]; then
-            # We zip the DMG to match the artifact_name expected by the website
-            zip -j "${{ matrix.artifact_name }}" "$INSTALLER"
+            mv "$INSTALLER" "${{ matrix.artifact_name }}"
           else
-            echo "Installer (.dmg) not found in DesktopApp/dist"
+            echo "Installer (.dmg) not found"
             exit 1
           fi
 
-      - name: Zip Artifact (Linux)
+      - name: Prepare Artifact (Linux)
         if: matrix.os == 'ubuntu-latest'
         run: |
-          # electron-builder outputs to DesktopApp/dist
           INSTALLER=$(ls DesktopApp/dist/*.AppImage | head -n 1)
           if [ -f "$INSTALLER" ]; then
-            zip -j "${{ matrix.artifact_name }}" "$INSTALLER"
+            mv "$INSTALLER" "${{ matrix.artifact_name }}"
           else
-            echo "Installer (.AppImage) not found in DesktopApp/dist"
+            echo "Installer (.AppImage) not found"
             exit 1
           fi
 

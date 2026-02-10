@@ -72,7 +72,7 @@
         <div class="flex flex-wrap justify-center gap-4">
           <!-- Windows Download -->
           <Button
-            href="https://github.com/mermert1/mermert1/releases/latest/download/Graphi-Desktop-Windows.zip"
+            href="https://github.com/mermert1/mermert1/releases/latest/download/Graphi-Desktop-Windows.exe"
             target="_blank"
             variant="secondary"
             size="lg"
@@ -89,13 +89,13 @@
               stroke-linejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
             <div class="flex flex-col items-start leading-none">
               <span class="font-bold">Windows</span>
-              <span class="text-xs font-normal text-muted-foreground">Download .zip</span>
+              <span class="text-xs font-normal text-muted-foreground">Download .exe Setup</span>
             </div>
           </Button>
 
           <!-- macOS Download -->
           <Button
-            href="https://github.com/mermert1/mermert1/releases/latest/download/Graphi-Desktop-macOS.zip"
+            href="https://github.com/mermert1/mermert1/releases/latest/download/Graphi-Desktop-macOS.dmg"
             target="_blank"
             variant="secondary"
             class="flex min-w-[200px] items-center gap-2 border-2 border-primary/20 bg-background/50 backdrop-blur transition-all hover:border-primary/50 hover:bg-primary/10">
@@ -111,13 +111,14 @@
               stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10H12V2z" /></svg>
             <div class="flex flex-col items-start leading-none">
               <span class="font-bold">macOS</span>
-              <span class="text-xs font-normal text-muted-foreground">Download .zip</span>
+              <span class="text-xs font-normal text-muted-foreground"
+                >Download .dmg Disk Image</span>
             </div>
           </Button>
 
           <!-- Linux Download -->
           <Button
-            href="https://github.com/mermert1/mermert1/releases/latest/download/Graphi-Desktop-Linux.zip"
+            href="https://github.com/mermert1/mermert1/releases/latest/download/Graphi-Desktop-Linux.AppImage"
             target="_blank"
             variant="secondary"
             class="flex min-w-[200px] items-center gap-2 border-2 border-primary/20 bg-background/50 backdrop-blur transition-all hover:border-primary/50 hover:bg-primary/10">
@@ -138,7 +139,7 @@
                 y2="21" /><line x1="12" y1="17" x2="12" y2="21" /></svg>
             <div class="flex flex-col items-start leading-none">
               <span class="font-bold">Linux</span>
-              <span class="text-xs font-normal text-muted-foreground">Download .zip</span>
+              <span class="text-xs font-normal text-muted-foreground">Download .AppImage</span>
             </div>
           </Button>
         </div>
