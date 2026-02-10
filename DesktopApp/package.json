@@ -7,8 +7,12 @@
     "start": "electron .",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
-    "package": "electron-packager . \"Graphi Desktop\" --platform=win32 --arch=x64 --icon=graphi-icon.ico --out=dist-packager --overwrite --asar --ignore=\"^/dist\" --ignore=\"^/dist-packager\" --ignore=\"^/.git\"",
-    "build:clean": "node build_clean.js",
+    "package": "node build_clean.js --platform=win32",
+    "build:win": "node build_clean.js --platform=win32",
+    "build:clean": "node build_clean.js --platform=win32",
+    "build:mac": "node build_clean.js --platform=darwin",
+    "build:linux": "node build_clean.js --platform=linux",
+    "build:all": "node build_clean.js --platform=win32 && node build_clean.js --platform=darwin && node build_clean.js --platform=linux",
     "postinstall": "electron-builder install-app-deps"
   },
   "keywords": [
@@ -22,7 +26,8 @@
     "electron": "^28.1.0",
     "electron-builder": "^24.9.1",
     "electron-packager": "^17.1.2",
-    "png-to-ico": "^3.0.1"
+    "png-to-ico": "^3.0.1",
+    "png2icons": "^2.0.1"
   },
   "dependencies": {
     "electron-serve": "^1.2.0"
