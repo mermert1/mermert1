@@ -16,7 +16,7 @@
   },
   "build": {
     "appId": "com.graphi.installer",
-    "productName": "Graphi Desktop Win Installer",
+    "productName": "Graphi-Desktop-Win-Installer",
     "win": {
       "target": "nsis",
       "icon": "../graphi-icon.ico"

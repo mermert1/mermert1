@@ -30,7 +30,7 @@ ipcMain.handle('perform-action', async (event, action) => {
   const targetDir = path.join(process.env.LOCALAPPDATA, 'Programs', 'GraphiDesktop');
   // Construct the URL dynamically based on the tag if possible, or use the latest release redirect
   const assetUrl =
-    'https://github.com/mermert1/mermert1/releases/latest/download/Graphi-Desktop-Windows-Assets.zip';
+    'https://github.com/mermert1/mermert1/releases/latest/download/Graphi-Desktop-Win.zip';
 
   try {
     if (action === 'install' || action === 'repair') {

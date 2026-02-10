@@ -18,8 +18,8 @@ jobs:
         include:
           - os: windows-latest
             platform: win32
-            artifact_name: Graphi Desktop Win.exe
-            installer_name: Graphi Desktop Win Installer.exe
+            artifact_name: Graphi-Desktop-Win.zip
+            installer_name: Graphi-Desktop-Win-Installer.exe
           - os: macos-latest
             platform: darwin
             artifact_name: Graphi-Desktop-macOS.dmg
@@ -65,16 +65,10 @@ jobs:
         if: matrix.os == 'windows-latest'
         shell: pwsh
         run: |
-          # 1. Zip the app assets for the downloader
-          Compress-Archive -Path "DesktopApp/dist/win-unpacked/*" -DestinationPath "Graphi-Desktop-Windows-Assets.zip" -Force
+          # 1. Zip the app assets (This becomes the manual install file AND the source for the installer)
+          Compress-Archive -Path "DesktopApp/dist/win-unpacked/*" -DestinationPath "${{ matrix.artifact_name }}" -Force
           
-          # 2. Prepare the main portable exe
-          $mainExe = Get-ChildItem -Path "DesktopApp/dist/*.exe" | Where-Object { $_.Name -notlike "*Installer*" } | Select-Object -First 1
-          if ($mainExe) {
-            Move-Item -Path $mainExe.FullName -Destination "${{ matrix.artifact_name }}" -Force
-          }
-
-          # 3. Prepare the premium installer
+          # 2. Get the premium installer
           $customInstaller = Get-ChildItem -Path "DesktopApp/installer/dist/*.exe" | Select-Object -First 1
           if ($customInstaller) {
             Move-Item -Path $customInstaller.FullName -Destination "${{ matrix.installer_name }}" -Force
@@ -111,6 +105,6 @@ jobs:
         with:
           files: |
             ${{ matrix.artifact_name }}
-            Graphi-Desktop-Windows-Assets.zip
+            ${{ matrix.installer_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
