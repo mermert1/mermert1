@@ -1,6 +1,6 @@
 {
   "name": "graphi-desktop-app",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "Desktop version of Graphi Live Editor",
   "main": "main.js",
   "homepage": "https://github.com/mermert1/mermert1",
@@ -66,13 +66,15 @@
       "icon": "graphi-icon.ico"
     },
     "nsis": {
-      "oneClick": true,
+      "oneClick": false,
       "perMachine": false,
       "allowElevation": true,
-      "allowToChangeInstallationDirectory": false,
+      "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "Graphi Desktop",
+      "installerSidebar": "assets/installer-sidebar.bmp",
+      "installerHeader": "assets/installer-header.bmp",
       "deleteAppDataOnUninstall": false
     },
     "mac": {
