@@ -66,13 +66,14 @@
       "icon": "graphi-icon.ico"
     },
     "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
+      "oneClick": true,
+      "perMachine": false,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": false,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "Graphi Desktop",
-      "installerIcon": "graphi-icon.ico",
-      "uninstallerIcon": "graphi-icon.ico"
+      "deleteAppDataOnUninstall": false
     },
     "mac": {
       "target": "dmg",
