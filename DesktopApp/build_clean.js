@@ -97,9 +97,9 @@ if (fs.existsSync('docs')) {
 // 6. Install Production Dependencies
 console.log('📦 Installing production dependencies...');
 try {
-  // Only install runtime dependencies (electron-serve)
-  // pnpm works perfectly on Mac/Linux CI runners.
-  execSync('pnpm install --prod --ignore-scripts', { cwd: STAGING_DIR, stdio: 'inherit' });
+  // Use npm --omit=dev for the final staging install.
+  // This is the most reliable way to package runtime dependencies in CI.
+  execSync('npm install --omit=dev --no-bin-links', { cwd: STAGING_DIR, stdio: 'inherit' });
 } catch (e) {
   console.error('Failed to install dependencies:', e);
   process.exit(1);
