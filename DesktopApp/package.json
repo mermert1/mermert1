@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "Desktop version of Graphi Live Editor",
   "main": "main.js",
+  "homepage": "https://github.com/mermert1/mermert1",
+  "author": "Graphi Team <support@graphi.app>",
   "scripts": {
     "start": "electron .",
     "pack": "electron-builder --dir",
@@ -22,7 +24,6 @@
     "Graphi",
     "Desktop"
   ],
-  "author": "Graphi Team",
   "license": "MIT",
   "devDependencies": {
     "electron": "^28.1.0",
