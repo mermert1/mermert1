@@ -127,6 +127,12 @@ try {
     console.log('✨ Building Custom Premium Installer (Downloader Mode)...');
 
     // Build the installer app
+    console.log('   Installing installer dependencies...');
+    execSync('npm install', {
+      cwd: path.join(process.cwd(), 'installer'),
+      stdio: 'inherit'
+    });
+
     execSync('npx electron-builder --win', {
       cwd: path.join(process.cwd(), 'installer'),
       stdio: 'inherit'

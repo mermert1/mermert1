@@ -1,15 +1,17 @@
 {
   "name": "graphi-installer",
+  "description": "Premium Installer for Graphi Desktop",
+  "author": "Graphi Team <support@graphi.app>",
   "version": "1.0.0",
   "main": "main.js",
   "private": true,
   "dependencies": {
-    "adm-zip": "^0.5.16",
-    "axios": "^1.13.5",
+    "adm-zip": "^0.5.10",
+    "axios": "^1.6.2",
     "fs-extra": "^11.2.0"
   },
   "devDependencies": {
-    "electron": "^28.1.0",
+    "electron": "28.1.0",
     "electron-builder": "^24.9.1"
   },
   "build": {
