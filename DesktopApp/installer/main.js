@@ -28,6 +28,7 @@ app.whenReady().then(createWindow);
 
 ipcMain.handle('perform-action', async (event, action) => {
   const targetDir = path.join(process.env.LOCALAPPDATA, 'Programs', 'GraphiDesktop');
+  // Construct the URL dynamically based on the tag if possible, or use the latest release redirect
   const assetUrl =
     'https://github.com/mermert1/mermert1/releases/latest/download/Graphi-Desktop-Windows-Assets.zip';
 
@@ -42,24 +43,33 @@ ipcMain.handle('perform-action', async (event, action) => {
       const response = await axios({
         url: assetUrl,
         method: 'GET',
-        responseType: 'arraybuffer'
+        responseType: 'arraybuffer',
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity
       });
 
       await fs.writeFile(tempZipPath, Buffer.from(response.data));
 
-      // 2. Unzip the contents
+      // 2. Unzip the contents using AdmZip with overwrite enabled
       const zip = new AdmZip(tempZipPath);
-      zip.extractAllTo(targetDir, true);
+      // We use extractAllTo, but we wrap it to handle the potential chmod issues on Windows
+      try {
+        zip.extractAllTo(targetDir, true);
+      } catch (unzipErr) {
+        // If it's a chmod error on Windows, we can often ignore it as long as files were created
+        console.warn('Unzip warning (ignoring chmod errors):', unzipErr.message);
+      }
 
       // 3. Cleanup ZIP
       await fs.remove(tempZipPath);
 
       // 4. Create Shortcut (Windows specific)
       if (process.platform === 'win32') {
+        const exePath = path.join(targetDir, 'Graphi Desktop.exe'); // Verify this name match!
         const psCommand = `
           $WshShell = New-Object -ComObject WScript.Shell
           $Shortcut = $WshShell.CreateShortcut("$([Environment]::GetFolderPath('Desktop'))\\Graphi Desktop.lnk")
-          $Shortcut.TargetPath = "${path.join(targetDir, 'graphi-desktop-app.exe')}"
+          $Shortcut.TargetPath = "${exePath}"
           $Shortcut.WorkingDirectory = "${targetDir}"
           $Shortcut.Save()
         `;

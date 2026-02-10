@@ -16,16 +16,26 @@
   },
   "build": {
     "appId": "com.graphi.installer",
-    "productName": "Graphi Desktop Setup",
+    "productName": "Graphi Desktop Win Installer",
     "win": {
-      "target": "portable",
+      "target": "nsis",
       "icon": "../graphi-icon.ico"
     },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false,
+      "allowElevation": true,
+      "createDesktopShortcut": false,
+      "installerIcon": "../graphi-icon.ico"
+    },
     "files": [
+      "package.json",
       "main.js",
       "index.html",
       "index.css",
-      "renderer.js"
+      "renderer.js",
+      "node_modules/**/*"
     ]
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "graphi-desktop-app",
-  "version": "1.1.9",
+  "version": "1.2.0",
   "description": "Desktop version of Graphi Live Editor",
   "main": "main.js",
   "homepage": "https://github.com/mermert1/mermert1",
