@@ -1,0 +1,69 @@
+name: Build and Release Desktop App
+
+on:
+  push:
+    tags:
+      - 'v*' # Trigger on version tags like v1.0.0
+
+jobs:
+  release:
+    name: Build & Release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # We build Mac on macOS, Windows on Windows, and Linux on Linux
+        # This fixes the symlink errors we hit locally
+        include:
+          - os: windows-latest
+            platform: win32
+            artifact_name: Graphi-Desktop-Windows.zip
+          - os: macos-latest
+            platform: darwin
+            artifact_name: Graphi-Desktop-macOS.zip
+          - os: ubuntu-latest
+            platform: linux
+            artifact_name: Graphi-Desktop-Linux.zip
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install Root Dependencies
+        run: pnpm install
+
+      - name: Build Web Application
+        run: pnpm build
+
+      - name: Build Desktop Application
+        working-directory: ./DesktopApp
+        run: |
+          pnpm install
+          node build_clean.js --platform=${{ matrix.platform }}
+
+      - name: Zip Artifact (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          Compress-Archive -Path DesktopApp/dist-packager/* -DestinationPath ${{ matrix.artifact_name }}
+
+      - name: Zip Artifact (macOS/Linux)
+        if: matrix.os != 'windows-latest'
+        run: |
+          cd DesktopApp/dist-packager
+          zip -r ../../${{ matrix.artifact_name }} . *
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ matrix.artifact_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

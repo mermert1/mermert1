@@ -16,10 +16,16 @@ const PACKAGER_DIR = 'dist-packager';
 
 // Parse arguments
 const args = process.argv.slice(2);
-let targetPlatform = 'win32'; // default
-if (args.includes('--platform=darwin')) targetPlatform = 'darwin';
-if (args.includes('--platform=linux')) targetPlatform = 'linux';
-if (args.includes('--platform=mas')) targetPlatform = 'mas';
+let targetPlatform = 'win32'; // Default to win32
+
+// Check for platform flags
+if (args.some((arg) => arg.includes('--platform=darwin') || arg.includes('--platform=mac'))) {
+  targetPlatform = 'darwin';
+} else if (args.includes('--platform=linux')) {
+  targetPlatform = 'linux';
+} else if (args.includes('--platform=mas')) {
+  targetPlatform = 'mas';
+}
 
 let targetArch = 'x64'; // Default to x64 for compatibility
 if (args.includes('--arch=arm64')) targetArch = 'arm64';
@@ -92,6 +98,7 @@ if (fs.existsSync('docs')) {
 console.log('📦 Installing production dependencies...');
 try {
   // Only install runtime dependencies (electron-serve)
+  // pnpm works perfectly on Mac/Linux CI runners.
   execSync('pnpm install --prod --ignore-scripts', { cwd: STAGING_DIR, stdio: 'inherit' });
 } catch (e) {
   console.error('Failed to install dependencies:', e);

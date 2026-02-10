@@ -12,7 +12,9 @@
     "build:clean": "node build_clean.js --platform=win32",
     "build:mac": "node build_clean.js --platform=darwin",
     "build:linux": "node build_clean.js --platform=linux",
-    "build:all": "node build_clean.js --platform=win32 && node build_clean.js --platform=darwin && node build_clean.js --platform=linux",
+    "build:all": "node build_clean.js --platform=win32 && node build_clean.js --platform=linux && node build_clean.js --platform=darwin",
+    "zip": "node zip_releases.js",
+    "release": "npm run build:all && npm run zip",
     "postinstall": "electron-builder install-app-deps"
   },
   "keywords": [
