@@ -110,7 +110,12 @@ console.log('📦 Installing production dependencies...');
 try {
   // Use npm --omit=dev for the final staging install.
   // This is the most reliable way to package runtime dependencies in CI.
-  execSync('npm install --omit=dev --no-bin-links', { cwd: STAGING_DIR, stdio: 'inherit' });
+  // We use --ignore-scripts to prevent postinstall scripts (like electron-builder)
+  // from running and failing when development dependencies are missing.
+  execSync('npm install --omit=dev --no-bin-links --ignore-scripts', {
+    cwd: STAGING_DIR,
+    stdio: 'inherit'
+  });
 } catch (e) {
   console.error('Failed to install dependencies:', e);
   process.exit(1);
