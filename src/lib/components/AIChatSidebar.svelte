@@ -371,8 +371,8 @@
     flex-direction: column;
     height: 100%;
     width: 360px;
-    background: hsl(var(--background));
-    border-left: 1px solid hsl(var(--border));
+    background: var(--background);
+    border-left: 1px solid var(--border);
     font-size: 0.875rem;
   }
 
@@ -381,8 +381,8 @@
     justify-content: space-between;
     align-items: center;
     padding: 0.75rem 1rem;
-    border-bottom: 1px solid hsl(var(--border));
-    background: hsl(var(--muted) / 0.3);
+    border-bottom: 1px solid var(--border);
+    background: var(--muted) / 0.3;
   }
 
   .ai-header-title {
@@ -416,15 +416,15 @@
   }
 
   .ai-btn-icon:hover {
-    background: hsl(var(--muted));
-    color: hsl(var(--foreground));
+    background: var(--muted);
+    color: var(--foreground);
   }
 
   /* Settings */
   .ai-settings {
     padding: 0.75rem 1rem;
-    border-bottom: 1px solid hsl(var(--border));
-    background: hsl(var(--muted) / 0.15);
+    border-bottom: 1px solid var(--border);
+    background: var(--muted) / 0.15;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
@@ -439,7 +439,7 @@
   .ai-label {
     font-size: 0.75rem;
     font-weight: 500;
-    color: hsl(var(--muted-foreground));
+    color: var(--muted-foreground);
     margin-bottom: 0.25rem;
   }
 
@@ -456,15 +456,15 @@
     padding: 0.5rem 0.75rem;
     border: 1px solid hsl(var(--border));
     border-radius: 6px;
-    background: hsl(var(--background));
-    color: hsl(var(--foreground));
+    background: var(--background);
+    color: var(--foreground);
     font-size: 0.85rem;
     cursor: pointer;
     transition: all 0.2s;
   }
 
   .custom-select-trigger:hover {
-    border-color: hsl(var(--primary) / 0.5);
+    border-color: var(--primary) / 0.5;
   }
 
   .custom-select-options {
@@ -474,8 +474,8 @@
     right: 0;
     margin-top: 4px;
     margin-top: 4px;
-    background: hsl(var(--popover)); 
-    border: 1px solid hsl(var(--border));
+    background: var(--popover); 
+    border: 1px solid var(--border);
     border-radius: 6px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     z-index: 50;
@@ -491,38 +491,38 @@
     cursor: pointer;
     border: none;
     background: transparent;
-    color: hsl(var(--popover-foreground));
+    color: var(--popover-foreground);
     font-size: 0.85rem;
     border-radius: 4px;
     text-align: left;
   }
 
   .custom-option:hover {
-    background: hsl(var(--accent));
-    color: hsl(var(--accent-foreground));
+    background: var(--accent);
+    color: var(--accent-foreground);
   }
 
   .custom-option.selected {
-    background: hsl(var(--primary) / 0.1);
-    color: hsl(var(--primary));
+    background: var(--primary) / 0.1;
+    color: var(--primary);
     font-weight: 500;
   }
 
   .custom-input {
     width: 100%;
     padding: 0.5rem 0.75rem;
-    border: 1px solid hsl(var(--border));
+    border: 1px solid var(--border);
     border-radius: 6px;
-    background: hsl(var(--background));
-    color: hsl(var(--foreground));
+    background: var(--background);
+    color: var(--foreground);
     font-size: 0.85rem;
     outline: none;
     transition: all 0.2s;
   }
 
   .custom-input:focus {
-    border-color: hsl(var(--primary));
-    box-shadow: 0 0 0 2px hsl(var(--primary) / 0.1);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px var(--primary) / 0.1;
   }
 
   .ai-settings-actions {
