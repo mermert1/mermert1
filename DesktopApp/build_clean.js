@@ -136,7 +136,7 @@ try {
       stdio: 'inherit'
     });
 
-    execSync('npx electron-builder --win', {
+    execSync('npx electron-builder --win --publish never', {
       cwd: path.join(process.cwd(), 'installer'),
       stdio: 'inherit'
     });
@@ -148,7 +148,7 @@ try {
     const platformFlag =
       targetPlatform === 'darwin' ? '--mac' : targetPlatform === 'win32' ? '--win' : '--linux';
     const dirFlag = args.includes('--dir') ? '--dir' : '';
-    const cmd = `npx electron-builder ${platformFlag} --x64 ${dirFlag}`;
+    const cmd = `npx electron-builder ${platformFlag} --x64 ${dirFlag} --publish never`;
 
     console.log(`Executing: ${cmd}`);
     execSync(cmd, { stdio: 'inherit' });
