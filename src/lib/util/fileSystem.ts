@@ -16,7 +16,7 @@ export const individualFiles = writable<FileEntry[]>([]);
 export const fileList = writable<FileEntry[]>([]);
 export const activeFileHandle = writable<FileSystemFileHandle | null>(null);
 export const activeVirtualFileId = writable<string | null>(null);
-export type SaveStatus = 'saved' | 'saving' | 'unsaved' | 'blocked';
+export type SaveStatus = 'saved' | 'saving' | 'unsaved' | 'blocked' | 'success';
 export const saveStatus = writable<SaveStatus>('saved');
 export const lastSavedCode = writable<string>('');
 
@@ -240,7 +240,10 @@ export async function readFile(fileHandle: FileSystemFileHandle): Promise<string
   activeFileHandle.set(fileHandle); // Set active handle on read
   const file = await fileHandle.getFile();
   const text = await file.text();
-  lastSavedCode.set(text); // Sync last saved code on load
+
+  const { unpackFileContent } = await import('./fileContent');
+  const { code: rawCode } = unpackFileContent(text);
+  lastSavedCode.set(rawCode); // Sync last saved code on load (unpacked)
   return text;
 }
 
@@ -262,8 +265,17 @@ export async function writeFile(fileHandle: FileSystemFileHandle, content: strin
     const writable = await fileHandle.createWritable();
     await writable.write(content);
     await writable.close();
-    saveStatus.set('saved');
-    lastSavedCode.set(content); // Update last saved code on success
+
+    const { unpackFileContent } = await import('./fileContent');
+    const { code: rawCode } = unpackFileContent(content);
+    lastSavedCode.set(rawCode);
+
+    saveStatus.set('success');
+    setTimeout(() => {
+      if (get(saveStatus) === 'success') {
+        saveStatus.set('saved');
+      }
+    }, 2000);
     console.log('Successfully wrote to:', fileHandle.name);
   } catch (error) {
     console.error('Error writing file:', error);
@@ -283,8 +295,17 @@ export async function saveActiveFile(content: string): Promise<boolean> {
       saveStatus.set('saving');
       file.content = content;
       await updateVirtualItem(file);
-      lastSavedCode.set(content);
-      saveStatus.set('saved');
+
+      const { unpackFileContent } = await import('./fileContent');
+      const { code: rawCode } = unpackFileContent(content);
+      lastSavedCode.set(rawCode);
+
+      saveStatus.set('success');
+      setTimeout(() => {
+        if (get(saveStatus) === 'success') {
+          saveStatus.set('saved');
+        }
+      }, 2000);
       return true;
     }
   }
@@ -320,6 +341,17 @@ export async function saveFile(content: string, suggestedName = 'diagram.dia'): 
     const writable = await handle.createWritable();
     await writable.write(content);
     await writable.close();
+
+    activeFileHandle.set(handle);
+    lastSavedCode.set(content);
+
+    saveStatus.set('success');
+    setTimeout(() => {
+      if (get(saveStatus) === 'success') {
+        saveStatus.set('saved');
+      }
+    }, 2000);
+
     return true;
   } catch (error) {
     if ((error as Error).name !== 'AbortError') {

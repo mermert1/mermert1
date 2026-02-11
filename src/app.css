@@ -120,3 +120,69 @@ body {
 .d {
   @apply border border-red-500;
 }
+
+/* === Glassmorphism & Premium UI Utilities === */
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-subtle {
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.glow {
+  box-shadow: 0 0 20px rgba(114, 137, 218, 0.15),
+              0 0 60px rgba(114, 137, 218, 0.05);
+}
+
+.glow-hover:hover {
+  box-shadow: 0 0 25px rgba(114, 137, 218, 0.25),
+              0 0 80px rgba(114, 137, 218, 0.08);
+}
+
+/* Animated gradient background */
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 8s ease infinite;
+}
+
+/* Pulse glow for active elements */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(114, 137, 218, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(114, 137, 218, 0.4);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2.5s ease-in-out infinite;
+}
+
+/* Smooth slide-up entrance */
+@keyframes slide-up-fade {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up-fade 0.3s ease-out;
+}

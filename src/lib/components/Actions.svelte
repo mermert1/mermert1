@@ -20,6 +20,16 @@
   import ExternalLinkIcon from '~icons/material-symbols/open-in-new-rounded';
   import WidthIcon from '~icons/material-symbols/width-rounded';
 
+  import {
+    exportToGitHubReadme,
+    exportToConfluence,
+    exportToJira,
+    exportToHtml,
+    copyToClipboard,
+    downloadAsFile
+  } from '$/util/exportPlugins';
+  import { toast } from 'svelte-sonner';
+
   const FONT_AWESOME_URL = `https://cdnjs.cloudflare.com/ajax/libs/font-awesome/${FAVersion}/css/all.min.css`;
 
   type Exporter = (context: CanvasRenderingContext2D, image: HTMLImageElement) => () => void;
@@ -290,5 +300,49 @@ ${svgString}`);
         </a>
       </div>
     {/if}
+    <Separator />
+    <p class="px-1 text-xs font-semibold text-muted-foreground">Export To...</p>
+    <div class="flex flex-wrap gap-1">
+      <Button
+        size="sm"
+        variant="outline"
+        class="flex-1 text-xs"
+        onclick={async () => {
+          const ok = await copyToClipboard(exportToGitHubReadme($stateStore.code));
+          if (ok) toast.success('GitHub Markdown copied!');
+        }}>
+        GitHub
+      </Button>
+      <Button
+        size="sm"
+        variant="outline"
+        class="flex-1 text-xs"
+        onclick={async () => {
+          const ok = await copyToClipboard(exportToConfluence($stateStore.code));
+          if (ok) toast.success('Confluence macro copied!');
+        }}>
+        Confluence
+      </Button>
+      <Button
+        size="sm"
+        variant="outline"
+        class="flex-1 text-xs"
+        onclick={async () => {
+          const ok = await copyToClipboard(exportToJira($stateStore.code));
+          if (ok) toast.success('Jira macro copied!');
+        }}>
+        Jira
+      </Button>
+      <Button
+        size="sm"
+        variant="outline"
+        class="flex-1 text-xs"
+        onclick={() => {
+          downloadAsFile(exportToHtml($stateStore.code), 'graphi-diagram.html', 'text/html');
+          toast.success('HTML file downloaded!');
+        }}>
+        HTML
+      </Button>
+    </div>
   </div>
 </Card>

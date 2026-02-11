@@ -2,7 +2,9 @@
   import DiagramDocButton from '$/components/DiagramDocumentationButton.svelte';
   import Editor from '$/components/Editor.svelte';
   import FileExplorer from '$/components/FileExplorer/FileExplorer.svelte';
-  import History from '$/components/History/History.svelte';
+  // import History from '$/components/History/History.svelte'; // Replaced by new HistoryTimeline
+  import HistoryTimeline from '$/components/History/HistoryTimeline.svelte';
+  import ThemeStore from '$/components/ThemeStore.svelte';
   import ActivityBar from '$/components/Layout/ActivityBar.svelte';
   import ExportPane from '$/components/Layout/ExportPane.svelte';
   import MobileLayout from '$/components/Layout/MobileLayout.svelte';
@@ -19,10 +21,12 @@
   import * as Resizable from '$/components/ui/resizable';
   import type { Tab } from '$/types';
   import { loadRoots, saveFile } from '$/util/fileSystem';
+  import { packFileContent } from '$/util/fileContent';
   import { PanZoomState } from '$/util/panZoom';
   import { stateStore, updateCodeStore } from '$/util/state';
   import { logEvent } from '$/util/stats';
   import { initHandler } from '$/util/util';
+  import { siteFiles } from '$/util/siteWorkspace.svelte';
   import { onMount } from 'svelte';
   import { toast } from 'svelte-sonner';
   import CodeIcon from '~icons/custom/code';
@@ -32,6 +36,10 @@
 
   import HelpIcon from '~icons/material-symbols/help';
   import Tutorial from '$/components/Layout/Tutorial.svelte';
+  import AIChatSidebar from '$/components/AIChatSidebar.svelte';
+  import { scheduleAutoSave } from '$/util/historyStore';
+  import AIIcon from '~icons/material-symbols/auto-awesome';
+  import CheckIcon from '~icons/material-symbols/check-circle-outline';
 
   const panZoomState = new PanZoomState();
 
@@ -73,22 +81,21 @@
   // let isHistoryOpen = $state(false); // Removed, using sidebar
 
   let activeSideBarView = $state('explorer'); // Default to explorer
+  let showAISidebar = $state(false);
 
   async function handleSaveDiagram() {
-    const code = $stateStore.code;
+    const packed = packFileContent($stateStore.code, $stateStore.mermaid);
     // Try to save to active file first
-    const saved = await saveActiveFile(code);
+    const saved = await saveActiveFile(packed);
     if (saved) {
       toast.success('Diagram saved successfully');
-      saveStatus.set('saved');
       return;
     }
 
     // Fallback to Save As
     try {
-      if (await saveFile(code)) {
+      if (await saveFile(packed)) {
         toast.success('Diagram saved successfully');
-        saveStatus.set('saved');
       }
     } catch {
       // Error handled in saveFile
@@ -116,9 +123,10 @@
   const autosave = debounce(async (code: string) => {
     const handle = $activeFileHandle;
     const virtualId = $activeVirtualFileId;
+    const packed = packFileContent(code, $stateStore.mermaid);
 
     if (virtualId) {
-      await saveActiveFile(code);
+      await saveActiveFile(packed);
       return;
     }
 
@@ -128,7 +136,7 @@
         // @ts-expect-error - File System API types are experimental
         const permission = await handle.queryPermission({ mode: 'readwrite' });
         if (permission === 'granted') {
-          await writeFile(handle, code);
+          await writeFile(handle, packed);
         } else {
           saveStatus.set('blocked');
         }
@@ -142,6 +150,8 @@
     if ((!!$activeFileHandle || !!$activeVirtualFileId) && isDirty) {
       autosave($stateStore.code);
     }
+    // Record history regardless of file system status
+    scheduleAutoSave($stateStore.code, $stateStore.mermaid);
   });
 
   // Clean up navbar to be just a top header if desired, or remove it completely
@@ -154,11 +164,7 @@
   <MobileLayout {isMobile} />
 {:else}
   <div class="flex h-screen w-screen flex-col overflow-hidden bg-background">
-    <!-- Top Bar / Title Bar (Optional, can be merged into Activity Bar top or kept separate) -->
-    <!-- Using a simplified header for standard app feel -->
-
     <div class="flex flex-1 overflow-hidden">
-      <!-- Activity Bar -->
       <ActivityBar
         {isMobile}
         activeView={activeSideBarView}
@@ -170,7 +176,6 @@
           }
         }} />
 
-      <!-- Resizable Content Area -->
       <Resizable.PaneGroup direction="horizontal" class="flex-1 overflow-hidden">
         {#if activeSideBarView}
           <Resizable.Pane defaultSize={20} minSize={15} maxSize={40} collapsible={false}>
@@ -181,6 +186,8 @@
                   ? 'Export'
                   : activeSideBarView === 'history'
                     ? 'History'
+                    : activeSideBarView === 'themes'
+                      ? 'Theme Store'
                     : activeSideBarView === 'templates'
                       ? 'Templates'
                       : activeSideBarView === 'credits'
@@ -194,8 +201,14 @@
                 <ExportPane />
               {:else if activeSideBarView === 'history'}
                 <div class="h-full overflow-y-auto">
-                  <History />
+                  <HistoryTimeline onRestore={(code, mermaid) => {
+                    const update: Record<string, string> = { code };
+                    if (mermaid) update.mermaid = mermaid;
+                    updateCodeStore(update);
+                  }} />
                 </div>
+              {:else if activeSideBarView === 'themes'}
+                <ThemeStore />
               {:else if activeSideBarView === 'templates'}
                 <div class="h-full overflow-y-auto">
                   <TemplatePane />
@@ -213,34 +226,49 @@
         <Resizable.Pane defaultSize={80}>
           <div class="flex h-full flex-col overflow-hidden">
             <div class="flex h-10 shrink-0 items-center justify-between border-b px-4">
-              <!-- Breadcrumbs or simple title -->
               <div class="flex items-center gap-2">
                 <MainMenu />
                 <span class="text-sm font-semibold">
-                  {$activeFileHandle?.name || 'Untitled'}
+                  {#if $activeVirtualFileId}
+                    {siteFiles.find(f => f.id === $activeVirtualFileId)?.name || 'Untitled'}
+                  {:else}
+                    {$activeFileHandle?.name || 'Untitled'}
+                  {/if}
                   {#if isDirty}
                     <span class="ml-1 text-[#333333] dark:text-white">●</span>
                   {/if}
                 </span>
               </div>
 
-              <div class="flex items-center gap-2">
-                <Share />
-                <div class="flex items-center gap-2 px-2 text-xs">
-                  {#if isDirty}
-                    <span class="text-[#333333] dark:text-white" title="Unsaved changes">●</span>
-                  {/if}
-
+              <div class="flex items-center gap-1.5">
+                <div class="flex items-center gap-2 px-2 text-[10px] uppercase font-bold tracking-wider h-6 min-w-[60px] justify-end">
                   {#if $saveStatus === 'saving'}
                     <span class="animate-pulse text-muted-foreground">Saving...</span>
+                  {:else if $saveStatus === 'success'}
+                    <span class="text-green-500 flex items-center gap-1 animate-out fade-out duration-1000 fill-mode-forwards">
+                      <CheckIcon class="size-3.5" />
+                      Saved
+                    </span>
                   {:else if $saveStatus === 'blocked'}
-                    <span class="text-rose-500" title="Click Save button to grant permission"
-                      >Permission Needed</span>
+                    <span class="text-rose-500 text-[9px]" title="Click Save button to grant permission"
+                      >Need Permission</span>
                   {/if}
                 </div>
-                <Button variant="ghost" size="icon" onclick={handleSaveDiagram} title="Save">
-                  <SaveIcon class="size-5" />
-                </Button>
+                
+                <div class="flex items-center gap-0.5 border rounded-md p-0.5 bg-background/50">
+                  <Button variant="ghost" size="icon" onclick={handleSaveDiagram} title="Save" class="size-8">
+                    <SaveIcon class="size-4" />
+                  </Button>
+                  <Share />
+                  <Button
+                    variant={showAISidebar ? 'secondary' : 'ghost'}
+                    size="icon"
+                    onclick={() => (showAISidebar = !showAISidebar)}
+                    title="AI Assistant"
+                    class="size-8">
+                    <AIIcon class="size-4" />
+                  </Button>
+                </div>
               </div>
             </div>
 
@@ -270,6 +298,14 @@
                   <PanZoomToolbar {panZoomState} />
                 </div>
               </div>
+
+              {#if showAISidebar}
+                <AIChatSidebar
+                  currentCode={$stateStore.code}
+                  onInsertCode={(code) => updateCodeStore({ code })}
+                  onClose={() => (showAISidebar = false)}
+                />
+              {/if}
             </div>
           </div>
         </Resizable.Pane>

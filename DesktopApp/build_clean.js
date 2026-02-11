@@ -75,6 +75,9 @@ console.log('📄 Copying app files...');
 const filesToCopy = [
   'package.json',
   'main.js',
+  'preload.js',
+  'autoUpdater.js',
+  'tray.js',
   'graphi-icon.png',
   'graphi-icon.ico',
   'graphi-icon.icns'

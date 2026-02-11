@@ -79,11 +79,22 @@
         const scroll = view?.parentElement?.scrollTop;
         delete container.dataset.processed;
         const viewID = uniqueID('graph-');
+        let mermaidConfig: MermaidConfig;
+        if (typeof state.mermaid === 'string') {
+          try {
+            mermaidConfig = JSON.parse(state.mermaid);
+          } catch {
+            mermaidConfig = { theme: 'default' };
+          }
+        } else {
+          mermaidConfig = state.mermaid as unknown as MermaidConfig;
+        }
+
         const {
           svg,
           bindFunctions,
           diagramType: detectedDiagramType
-        } = await renderDiagram(JSON.parse(state.mermaid) as MermaidConfig, code, viewID);
+        } = await renderDiagram(mermaidConfig, code, viewID);
         diagramType = detectedDiagramType;
         if (svg.length > 0) {
           // eslint-disable-next-line svelte/no-dom-manipulating

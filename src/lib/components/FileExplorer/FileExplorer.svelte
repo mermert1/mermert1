@@ -28,6 +28,7 @@
   import MoreIcon from '~icons/material-symbols/more-vert';
   import { fileMetadataStore, fileMetadata, expansionStore } from '$lib/util/fileMetadata.svelte';
   import { stateStore, updateCodeStore } from '$lib/util/state';
+  import { packFileContent, unpackFileContent } from '$lib/util/fileContent';
   import FolderIcon from '~icons/material-symbols/folder-open';
   import ChevronRight from '~icons/material-symbols/chevron-right';
   import RefreshIcon from '~icons/material-symbols/refresh';
@@ -100,6 +101,17 @@
     expansionStore[path] = !expansionStore[path];
   }
 
+  /** Returns a default theme config based on current diagram dark mode */
+  function getDiagramThemeFallback() {
+    try {
+      const currentConfig = JSON.parse($stateStore.mermaid);
+      const isDark = currentConfig.theme === 'dark';
+      return { theme: isDark ? 'dark' : 'default' };
+    } catch {
+      return { theme: 'default' };
+    }
+  }
+
   onMount(async () => {
     await loadSiteWorkspace();
   });
@@ -108,7 +120,16 @@
     if (entry.kind !== 'file') return;
     try {
       const content = await readFile(entry.handle as FileSystemFileHandle);
-      updateCodeStore({ code: content });
+      const { code, config } = unpackFileContent(content);
+      const update: Record<string, any> = { code };
+      if (config) {
+        update.mermaid = config;
+      } else {
+        // Fallback: set theme based on current diagram dark mode
+        const currentTheme = getDiagramThemeFallback();
+        update.mermaid = JSON.stringify(currentTheme, null, 2);
+      }
+      updateCodeStore(update);
       activeVirtualFileId.set(null); // Clear virtual state
     } catch (err) {
       console.error('Failed to read file', err);
@@ -121,8 +142,16 @@
     if (file) {
       activeVirtualFileId.set(file.id);
       activeFileHandle.set(null); // Clear local state
-      lastSavedCode.set(file.content);
-      updateCodeStore({ code: file.content });
+      const { code, config } = unpackFileContent(file.content);
+      lastSavedCode.set(code);
+      const update: Record<string, any> = { code };
+      if (config) {
+        update.mermaid = config;
+      } else {
+        const currentTheme = getDiagramThemeFallback();
+        update.mermaid = JSON.stringify(currentTheme, null, 2);
+      }
+      updateCodeStore(update);
     }
   }
 
@@ -189,8 +218,8 @@
   });
 
   async function handleManualSave() {
-    const code = $stateStore.code;
-    const saved = await saveActiveFile(code);
+    const packed = packFileContent($stateStore.code, $stateStore.mermaid);
+    const saved = await saveActiveFile(packed);
     if (saved) {
       toast.success('Saved to file');
     }

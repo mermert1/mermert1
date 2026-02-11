@@ -72,7 +72,7 @@
         <div class="flex flex-wrap justify-center gap-4">
           <!-- Windows Download -->
           <Button
-            href="https://github.com/mermert1/mermert1/releases/latest/download/Graphi-Desktop-Windows.exe"
+            href="https://github.com/mermert1/mermert1/releases/latest/download/Graphi-Desktop-Win-Installer.exe"
             target="_blank"
             variant="secondary"
             size="lg"

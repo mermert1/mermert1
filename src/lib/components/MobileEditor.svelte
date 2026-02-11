@@ -13,11 +13,14 @@
   import { mode } from 'mode-watcher';
   import { onMount } from 'svelte';
 
+  import { debounce } from 'lodash-es';
+
   let editorView: EditorView | undefined;
   let editorContainer: HTMLDivElement;
   let currentText = $state('');
 
   const { onUpdate }: EditorProps = $props();
+  const onUpdateDebounced = debounce(onUpdate, 300);
 
   onMount(() => {
     const themeCompartment = new Compartment();
@@ -37,7 +40,7 @@
                 return;
               }
               currentText = newText;
-              onUpdate(newText);
+              onUpdateDebounced(newText);
             }
           }),
           EditorView.theme({

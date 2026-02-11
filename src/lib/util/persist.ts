@@ -219,7 +219,16 @@ function getBrowserStorage(
       }
     },
     setValue(key: string, value: any) {
-      browserStorage.setItem(key, serialize(value));
+      try {
+        browserStorage.setItem(key, serialize(value));
+      } catch (error) {
+        if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+          console.warn('LocalStorage quota exceeded. Unable to save state.');
+          // Optional: Clear some old data or just fail silently
+        } else {
+          console.error('Error saving to localStorage:', error);
+        }
+      }
     }
   };
 }

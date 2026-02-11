@@ -1,6 +1,6 @@
 {
   "name": "graphi-desktop-app",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "description": "Desktop version of Graphi Live Editor",
   "main": "main.js",
   "homepage": "https://github.com/mermert1/mermert1",
@@ -33,7 +33,8 @@
     "png2icons": "^2.0.1"
   },
   "dependencies": {
-    "electron-serve": "^1.2.0"
+    "electron-serve": "^1.2.0",
+    "electron-updater": "^6.1.7"
   },
   "build": {
     "appId": "com.graphi.desktop",
@@ -45,6 +46,9 @@
     },
     "files": [
       "main.js",
+      "preload.js",
+      "autoUpdater.js",
+      "tray.js",
       "package.json",
       {
         "from": "../docs",
@@ -52,6 +56,31 @@
         "filter": [
           "**/*"
         ]
+      }
+    ],
+    "publish": {
+      "provider": "github",
+      "owner": "mermert1",
+      "repo": "mermert1"
+    },
+    "fileAssociations": [
+      {
+        "ext": "graphi",
+        "name": "Graphi Diagram",
+        "role": "Editor",
+        "mimeType": "text/plain"
+      },
+      {
+        "ext": "mermaid",
+        "name": "Mermaid Diagram",
+        "role": "Editor",
+        "mimeType": "text/plain"
+      },
+      {
+        "ext": "mmd",
+        "name": "Mermaid Diagram",
+        "role": "Editor",
+        "mimeType": "text/plain"
       }
     ],
     "win": {

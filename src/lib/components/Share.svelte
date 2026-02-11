@@ -1,12 +1,15 @@
 <script>
   import { buttonVariants } from '$/components/ui/button';
+  import { Button } from '$/components/ui/button';
   import * as Dialog from '$/components/ui/dialog';
   import ShareIcon from '~icons/material-symbols/share';
   import CopyInput from './CopyInput.svelte';
 </script>
 
 <Dialog.Root>
-  <Dialog.Trigger class={buttonVariants({ size: 'sm' })}>Share</Dialog.Trigger>
+  <Dialog.Trigger class={buttonVariants({ variant: 'ghost', size: 'icon' })} title="Share">
+    <ShareIcon class="size-5" />
+  </Dialog.Trigger>
   <Dialog.Content>
     <Dialog.Header>
       <Dialog.Title class="flex items-center gap-2 text-xl">

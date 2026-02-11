@@ -2,9 +2,11 @@
   import { toggleDarkTheme, updateCodeStore, stateStore } from '$/util/state';
   import { Switch } from '$/components/ui/switch';
   import { Label } from '$/components/ui/label';
+  import { Button } from '$/components/ui/button';
   import { mode, setMode } from 'mode-watcher';
   import ThemeIcon from '~icons/material-symbols/dark-mode-rounded';
   import AppThemeIcon from '~icons/material-symbols/palette';
+  import TrashIcon from '~icons/material-symbols/delete-forever';
 
   let sync = $derived($stateStore.updateDiagram);
   // let autoSync = $derived($stateStore.autoSync);
@@ -35,6 +37,30 @@
 
   const handleAppThemeChange = () => {
     setMode($mode === 'dark' ? 'light' : 'dark');
+  };
+
+  const handleClearData = async () => {
+    if (!confirm('This will clear ALL local data including your diagrams, themes, workspace files, and settings. This cannot be undone.\n\nAre you sure?')) {
+      return;
+    }
+    try {
+      // Clear all localStorage
+      localStorage.clear();
+
+      // Clear all IndexedDB databases
+      const databases = await indexedDB.databases();
+      for (const db of databases) {
+        if (db.name) indexedDB.deleteDatabase(db.name);
+      }
+
+      // Reload to reset everything
+      window.location.reload();
+    } catch (e) {
+      console.error('Failed to clear data:', e);
+      // Force reload anyway
+      localStorage.clear();
+      window.location.reload();
+    }
   };
 </script>
 
@@ -70,6 +96,19 @@
     <div class="flex items-center justify-between">
       <Label for="pan-zoom">Pan & Zoom</Label>
       <Switch id="pan-zoom" checked={panZoom} onCheckedChange={togglePanZoom} />
+    </div>
+  </div>
+
+  <div class="space-y-4 border-t pt-4">
+    <h3 class="text-sm font-medium tracking-wider text-destructive uppercase">Danger Zone</h3>
+    <div class="flex flex-col gap-2">
+      <p class="text-xs text-muted-foreground">
+        Clear all local data including diagrams, themes, workspace files, folders, and settings.
+      </p>
+      <Button variant="destructive" size="sm" onclick={handleClearData} class="gap-2">
+        <TrashIcon class="size-4" />
+        Clear All Data
+      </Button>
     </div>
   </div>
 </div>

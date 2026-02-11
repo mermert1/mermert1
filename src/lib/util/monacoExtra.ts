@@ -587,13 +587,7 @@ export const initEditor = (monacoEditor: typeof Monaco): void => {
     ]
   });
 
-  monacoEditor.languages.registerCompletionItemProvider('mermaid', {
-    provideCompletionItems: () => {
-      return {
-        suggestions: []
-      };
-    }
-  });
+
 
   monacoEditor.languages.setLanguageConfiguration('mermaid', {
     autoClosingPairs: [

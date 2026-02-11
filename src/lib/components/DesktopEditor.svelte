@@ -8,6 +8,7 @@
   import * as monaco from 'monaco-editor';
   import monacoEditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
   import monacoJsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
+  import { debounce } from 'lodash-es';
   import { onMount } from 'svelte';
 
   const { onUpdate }: EditorProps = $props();
@@ -18,20 +19,15 @@
     minimap: {
       enabled: false
     },
-    overviewRulerLanes: 0
+    overviewRulerLanes: 0,
+    quickSuggestions: false,
+    suggestOnTriggerCharacters: false,
+    wordBasedSuggestions: false
   } satisfies monaco.editor.IStandaloneEditorConstructionOptions;
   let currentText = '';
 
-  const jsonModel = monaco.editor.createModel(
-    '',
-    'json',
-    monaco.Uri.parse('internal://config.json')
-  );
-  const mermaidModel = monaco.editor.createModel(
-    '',
-    'mermaid',
-    monaco.Uri.parse('internal://mermaid.mmd')
-  );
+  let jsonModel: monaco.editor.ITextModel;
+  let mermaidModel: monaco.editor.ITextModel;
 
   onMount(() => {
     self.MonacoEnvironment = {
@@ -58,16 +54,32 @@
       ]
     });
 
+
+
     initEditor(monaco);
+    
+    jsonModel = monaco.editor.createModel(
+      '',
+      'json',
+      monaco.Uri.parse('internal://config.json')
+    );
+    mermaidModel = monaco.editor.createModel(
+      '',
+      'mermaid',
+      monaco.Uri.parse('internal://mermaid.mmd')
+    );
+
     errorDebug();
     editor = monaco.editor.create(divElement, editorOptions);
+    const onUpdateDebounced = debounce(onUpdate, 300);
+
     editor.onDidChangeModelContent(({ isFlush }) => {
       const newText = editor?.getValue();
       if (!newText || currentText === newText || isFlush) {
         return;
       }
       currentText = newText;
-      onUpdate(currentText);
+      onUpdateDebounced(currentText);
     });
 
     const unsubscribeState = stateStore.subscribe(({ errorMarkers, editorMode, code, mermaid }) => {
@@ -82,7 +94,10 @@
       }
 
       // Update editor text if it's different
-      const newText = editorMode === 'code' ? code : mermaid;
+      let newText = editorMode === 'code' ? code : mermaid;
+      if (typeof newText !== 'string') {
+        newText = JSON.stringify(newText, null, 2);
+      }
       if (newText !== currentText) {
         editor.setScrollTop(0);
         editor.setValue(newText);

@@ -80,7 +80,12 @@ const processState = async (state: State) => {
       setTimeout(() => window.location.reload(), 500);
     }
     lastDiagramType = diagramType;
-    JSON.parse(state.mermaid);
+    if (typeof state.mermaid === 'string') {
+      JSON.parse(state.mermaid);
+    } else {
+      // Auto-correct if it's not a string (e.g. invalid object in state)
+      processed.serialized = serializeState({ ...state, mermaid: JSON.stringify(state.mermaid) });
+    }
   } catch (error) {
     processed.error = error as Error;
     errorDebug();
@@ -174,6 +179,52 @@ export const loadState = (data: string): void => {
     if (!state.mermaid) {
       state.mermaid = defaultState.mermaid;
     }
+
+    // 1. Handle "Raw Burst Object"
+    // If state.mermaid is already an object with numeric keys (0, 1, 2...), it's a burst string.
+    // This happens if the state was saved with the spread string.
+    if (
+      typeof state.mermaid === 'object' &&
+      state.mermaid !== null &&
+      !Array.isArray(state.mermaid) &&
+      '0' in (state.mermaid as unknown as Record<string, string>)
+    ) {
+      const keys = Object.keys(state.mermaid)
+        .filter((key) => /^\d+$/.test(key))
+        .sort((a, b) => Number(a) - Number(b));
+      const burstString = keys.map((key) => (state.mermaid as unknown as Record<string, string>)[key]).join('');
+      if (burstString.trim().startsWith('{')) {
+        state.mermaid = burstString;
+      }
+    }
+
+    // 2. Handle "Cemented Burst Object" (Stringified Burst Object)
+    // If state.mermaid is a string, it might be a JSON string describing a burst object.
+    // e.g. '{"0":"{","1":"\"","2":"t",...}'
+    // We need to parse it, check if it's a burst object, and if so, recover the original string.
+    if (typeof state.mermaid === 'string') {
+      try {
+        const potentialConfig = JSON.parse(state.mermaid);
+        if (
+          typeof potentialConfig === 'object' &&
+          potentialConfig !== null &&
+          !Array.isArray(potentialConfig) &&
+          '0' in potentialConfig
+        ) {
+          // It's a cemented burst object! Join the values to recover the original config string.
+          const keys = Object.keys(potentialConfig)
+            .filter((key) => /^\d+$/.test(key))
+            .sort((a, b) => Number(a) - Number(b));
+          const burstString = keys.map((key) => (potentialConfig as unknown as Record<string, string>)[key]).join('');
+          if (burstString.trim().startsWith('{')) {
+            state.mermaid = burstString;
+          }
+        }
+      } catch {
+        // Not a JSON string or not a burst object, proceed as normal string
+      }
+    }
+
     const mermaidConfig: MermaidConfig =
       typeof state.mermaid === 'string'
         ? (JSON.parse(state.mermaid) as MermaidConfig)
@@ -194,6 +245,15 @@ export const loadState = (data: string): void => {
       console.error('Init error', error);
       state.code = urlParseFailedState;
       state.mermaid = defaultState.mermaid;
+    }
+
+    // Hard reset if state is corrupted
+    if (state.mermaid === '[object Object]') {
+      state.mermaid = defaultState.mermaid;
+    }
+
+    if (state.code === '[object Object]') {
+      state.code = defaultState.code;
     }
   }
   updateCodeStore(state);
@@ -231,7 +291,17 @@ export const updateConfig = (config: string): void => {
 
 export const toggleDarkTheme = (dark: boolean): void => {
   inputStateStore.update((state) => {
-    const config = JSON.parse(state.mermaid) as MermaidConfig;
+    let config: MermaidConfig;
+    if (typeof state.mermaid === 'string') {
+      try {
+        config = JSON.parse(state.mermaid);
+      } catch {
+        config = { theme: 'default' };
+      }
+    } else {
+      config = state.mermaid as unknown as MermaidConfig;
+    }
+
     if (!config.theme || ['dark', 'default'].includes(config.theme)) {
       config.theme = dark ? 'dark' : 'default';
     }

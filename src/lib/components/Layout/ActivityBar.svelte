@@ -3,9 +3,11 @@
   import { cn } from '$/utils';
   import FolderIcon from '~icons/material-symbols/folder-open';
   import ExportIcon from '~icons/material-symbols/download';
-  import TemplateIcon from '~icons/material-symbols/account-tree';
+  import TemplateIcon from '~icons/material-symbols/grid-view';
   import SettingsIcon from '~icons/material-symbols/settings';
-  import CreditIcon from '~icons/material-symbols/person-outline';
+  import InfoIcon from '~icons/material-symbols/info-outline';
+  import HistoryIcon from '~icons/material-symbols/history';
+  import PaletteIcon from '~icons/material-symbols/palette';
 
   interface Props {
     activeView: string;
@@ -16,12 +18,14 @@
 
   const primaryActions = [
     { id: 'explorer', icon: FolderIcon, label: 'Explorer' },
+    { id: 'history', icon: HistoryIcon, label: 'History' },
     { id: 'templates', icon: TemplateIcon, label: 'Templates' },
+    { id: 'themes', icon: PaletteIcon, label: 'Themes' },
     { id: 'export', icon: ExportIcon, label: 'Export' }
   ];
 
   const secondaryActions = [
-    { id: 'credits', icon: CreditIcon, label: 'Credits' },
+    { id: 'credits', icon: InfoIcon, label: 'Credits' },
     { id: 'settings', icon: SettingsIcon, label: 'Settings' }
   ];
 </script>
