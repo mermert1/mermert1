@@ -37,6 +37,18 @@
     "electron-serve": "^1.2.0",
     "electron-updater": "^6.1.7"
   },
+  "build": {
+    "appId": "com.graphi.desktop",
+    "productName": "Graphi Desktop",
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Graphics",
+      "icon": "graphi-icon.png"
+    }
+  },
   "pnpm": {
     "onlyBuiltDependencies": [
       "electron"
