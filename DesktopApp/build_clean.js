@@ -126,24 +126,18 @@ try {
 
 // 7. Package the application
 try {
-  if (args.includes('--custom-installer')) {
-    console.log('✨ Building Custom Premium Installer (Downloader Mode)...');
+  if (args.includes('--use-packager')) {
+    console.log('🎁 Packaging application with electron-packager...');
+    let iconArg = '';
+    if (targetPlatform === 'darwin') {
+      iconArg = `--icon=graphi-icon.icns`;
+    } else if (targetPlatform === 'win32') {
+      iconArg = `--icon=graphi-icon.ico`;
+    }
 
-    // Build the installer app
-    console.log('   Installing installer dependencies...');
-    execSync('npm install', {
-      cwd: path.join(process.cwd(), 'installer'),
-      stdio: 'inherit'
-    });
-
-    execSync('npx electron-builder --win --publish never', {
-      cwd: path.join(process.cwd(), 'installer'),
-      stdio: 'inherit'
-    });
-
-    console.log('✅ Premium Custom Installer (Downloader) Build Complete!');
-    console.log(`Artifact is in: ${path.join(process.cwd(), 'installer', 'dist')}`);
-  } else if (args.includes('--use-builder')) {
+    const cmd = `npx electron-packager "${STAGING_DIR}" "Graphi Desktop" --platform=${targetPlatform} --arch=${targetArch} ${iconArg} --out="${PACKAGER_DIR}" --overwrite`;
+    execSync(cmd, { stdio: 'inherit' });
+  } else {
     console.log('🏗️ Packaging application with electron-builder...');
     const platformFlag =
       targetPlatform === 'darwin' ? '--mac' : targetPlatform === 'win32' ? '--win' : '--linux';
@@ -155,17 +149,6 @@ try {
 
     console.log(`✅ Installer Build Complete for ${targetPlatform}!`);
     console.log(`Artifacts are in ${path.join(process.cwd(), 'dist')}`);
-  } else {
-    console.log('🎁 Packaging application with electron-packager...');
-    let iconArg = '';
-    if (targetPlatform === 'darwin') {
-      iconArg = `--icon=graphi-icon.icns`;
-    } else if (targetPlatform === 'win32') {
-      iconArg = `--icon=graphi-icon.ico`;
-    }
-
-    const cmd = `npx electron-packager "${STAGING_DIR}" "Graphi Desktop" --platform=${targetPlatform} --arch=${targetArch} ${iconArg} --out="${PACKAGER_DIR}" --overwrite`;
-    execSync(cmd, { stdio: 'inherit' });
   }
 } catch (e) {
   console.error('Packaging failed:', e);

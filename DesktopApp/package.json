@@ -9,10 +9,10 @@
     "start": "electron .",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
-    "package": "node build_clean.js --platform=win32",
-    "build:win": "node build_clean.js --platform=win32",
-    "build:clean": "node build_clean.js --platform=win32",
-    "build:mac": "node build_clean.js --platform=darwin",
+    "package": "node build_clean.js --platform=win32 --use-builder",
+    "build:win": "node build_clean.js --platform=win32 --use-builder",
+    "build:clean": "node build_clean.js --platform=win32 --use-builder",
+    "build:mac": "node build_clean.js --platform=darwin --use-builder",
     "build:linux": "node build_clean.js --platform=linux",
     "build:all": "node build_clean.js --platform=win32 && node build_clean.js --platform=linux && node build_clean.js --platform=darwin",
     "zip": "node zip_releases.js",
@@ -90,21 +90,26 @@
           "arch": [
             "x64"
           ]
+        },
+        {
+          "target": "msi",
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "icon": "graphi-icon.ico"
     },
     "nsis": {
       "oneClick": false,
-      "perMachine": false,
+      "perMachine": true,
       "allowElevation": true,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "Graphi Desktop",
-      "installerSidebar": "assets/installer-sidebar.bmp",
-      "installerHeader": "assets/installer-header.bmp",
-      "deleteAppDataOnUninstall": false
+      "deleteAppDataOnUninstall": false,
+      "runAfterFinish": true
     },
     "mac": {
       "target": "dmg",
