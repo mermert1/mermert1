@@ -126,7 +126,25 @@ try {
 
 // 7. Package the application
 try {
-  if (args.includes('--use-packager')) {
+  if (args.includes('--use-builder')) {
+    console.log('🏗️ Packaging application with electron-builder...');
+    const platformFlag =
+      targetPlatform === 'darwin' ? '--mac' : targetPlatform === 'win32' ? '--win' : '--linux';
+    const dirFlag = args.includes('--dir') ? '--dir' : '';
+    const cmd = `npx electron-builder ${platformFlag} --x64 ${dirFlag}`;
+
+    console.log(`Executing: ${cmd}`);
+    execSync(cmd, {
+      stdio: 'inherit',
+      env: {
+        ...process.env,
+        ELECTRON_BUILDER_BINARIES_SKIP_CUSTOM_MAC_OSX_CONVENIENCE: 'true'
+      }
+    });
+
+    console.log(`✅ Installer Build Complete for ${targetPlatform}!`);
+    console.log(`Artifacts are in ${path.join(process.cwd(), 'dist')}`);
+  } else {
     console.log('🎁 Packaging application with electron-packager...');
     let iconArg = '';
     if (targetPlatform === 'darwin') {
@@ -137,18 +155,14 @@ try {
 
     const cmd = `npx electron-packager "${STAGING_DIR}" "Graphi Desktop" --platform=${targetPlatform} --arch=${targetArch} ${iconArg} --out="${PACKAGER_DIR}" --overwrite`;
     execSync(cmd, { stdio: 'inherit' });
-  } else {
-    console.log('🏗️ Packaging application with electron-builder...');
-    const platformFlag =
-      targetPlatform === 'darwin' ? '--mac' : targetPlatform === 'win32' ? '--win' : '--linux';
-    const dirFlag = args.includes('--dir') ? '--dir' : '';
-    const cmd = `npx electron-builder ${platformFlag} --x64 ${dirFlag} --publish never`;
 
-    console.log(`Executing: ${cmd}`);
-    execSync(cmd, { stdio: 'inherit' });
+    console.log(`✅ Build Complete for ${targetPlatform}!`);
+    console.log(`Artifacts are in ${PACKAGER_DIR}`);
 
-    console.log(`✅ Installer Build Complete for ${targetPlatform}!`);
-    console.log(`Artifacts are in ${path.join(process.cwd(), 'dist')}`);
+    // If it's Windows and we are NOT using builder, suggest running the installer script
+    if (targetPlatform === 'win32') {
+      console.log('\n💡 To create a Windows Installer (.exe), run: node create_installer.js');
+    }
   }
 } catch (e) {
   console.error('Packaging failed:', e);

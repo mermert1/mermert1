@@ -54,9 +54,9 @@ jobs:
           npm install
           if [ "${{ matrix.platform }}" = "win32" ]; then
             # 1. Build main app assets (unpacked)
-            node build_clean.js --platform=win32 --use-builder --dir
-            # 2. Build custom premium installer
-            node build_clean.js --platform=win32 --custom-installer
+            node build_clean.js --platform=win32
+            # 2. Build Squirrel installer
+            node create_installer.js
           else
             node build_clean.js --platform=${{ matrix.platform }} --use-builder
           fi
@@ -65,15 +65,15 @@ jobs:
         if: matrix.os == 'windows-latest'
         shell: pwsh
         run: |
-          # 1. Zip the app assets (This becomes the manual install file AND the source for the installer)
-          Compress-Archive -Path "DesktopApp/dist/win-unpacked/*" -DestinationPath "${{ matrix.artifact_name }}" -Force
+          # 1. Zip the app assets (This becomes the manual install file)
+          Compress-Archive -Path "DesktopApp/dist-packager/Graphi Desktop-win32-x64/*" -DestinationPath "${{ matrix.artifact_name }}" -Force
           
-          # 2. Get the premium installer
-          $customInstaller = Get-ChildItem -Path "DesktopApp/installer/dist/*.exe" | Select-Object -First 1
+          # 2. Get the Squirrel installer
+          $customInstaller = Get-ChildItem -Path "DesktopApp/dist-installer/*.exe" | Select-Object -First 1
           if ($customInstaller) {
             Move-Item -Path $customInstaller.FullName -Destination "${{ matrix.installer_name }}" -Force
           } else {
-            Write-Error "Premium Installer not found"
+            Write-Error "Squirrel Installer not found"
             exit 1
           }
 

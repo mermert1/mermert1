@@ -1,6 +1,6 @@
 {
   "name": "graphi-desktop-app",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Desktop version of Graphi Live Editor",
   "main": "main.js",
   "homepage": "https://github.com/mermert1/mermert1",
@@ -8,11 +8,11 @@
   "scripts": {
     "start": "electron .",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder",
-    "package": "node build_clean.js --platform=win32 --use-builder",
-    "build:win": "node build_clean.js --platform=win32 --use-builder",
-    "build:clean": "node build_clean.js --platform=win32 --use-builder",
-    "build:mac": "node build_clean.js --platform=darwin --use-builder",
+    "dist": "npm run build:win && node create_installer.js",
+    "package": "node build_clean.js --platform=win32",
+    "build:win": "node build_clean.js --platform=win32",
+    "build:clean": "node build_clean.js --platform=win32",
+    "build:mac": "node build_clean.js --platform=darwin",
     "build:linux": "node build_clean.js --platform=linux",
     "build:all": "node build_clean.js --platform=win32 && node build_clean.js --platform=linux && node build_clean.js --platform=darwin",
     "zip": "node zip_releases.js",
@@ -27,118 +27,15 @@
   "license": "MIT",
   "devDependencies": {
     "electron": "^28.1.0",
-    "electron-builder": "^24.9.1",
+    "electron-builder": "24.9.1",
     "electron-packager": "^17.1.2",
+    "electron-winstaller": "^5.4.0",
     "png-to-ico": "^3.0.1",
     "png2icons": "^2.0.1"
   },
   "dependencies": {
     "electron-serve": "^1.2.0",
     "electron-updater": "^6.1.7"
-  },
-  "build": {
-    "appId": "com.graphi.desktop",
-    "productName": "Graphi Desktop",
-    "copyright": "Copyright © 2024 Graphi Team",
-    "directories": {
-      "output": "dist",
-      "buildResources": "assets"
-    },
-    "files": [
-      "main.js",
-      "preload.js",
-      "autoUpdater.js",
-      "tray.js",
-      "package.json",
-      {
-        "from": "../docs",
-        "to": "docs",
-        "filter": [
-          "**/*"
-        ]
-      }
-    ],
-    "publish": {
-      "provider": "github",
-      "owner": "mermert1",
-      "repo": "mermert1"
-    },
-    "fileAssociations": [
-      {
-        "ext": "graphi",
-        "name": "Graphi Diagram",
-        "role": "Editor",
-        "mimeType": "text/plain"
-      },
-      {
-        "ext": "mermaid",
-        "name": "Mermaid Diagram",
-        "role": "Editor",
-        "mimeType": "text/plain"
-      },
-      {
-        "ext": "mmd",
-        "name": "Mermaid Diagram",
-        "role": "Editor",
-        "mimeType": "text/plain"
-      }
-    ],
-    "win": {
-      "target": [
-        {
-          "target": "nsis",
-          "arch": [
-            "x64"
-          ]
-        },
-        {
-          "target": "msi",
-          "arch": [
-            "x64"
-          ]
-        }
-      ],
-      "icon": "graphi-icon.ico"
-    },
-    "nsis": {
-      "oneClick": false,
-      "perMachine": true,
-      "allowElevation": true,
-      "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true,
-      "createStartMenuShortcut": true,
-      "shortcutName": "Graphi Desktop",
-      "deleteAppDataOnUninstall": false,
-      "runAfterFinish": true
-    },
-    "mac": {
-      "target": "dmg",
-      "icon": "graphi-icon.icns",
-      "category": "public.app-category.graphics-design"
-    },
-    "dmg": {
-      "contents": [
-        {
-          "x": 410,
-          "y": 150,
-          "type": "link",
-          "path": "/Applications"
-        },
-        {
-          "x": 130,
-          "y": 150,
-          "type": "file"
-        }
-      ]
-    },
-    "linux": {
-      "target": [
-        "AppImage",
-        "deb"
-      ],
-      "category": "Graphics",
-      "icon": "graphi-icon.png"
-    }
   },
   "pnpm": {
     "onlyBuiltDependencies": [
