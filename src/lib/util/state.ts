@@ -30,18 +30,21 @@ C -->| Three | F[fa: fa - car Car]
   panZoom: true,
   rough: false,
   updateDiagram: true,
-  viewMode: 'code'
+  viewMode: 'code',
+  isAdvancedMode: true,
+  exportBackground: '#ffffff',
+  performanceMode: false
 };
 
 const urlParseFailedState = `flowchart TD
-A[Loading URL failed.We can try to figure out why.]-->| Decode JSON | B(Please check the console to see the JSON and error details.)
+A[Loading URL failed. We can try to figure out why.] -->|Decode JSON| B(Please check the console to see the JSON and error details.)
 B --> C{Is the JSON correct ?}
-C -->| Yes | D(Please Click here to Raise an issue in github.< br /> Including the broken link in the issue < br /> will speed up the fix.)
-C -->| No | E{Did someone < br /> send you this link ?}
-E -->| Yes | F[Ask them to send < br /> you the complete link]
-E -->| No | G{Did you copy < br /> the complete URL ?}
-G --> | Yes | D
-G --> | "No :(" | H(Try using the Timeline tab in History < br /> from same browser you used to create the diagram.)
+C -->|Yes| D(Please Click here to Raise an issue in github.<br/>Including the broken link in the issue<br/>will speed up the fix.)
+C -->|No| E{Did someone<br/>send you this link ?}
+E -->|Yes| F[Ask them to send<br/>you the complete link]
+E -->|No| G{Did you copy<br/>the complete URL ?}
+G -->|Yes| D
+G -->|No| H(Try using the Timeline tab in History<br/>from same browser you used to create the diagram.)
     click D href "https://github.com/mermaid-js/mermaid-live-editor/issues/new?assignees=&labels=bug&template=bug_report.md&title=Broken%20link" "Raise issue"`;
 
 // inputStateStore handles all updates and is shared externally when exporting via URL, History, etc.
@@ -55,7 +58,10 @@ export const currentState: ValidatedState = (() => {
     error: undefined,
     errorMarkers: [],
     serialized: serializeState(state),
-    viewMode: state.viewMode ?? 'code'
+    viewMode: state.viewMode ?? 'code',
+    isAdvancedMode: state.isAdvancedMode ?? true,
+    exportBackground: state.exportBackground ?? '#ffffff',
+    performanceMode: state.performanceMode ?? false
   };
 })();
 
@@ -68,7 +74,10 @@ const processState = async (state: State) => {
     error: undefined,
     errorMarkers: [],
     serialized: '',
-    viewMode: state.viewMode ?? 'code'
+    viewMode: state.viewMode ?? 'code',
+    isAdvancedMode: state.isAdvancedMode ?? true,
+    exportBackground: state.exportBackground ?? '#ffffff',
+    performanceMode: state.performanceMode ?? false
   };
   // No changes should be done to fields part of `state`.
   try {

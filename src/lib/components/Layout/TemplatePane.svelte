@@ -115,7 +115,9 @@
     updateCodeStore({
       code: template.code,
       mermaid: JSON.stringify(themeConfig, null, 2),
-      updateDiagram: true
+      updateDiagram: true,
+      pan: undefined,
+      zoom: undefined
     });
     logEvent('loadTemplate', { name: template.name });
   };

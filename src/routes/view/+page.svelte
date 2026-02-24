@@ -9,4 +9,6 @@
   <meta name="robots" content="noindex" />
 </svelte:head>
 
-<View shouldShowGrid={false} />
+<div class="h-screen w-screen overflow-hidden bg-background">
+  <View shouldShowGrid={false} />
+</div>

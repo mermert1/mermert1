@@ -24,10 +24,10 @@ test.describe('Site Loads', () => {
 
   test('should load sample diagrams when clicked', async ({ editPage }) => {
     await editPage.toggleSampleDiagrams();
-    await editPage.loadSampleDiagram('Pie');
+    await editPage.loadSampleDiagram('Pie Chart');
     await editPage.checkInEditor('pie title Pets adopted by volunteers');
     await editPage.checkTextInView('Pets adopted by volunteers');
-    await editPage.loadSampleDiagram('Class');
+    await editPage.loadSampleDiagram('Design Pattern');
     await editPage.checkInEditor('classDiagram');
   });
 

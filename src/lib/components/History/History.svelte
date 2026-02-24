@@ -82,10 +82,15 @@
     const currentState: string = getStateString();
     const previousState: string = getPreviousState(auto);
     if (previousState !== currentState) {
+      let name: string | undefined = undefined;
+      if (!auto) {
+        name = prompt('Enter a name for this save (optional):') || undefined;
+      }
       addHistoryEntry({
         state: $inputStateStore,
         time: Date.now(),
-        type: auto ? 'auto' : 'manual'
+        type: auto ? 'auto' : 'manual',
+        name
       });
     } else if (!auto) {
       notify('State already saved.');

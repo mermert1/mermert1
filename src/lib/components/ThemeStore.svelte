@@ -168,19 +168,19 @@
   <div class="px-4 pt-4 pb-2">
     <div class="flex space-x-1 rounded-lg bg-muted p-1">
         <button 
-            class="flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-all {activeCategory === 'light' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:bg-background/50'}"
+            class="flex-1 rounded-md px-1.5 py-1 text-xs font-medium transition-all {activeCategory === 'light' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:bg-background/50'}"
             onclick={() => activeCategory = 'light'}
         >
             Light
         </button>
         <button 
-            class="flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-all {activeCategory === 'dark' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:bg-background/50'}"
+            class="flex-1 rounded-md px-1.5 py-1 text-xs font-medium transition-all {activeCategory === 'dark' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:bg-background/50'}"
             onclick={() => activeCategory = 'dark'}
         >
             Dark
         </button>
         <button 
-            class="flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-all {activeCategory === 'custom' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:bg-background/50'}"
+            class="flex-1 rounded-md px-1.5 py-1 text-xs font-medium transition-all {activeCategory === 'custom' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:bg-background/50'}"
             onclick={() => activeCategory = 'custom'}
         >
             My Themes
@@ -233,8 +233,16 @@
         </div>
 
         {#if !theme.isBuiltIn}
-          <button
+          <div
+            role="button"
+            tabindex="0"
             class="absolute top-2 right-2 p-1.5 rounded-full hover:bg-destructive/10 hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+            onkeydown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.stopPropagation();
+                deleteTheme(theme.id);
+              }
+            }}
             onclick={(e) => {
               e.stopPropagation();
               deleteTheme(theme.id);
@@ -242,7 +250,7 @@
             title="Delete theme"
           >
             <TrashIcon class="size-4" />
-          </button>
+          </div>
         {/if}
       </button>
     {/each}

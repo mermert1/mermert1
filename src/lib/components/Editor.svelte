@@ -11,11 +11,28 @@
   import ExclamationCircleIcon from '~icons/material-symbols/error-outline-rounded';
 
   const { isMobile } = $props<{ isMobile: boolean }>();
-  const onUpdate = (text: string) => {
-    if ($stateStore.editorMode === 'code') {
+
+  const debouncedUpdate = debounce((text: string, isCode: boolean) => {
+    if (isCode) {
       updateCode(text);
     } else {
       updateConfig(text);
+    }
+  }, 1500);
+
+  const onUpdate = (text: string) => {
+    const isCode = $stateStore.editorMode === 'code';
+    if ($stateStore.performanceMode) {
+      debouncedUpdate(text, isCode);
+    } else {
+      // If we're not in performance mode, we want instant updates.
+      // We still cancel any pending debounced updates to avoid "ghost" updates later.
+      debouncedUpdate.cancel();
+      if (isCode) {
+        updateCode(text);
+      } else {
+        updateConfig(text);
+      }
     }
   };
 
@@ -39,14 +56,18 @@
   });
 </script>
 
-<div class="flex h-full flex-col">
+<div class="flex h-full flex-col overflow-hidden">
   {#if isMobile}
-    <MobileEditor {onUpdate} />
+    <div class="flex-1 overflow-hidden">
+      <MobileEditor {onUpdate} />
+    </div>
   {:else}
-    <DesktopEditor {onUpdate} />
+    <div class="flex-1 overflow-hidden">
+      <DesktopEditor {onUpdate} />
+    </div>
   {/if}
   {#if showError && $stateStore.error instanceof Error}
-    <div class="flex flex-col text-sm" data-testid={TID.errorContainer}>
+    <div class="flex flex-none flex-col text-sm border-t border-border" data-testid={TID.errorContainer}>
       <div class="flex items-center justify-between gap-2 bg-slate-900 p-2 text-white">
         <div class="flex w-fit items-center gap-2">
           <ExclamationCircleIcon class="size-6 text-destructive" aria-hidden="true" />

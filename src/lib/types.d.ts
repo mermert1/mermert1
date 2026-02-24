@@ -36,6 +36,9 @@ export interface State {
   pan?: { x: number; y: number };
   zoom?: number;
   loader?: LoaderConfig;
+  isAdvancedMode?: boolean;
+  exportBackground?: string;
+  performanceMode?: boolean;
 }
 
 export interface ValidatedState extends State {
@@ -61,23 +64,23 @@ export interface FileLoaderConfig {
 }
 export type LoaderConfig =
   | {
-      type: 'gist';
-      config: GistLoaderConfig;
-    }
+    type: 'gist';
+    config: GistLoaderConfig;
+  }
   | {
-      type: 'files';
-      config: FileLoaderConfig;
-    };
+    type: 'files';
+    config: FileLoaderConfig;
+  };
 export type HistoryType = 'auto' | 'manual' | 'loader';
 export type HistoryEntry = { id: string; state: State; time: number; url?: string } & (
   | {
-      type: 'loader';
-      name: string;
-    }
+    type: 'loader';
+    name: string;
+  }
   | {
-      type: HistoryType;
-      name?: string;
-    }
+    type: HistoryType;
+    name?: string;
+  }
 );
 
 export type DocumentationConfig = Record<

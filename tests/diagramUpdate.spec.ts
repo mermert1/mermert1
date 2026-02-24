@@ -20,6 +20,9 @@ A & B & C & D & E --> F & G & H & I & J & K & LongTest`
   });
 
   test('supports commenting code out/in', async ({ editPage }) => {
+    await editPage.clearEditor();
+    await editPage.typeInEditor('graph LR\n    A[Car]:::fa-car');
+    await editPage.checkTextInView('Car');
     await editPage.toggleComment('fa-car');
     await editPage.checkTextNotInView('Car');
     await editPage.toggleComment('fa-car');

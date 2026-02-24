@@ -83,7 +83,7 @@
     {/if}
   </div>
   {#if isOpen}
-    <div class="flex-grow overflow-x-auto" transition:slide={{ easing: quintOut }}>
+    <div class="flex flex-grow flex-col overflow-hidden" transition:slide={{ easing: quintOut }}>
       {@render children()}
     </div>
   {/if}

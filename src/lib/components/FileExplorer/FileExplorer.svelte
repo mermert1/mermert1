@@ -121,7 +121,7 @@
     try {
       const content = await readFile(entry.handle as FileSystemFileHandle);
       const { code, config } = unpackFileContent(content);
-      const update: Record<string, any> = { code };
+      const update: Record<string, any> = { code, pan: undefined, zoom: undefined };
       if (config) {
         update.mermaid = config;
       } else {
@@ -144,7 +144,7 @@
       activeFileHandle.set(null); // Clear local state
       const { code, config } = unpackFileContent(file.content);
       lastSavedCode.set(code);
-      const update: Record<string, any> = { code };
+      const update: Record<string, any> = { code, pan: undefined, zoom: undefined };
       if (config) {
         update.mermaid = config;
       } else {
@@ -378,6 +378,9 @@
 {#snippet virtualItem(item: any, depth: number)}
   <div class="flex flex-col">
     <div
+      role="treeitem"
+      tabindex="0"
+      aria-selected={$activeVirtualFileId === item.id}
       draggable="true"
       ondragstart={(e) => handleDragStart(e, item.id)}
       ondragover={(e) => handleDragOver(e, item.id)}

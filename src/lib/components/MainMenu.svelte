@@ -51,11 +51,11 @@
     href={options.href}
     target="_blank"
     class={cn(
-      'flex items-center justify-start gap-2 border-b-2 p-2 px-3 hover:bg-muted',
-      options.isSectionEnd && 'border-border-dark',
+      'flex items-center justify-start gap-2 border-b border-border p-2 px-3 text-sm hover:bg-muted text-foreground transition-colors',
+      options.isSectionEnd && 'border-b-2',
       options.class
     )}>
-    <options.icon class="size-5" />
+    <options.icon class="size-4 text-muted-foreground mr-1" />
     {options.label}
   </a>
 {/snippet}
@@ -73,12 +73,12 @@
 {#snippet darkModeMenuItem(options: MenuItem)}
   <div
     class={cn(
-      'flex cursor-pointer items-center justify-between border-b-2 px-3 py-2 hover:bg-muted',
-      options.isSectionEnd && 'border-border-dark',
+      'flex cursor-pointer items-center justify-between border-b border-border px-3 py-2.5 hover:bg-muted transition-colors text-sm text-foreground',
+      options.isSectionEnd && 'border-b-0',
       options.class
     )}>
     <span class="flex items-center gap-2">
-      <ContrastIcon />
+      <ContrastIcon class="size-4 text-muted-foreground mr-1" />
       Dark Mode
     </span>
     <Switch
@@ -88,13 +88,13 @@
 {/snippet}
 
 <Popover.Root>
-  <Popover.Trigger class="shrink-0">
+  <Popover.Trigger class="shrink-0 rounded-md p-1 hover:bg-muted transition-colors focus:ring-2 focus:ring-primary outline-none">
     <img
       src="https://raw.githubusercontent.com/mermert1/Assets/refs/heads/main/graphilogo.png"
-      alt="Graphi"
-      class="size-8 object-contain" />
+      alt="Menu"
+      class="size-6 object-contain" />
   </Popover.Trigger>
-  <Popover.Content align="start" class="flex flex-col overflow-hidden border-2 p-0" sideOffset={16}>
+  <Popover.Content align="start" class="flex flex-col w-56 overflow-hidden border border-border bg-background shadow-lg rounded-xl p-0" sideOffset={8}>
     {#each menuItems as { renderer, ...item } (item.label)}
       {@render renderer(item)}
     {/each}

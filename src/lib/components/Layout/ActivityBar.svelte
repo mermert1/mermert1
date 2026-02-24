@@ -8,6 +8,7 @@
   import InfoIcon from '~icons/material-symbols/info-outline';
   import HistoryIcon from '~icons/material-symbols/history';
   import PaletteIcon from '~icons/material-symbols/palette';
+  import KeyboardIcon from '~icons/material-symbols/keyboard-outline';
 
   interface Props {
     activeView: string;
@@ -25,40 +26,42 @@
   ];
 
   const secondaryActions = [
+    { id: 'shortcuts', icon: KeyboardIcon, label: 'Keyboard Shortcuts' },
     { id: 'credits', icon: InfoIcon, label: 'Credits' },
     { id: 'settings', icon: SettingsIcon, label: 'Settings' }
   ];
 </script>
 
-<div class="flex h-full w-12 flex-col items-center justify-between border-r bg-muted py-2">
-  <div class="flex flex-col gap-2">
+<aside class="flex h-full w-12 shrink-0 flex-col items-center justify-between border-r border-border bg-background py-4 theme-transition z-40">
+  <div class="flex flex-col items-center gap-3">
     {#each primaryActions as action (action.id)}
-      <Button
-        variant="ghost"
-        size="icon"
+      <button
         class={cn(
-          'size-10 rounded-none border-l-2 border-transparent hover:bg-background',
-          activeView === action.id && 'border-primary bg-background'
+          'p-2 rounded-lg transition-all',
+          activeView === action.id
+            ? 'text-primary bg-primary/10 shadow-sm'
+            : 'text-muted-foreground hover:text-primary hover:bg-muted/50 w-full'
         )}
         onclick={() => onViewChange(activeView === action.id ? '' : action.id)}
         title={action.label}>
-        <action.icon class="size-6 text-muted-foreground" />
-      </Button>
+        <action.icon class="w-5 h-5 mx-auto" />
+      </button>
     {/each}
   </div>
-  <div class="flex flex-col gap-2">
+  
+  <div class="flex flex-col items-center gap-3 mt-auto">
     {#each secondaryActions as action (action.id)}
-      <Button
-        variant="ghost"
-        size="icon"
+      <button
         class={cn(
-          'size-10 rounded-none border-l-2 border-transparent hover:bg-background',
-          activeView === action.id && 'border-primary bg-background'
+          'p-2 rounded-lg transition-all',
+          activeView === action.id
+            ? 'text-primary bg-primary/10 shadow-sm w-full'
+            : 'text-muted-foreground hover:text-primary hover:bg-muted/50 w-full'
         )}
         onclick={() => onViewChange(activeView === action.id ? '' : action.id)}
         title={action.label}>
-        <action.icon class="size-6 text-muted-foreground" />
-      </Button>
+        <action.icon class="w-5 h-5 mx-auto" />
+      </button>
     {/each}
   </div>
-</div>
+</aside>

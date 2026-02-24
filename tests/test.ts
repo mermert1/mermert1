@@ -8,17 +8,24 @@ export class EditorPage {
   readonly view: Locator;
 
   constructor(readonly page: Page) {
-    this.editor = page.locator('css=.monaco-editor');
-    this.markdownInput = page.getByTestId(TID.copyMarkdown);
+    this.editor = page.locator('css=.monaco-editor').first();
+    this.markdownInput = page.getByTestId(TID.copyMarkdown).first();
     this.view = page.locator('#view');
   }
 
   async start(url = '/edit') {
     await this.page.goto(url);
     await expect(this.page)
-      .toHaveURL(/.*\/edit#pako/)
+      .toHaveURL(/.*\/edit#pako/, { timeout: 10000 })
       // eslint-disable-next-line @typescript-eslint/no-empty-function
-      .catch(() => {});
+      .catch(() => { });
+  }
+
+  async setAdvancedMode() {
+    const isAdvanced = await this.page.getByText('Advanced').locator('xpath=preceding-sibling::button').getAttribute('data-state') === 'on' || await this.page.locator('button[data-state="on"]').evaluate((node) => node.parentElement?.textContent?.includes('Advanced')).catch(() => false);
+    if (!isAdvanced) {
+      await this.page.getByText('Advanced').click();
+    }
   }
 
   async typeInEditor(text: string, { bottom = true, newline = false }: EditorOptions = {}) {
@@ -39,11 +46,13 @@ export class EditorPage {
   }
 
   async toggleActions() {
-    await this.page.getByText('Actions', { exact: true }).click();
+    await this.setAdvancedMode();
+    await this.page.getByRole('button', { name: 'Export' }).first().click();
   }
 
   async toggleSampleDiagrams() {
-    await this.page.getByText('Sample Diagrams', { exact: true }).click();
+    await this.setAdvancedMode();
+    await this.page.getByTitle('Templates').first().click();
   }
 
   async checkAndDownloadPNG(expectedSize: number) {
@@ -95,11 +104,11 @@ export class EditorPage {
   }
 
   async toggleTheme() {
-    await this.page.getByTestId(TID.themeToggleButton).click();
+    await this.page.getByTestId(TID.themeToggleButton).first().click();
   }
 
   async checkTheme(theme: 'light' | 'dark') {
-    await expect(this.page.getByTestId(TID.themeToggleButton)).toHaveAttribute(
+    await expect(this.page.getByTestId(TID.themeToggleButton).first()).toHaveAttribute(
       'title',
       `Switch to ${theme === 'light' ? 'dark' : 'light'} theme`
     );
@@ -117,7 +126,7 @@ export const test = base.extend<{ editPage: EditorPage }>({
   editPage: async ({ page }, use) => {
     const editorPage = new EditorPage(page);
     await editorPage.start();
-    await editorPage.toggleSampleDiagrams();
+    await editorPage.setAdvancedMode();
     await use(editorPage);
   }
 });

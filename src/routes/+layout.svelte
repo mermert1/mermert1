@@ -14,13 +14,7 @@
 
   let { children }: Props = $props();
 
-  // This can be removed once https://github.com/sveltejs/kit/issues/1612 is fixed.
-  // Then move it into src and vite will bundle it automatically.
   onMount(() => {
-    window.addEventListener('hashchange', () => {
-      void initHandler();
-    });
-
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker
         .register(`${base}/service-worker.js`, { scope: `${base}/` })
@@ -38,10 +32,10 @@
   });
 </script>
 
-<ModeWatcher defaultMode="dark" />
+<ModeWatcher defaultMode="light" />
 <Toaster />
 
-<main class="h-[100dvh]">
+<main class="h-full w-full">
   {@render children()}
 </main>
 

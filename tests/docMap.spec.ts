@@ -12,14 +12,14 @@ test.describe('Editor docs tests', () => {
   test('Test to see if the correct URL loads when changing from one diagram to other', async ({
     editPage
   }) => {
-    await editPage.loadSampleDiagram('Flowchart');
+    await editPage.loadSampleDiagram('Simple Flow');
     await editPage.checkDocURL(/syntax\/flowchart\.html/);
     await editPage.setEditorMode('Config');
     await editPage.checkDocURL(/syntax\/flowchart\.html#configuration/);
     await editPage.setEditorMode('Code');
     await editPage.checkDocURL(/syntax\/flowchart\.html/);
 
-    await editPage.loadSampleDiagram('Sequence');
+    await editPage.loadSampleDiagram('User Auth');
     await editPage.checkDocURL(/syntax\/sequenceDiagram\.html/);
     await editPage.setEditorMode('Config');
     await editPage.checkDocURL(/syntax\/sequenceDiagram\.html#configuration/);
@@ -28,7 +28,7 @@ test.describe('Editor docs tests', () => {
   });
 
   test("Test to check URLs for a case where config URL doesn't exist", async ({ editPage }) => {
-    await editPage.loadSampleDiagram('State');
+    await editPage.loadSampleDiagram('Order Lifecycle');
     await editPage.checkDocURL(/syntax\/stateDiagram\.html/);
     await editPage.setEditorMode('Config');
     await editPage.checkDocURL(/syntax\/stateDiagram\.html/);

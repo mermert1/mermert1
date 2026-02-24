@@ -13,6 +13,32 @@
   ::file-selector-button {
     border-color: var(--color-gray-200, currentcolor);
   }
+
+  /* Custom Scrollbar Styling */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--muted-foreground);
+    border-radius: 10px;
+    opacity: 0.5;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+  }
+
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--muted-foreground) transparent;
+  }
 }
 
 @layer base {
@@ -23,44 +49,56 @@
     --card-foreground: hsl(222.2 84% 4.9%);
     --popover: hsl(0 0% 100%);
     --popover-foreground: hsl(222.2 84% 4.9%);
-    --primary: #7289da;
+    --primary: #4f46e5;
+    /* indigo-600 */
     --primary-foreground: hsl(0 0% 100%);
     --secondary: hsl(210 40% 96.1%);
     --secondary-foreground: hsl(222.2 47.4% 11.2%);
     --muted: hsl(228 24% 96%);
     --muted-foreground: hsl(215.4 16.3% 46.9%);
-    --accent: #7289da;
-    --accent-foreground: hsl(0 0% 100%);
+    --accent: #e0e7ff;
+    /* indigo-100 */
+    --accent-foreground: #312e81;
+    /* indigo-900 */
     --destructive: hsl(0 72.22% 50.59%);
     --destructive-foreground: hsl(210 40% 98%);
     --border: hsl(214.3 31.8% 91.4%);
     --border-dark: hsl(214.3 31.8% 81.4%);
     --input: hsl(214.3 31.8% 91.4%);
-    --ring: hsl(222.2 84% 4.9%);
+    --ring: #4f46e5;
+    /* indigo-600 */
     --radius: 0.75rem;
   }
 
   .dark {
-    --background: #282b30;
-    --foreground: #dcddde;
-    --card: #282b30;
-    --card-foreground: #dcddde;
-    --popover: #2f3136;
-    --popover-foreground: #dcddde;
-    --primary: #7289da;
+    --background: #020617;
+    /* Slate-950 - Blueish Dark */
+    --foreground: #f8fafc;
+    /* Slate-50 */
+    --card: #0f172a;
+    /* Slate-900 */
+    --card-foreground: #f8fafc;
+    --popover: #0f172a;
+    --popover-foreground: #f8fafc;
+    --primary: #6366f1;
+    /* indigo-500 */
     --primary-foreground: #ffffff;
-    --secondary: #2f3136;
-    --secondary-foreground: #dcddde;
-    --muted: #2f3136;
-    --muted-foreground: #72767d;
-    --accent: #7289da;
+    --secondary: #1e293b;
+    /* Slate-800 */
+    --secondary-foreground: #f8fafc;
+    --muted: #1e293b;
+    --muted-foreground: #94a3b8;
+    /* Slate-400 */
+    --accent: #334155;
+    /* Slate-700 */
     --accent-foreground: #ffffff;
-    --destructive: #7289da;
+    --destructive: #ef4444;
     --destructive-foreground: #ffffff;
-    --border: #202225;
-    --border-dark: #202225;
-    --input: #202225;
-    --ring: #7289da;
+    --border: #1e293b;
+    /* Slate-800 */
+    --border-dark: #0f172a;
+    --input: #1e293b;
+    --ring: #6366f1;
   }
 }
 
@@ -109,8 +147,14 @@
   }
 
   body {
-    @apply h-screen w-screen overflow-hidden bg-background text-foreground;
+    @apply bg-background text-foreground;
   }
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
 }
 
 body {
@@ -123,10 +167,8 @@ body {
 
 /* === Glassmorphism & Premium UI Utilities === */
 .glass {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--background);
+  border: 1px solid var(--border);
 }
 
 .glass-subtle {
@@ -136,20 +178,27 @@ body {
 }
 
 .glow {
-  box-shadow: 0 0 20px rgba(114, 137, 218, 0.15),
-              0 0 60px rgba(114, 137, 218, 0.05);
+  box-shadow: none;
 }
 
 .glow-hover:hover {
   box-shadow: 0 0 25px rgba(114, 137, 218, 0.25),
-              0 0 80px rgba(114, 137, 218, 0.08);
+    0 0 80px rgba(114, 137, 218, 0.08);
 }
 
 /* Animated gradient background */
 @keyframes gradient-shift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .animate-gradient {
@@ -159,9 +208,12 @@ body {
 
 /* Pulse glow for active elements */
 @keyframes pulse-glow {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow: 0 0 8px rgba(114, 137, 218, 0.2);
   }
+
   50% {
     box-shadow: 0 0 20px rgba(114, 137, 218, 0.4);
   }
@@ -177,6 +229,7 @@ body {
     opacity: 0;
     transform: translateY(8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -185,4 +238,14 @@ body {
 
 .animate-slide-up {
   animation: slide-up-fade 0.3s ease-out;
+}
+
+/* Remove any potential remaining outer glows */
+* {
+  box-shadow: none !important;
+}
+
+/* Re-enable focus rings which are important for accessibility and distinct from the branding glow */
+*:focus-visible {
+  @apply ring-2 ring-primary ring-offset-2 !important;
 }

@@ -7,6 +7,7 @@
   import ThemeIcon from '~icons/material-symbols/dark-mode-rounded';
   import AppThemeIcon from '~icons/material-symbols/palette';
   import TrashIcon from '~icons/material-symbols/delete-forever';
+  import ZapIcon from '~icons/material-symbols/bolt';
 
   let sync = $derived($stateStore.updateDiagram);
   // let autoSync = $derived($stateStore.autoSync);
@@ -15,6 +16,7 @@
   let currentTheme = $derived(JSON.parse($stateStore.mermaid).theme);
   let isDark = $derived(currentTheme === 'dark');
   let isAppDark = $derived($mode === 'dark');
+  let performanceMode = $derived($stateStore.performanceMode);
 
   const toggleSync = () => {
     updateCodeStore({ updateDiagram: !sync });
@@ -33,6 +35,10 @@
 
   const handleThemeChange = () => {
     toggleDarkTheme(!isDark);
+  };
+
+  const togglePerformance = () => {
+    updateCodeStore({ performanceMode: !performanceMode });
   };
 
   const handleAppThemeChange = () => {
@@ -96,6 +102,16 @@
     <div class="flex items-center justify-between">
       <Label for="pan-zoom">Pan & Zoom</Label>
       <Switch id="pan-zoom" checked={panZoom} onCheckedChange={togglePanZoom} />
+    </div>
+    <div class="flex items-center justify-between">
+      <div class="flex flex-col gap-0.5">
+          <Label for="performance-mode" class="flex items-center gap-1.5">
+            <ZapIcon class="size-3.5 text-amber-500" />
+            Performance Mode
+          </Label>
+          <span class="text-[10px] text-muted-foreground">Optimize for large diagrams</span>
+      </div>
+      <Switch id="performance-mode" checked={performanceMode} onCheckedChange={togglePerformance} />
     </div>
   </div>
 

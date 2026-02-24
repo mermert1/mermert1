@@ -1,87 +1,90 @@
 <script lang="ts">
-  import CopyButton from '$/components/CopyButton.svelte';
-  import CopyInput from '$/components/CopyInput.svelte';
-  import ExternalLinkWrapper from '$/components/ExternalLinkWrapper.svelte';
-  import { Button } from '$/components/ui/button';
-  import { Input } from '$/components/ui/input';
-  import { Separator } from '$/components/ui/separator';
-  import * as ToggleGroup from '$/components/ui/toggle-group';
-  import { TID } from '$/constants';
-  import { getDomain } from '$/util/util';
-  import { browser } from '$app/environment';
-  import { waitForRender } from '$lib/util/autoSync';
-  import { inputStateStore, stateStore, urlsStore } from '$lib/util/state';
-  import { logEvent } from '$lib/util/stats';
-  import { version as FAVersion } from '@fortawesome/fontawesome-free/package.json';
+  import CopyButton from '../CopyButton.svelte';
+  import { Button } from '../ui/button';
+  import { Input } from '../ui/input';
+  import { Separator } from '../ui/separator';
+  import * as ToggleGroup from '../ui/toggle-group';
+  import { TID } from '../../constants';
+  import { waitForRender } from '../../util/autoSync';
+  import { inputStateStore, stateStore } from '../../util/state';
+  import { logEvent } from '../../util/stats';
   import dayjs from 'dayjs';
   import { toBase64 } from 'js-base64';
   import DownloadIcon from '~icons/material-symbols/download';
-  import ExternalLinkIcon from '~icons/material-symbols/open-in-new-rounded';
   import WidthIcon from '~icons/material-symbols/width-rounded';
+  import PaletteIcon from '~icons/material-symbols/palette';
+  import PrintIcon from '~icons/material-symbols/print';
 
+  const FAVersion = '6.7.2';
   const FONT_AWESOME_URL = `https://cdnjs.cloudflare.com/ajax/libs/font-awesome/${FAVersion}/css/all.min.css`;
 
-  type Exporter = (context: CanvasRenderingContext2D, image: HTMLImageElement) => () => void;
-
-  let imageSizeMode: 'auto' | 'width' | 'height' = $state('auto');
+  let imageSizeMode: string = $state('auto');
   let isTransparent = $state(false);
+  let exportBackground = $state('#ffffff');
 
   $effect(() => {
-    if (!imageSizeMode) {
-      imageSizeMode = 'auto';
+    if (typeof window !== 'undefined' && (stateStore as any).exportBackground) {
+        exportBackground = (stateStore as any).exportBackground;
+    }
+  });
+
+  $effect(() => {
+    if (typeof window !== 'undefined' && (stateStore as any).exportBackground !== exportBackground) {
+        inputStateStore.update((s: any) => ({ ...s, exportBackground }));
     }
   });
 
   let imageSize = $state(1080);
 
-  const getSvgElement = () => {
-    const svgElement = document.querySelector('#container svg')?.cloneNode(true) as HTMLElement;
-    svgElement.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
-    return svgElement;
+  const getSvgElement = (): any => {
+    if (typeof document === 'undefined') return null;
+    const svgElement = document.querySelector('#container svg')?.cloneNode(true);
+    if (!svgElement) return null;
+    const element = svgElement as any;
+    element.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+    return element;
   };
 
-  const getBase64SVG = (svg?: HTMLElement, width?: number, height?: number): string => {
-    if (svg) {
-      // Prevents the SVG size of the interface from being changed
-      svg = svg.cloneNode(true) as HTMLElement;
+  const getBase64SVG = (svg?: any, width?: number, height?: number): string => {
+    let svgToUse: any = svg;
+    if (svgToUse) {
+      svgToUse = svgToUse.cloneNode(true);
+    } else {
+      svgToUse = getSvgElement();
     }
+    
+    if (!svgToUse) return '';
+
     if (height) {
-      svg?.setAttribute('height', `${height}px`);
+      svgToUse.setAttribute('height', `${height}px`);
     }
     if (width) {
-      svg?.setAttribute('width', `${width}px`);
-    }
-
-    if (!svg) {
-      svg = getSvgElement();
+      svgToUse.setAttribute('width', `${width}px`);
     }
 
     if (!isTransparent) {
-      svg.style.backgroundColor = window
-        .getComputedStyle(document.body)
-        .getPropertyValue('--background');
+      svgToUse.style.backgroundColor = exportBackground;
     } else {
-      svg.style.backgroundColor = 'transparent';
+      svgToUse.style.backgroundColor = 'transparent';
     }
 
-    const svgString = svg.outerHTML
+    const svgString = svgToUse.outerHTML
       .replaceAll('<br>', '<br/>')
-      .replaceAll(/<img([^>]*)>/g, (m, g: string) => `<img ${g} />`);
+      .replaceAll(/<img([^>]*)>/g, (m: string, g: string) => `<img ${g} />`);
 
     return toBase64(`<?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet href="${FONT_AWESOME_URL}" type="text/css"?>
 ${svgString}`);
   };
 
-  const exportImage = async (event: Event, exporter: Exporter) => {
-    $inputStateStore.panZoom = false;
+  const exportImage = async (event: Event, exporter: any) => {
+    if (typeof window === 'undefined') return;
+    (inputStateStore as any).update((s: any) => ({ ...s, panZoom: false }));
     await new Promise((resolve) => setTimeout(resolve, 1000));
     await waitForRender();
     const canvas = document.createElement('canvas');
-    const svg = document.querySelector<HTMLElement>('#container svg');
-    if (!svg) {
-      throw new Error('svg not found');
-    }
+    const svg = document.querySelector<any>('#container svg');
+    if (!svg) return;
 
     const box = svg.getBoundingClientRect();
 
@@ -100,12 +103,10 @@ ${svgString}`);
     }
 
     const context = canvas.getContext('2d');
-    if (!context) {
-      throw new Error('context not found');
-    }
+    if (!context) return;
 
     if (!isTransparent) {
-      context.fillStyle = window.getComputedStyle(document.body).getPropertyValue('--background');
+      context.fillStyle = exportBackground;
       context.fillRect(0, 0, canvas.width, canvas.height);
     } else {
       context.clearRect(0, 0, canvas.width, canvas.height);
@@ -114,15 +115,9 @@ ${svgString}`);
     const image = new Image();
     image.addEventListener('load', () => {
       exporter(context, image)();
-      $inputStateStore.panZoom = true;
+      (inputStateStore as any).update((s: any) => ({ ...s, panZoom: true }));
     });
     image.src = `data:image/svg+xml;base64,${getBase64SVG(svg, canvas.width, canvas.height)}`;
-    // Fallback to set panZoom to true after 2 seconds
-    setTimeout(() => {
-      if (!$inputStateStore.panZoom) {
-        $inputStateStore.panZoom = true;
-      }
-    }, 2000);
     event.stopPropagation();
     event.preventDefault();
   };
@@ -131,6 +126,7 @@ ${svgString}`);
     `mermaid-diagram-${dayjs().format('YYYY-MM-DD-HHmmss')}.${extension}`;
 
   const simulateDownload = (download: string, href: string): void => {
+    if (typeof document === 'undefined') return;
     const a = document.createElement('a');
     a.download = download;
     a.href = href;
@@ -138,9 +134,9 @@ ${svgString}`);
     a.remove();
   };
 
-  const downloadImage: Exporter = (context, image) => {
+  const downloadImage: any = (context: any, image: any) => {
     return () => {
-      const { canvas } = context;
+      const canvas = context.canvas;
       context.drawImage(image, 0, 0, canvas.width, canvas.height);
       simulateDownload(
         getFileName('png'),
@@ -150,23 +146,24 @@ ${svgString}`);
   };
 
   const isClipboardAvailable = (): boolean => {
-    return Object.prototype.hasOwnProperty.call(window, 'ClipboardItem');
+    return typeof window !== 'undefined' && 'ClipboardItem' in (window as any);
   };
 
-  const clipboardCopy: Exporter = (context, image) => {
+  const clipboardCopy: any = (context: any, image: any) => {
     return () => {
-      const { canvas } = context;
+      const canvas = context.canvas;
       context.drawImage(image, 0, 0, canvas.width, canvas.height);
-      canvas.toBlob((blob) => {
+      canvas.toBlob((blob: any) => {
         try {
-          if (!blob) {
-            throw new Error('blob is empty');
+          if (!blob) return;
+          const nav = (typeof window !== 'undefined' ? window.navigator : null) as any;
+          if (nav && nav.clipboard && 'write' in nav.clipboard) {
+            void nav.clipboard.write([
+                new (window as any).ClipboardItem({
+                [blob.type]: blob
+                })
+            ]);
           }
-          void navigator.clipboard.write([
-            new ClipboardItem({
-              [blob.type]: blob
-            })
-          ]);
         } catch (error) {
           console.error(error);
         }
@@ -193,127 +190,155 @@ ${svgString}`);
     });
   };
 
-  let gistURL = $state('');
-  stateStore.subscribe(({ loader }) => {
-    if (loader?.type === 'gist') {
-      gistURL = loader.config.url;
+  const onDownloadPDF = () => {
+    if (typeof window === 'undefined') return;
+    const svg = getSvgElement();
+    if (!svg) return;
+    
+    // Ensure the SVG fills the container for PDF export
+    svg.removeAttribute('width');
+    svg.removeAttribute('height');
+    svg.style.maxWidth = '100%';
+    svg.style.width = '100%';
+    svg.style.height = '100%';
+    
+    const svgBase64 = getBase64SVG(svg);
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>Mermaid Export - PDF</title>
+            <style>
+              @page { size: auto; margin: 0; }
+              html, body { 
+                margin: 0; 
+                padding: 0; 
+                width: 100vw; 
+                height: 100vh; 
+                overflow: hidden;
+                background: ${isTransparent ? 'transparent' : exportBackground};
+              }
+              .container {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 100%;
+                height: 100%;
+                padding: 20px;
+                box-sizing: border-box;
+              }
+              img { 
+                max-width: 100%; 
+                max-height: 100%; 
+                object-fit: contain;
+                display: block;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <img src="data:image/svg+xml;base64,${svgBase64}" />
+            </div>
+            <scr` + `ipt>
+              window.onload = () => {
+                setTimeout(() => {
+                    window.print();
+                    window.close();
+                }, 1000);
+              };
+            </scr` + `ipt>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
     }
-  });
-
-  const loadGist = () => {
-    if (!gistURL) {
-      return alert('Please enter a Gist URL first');
-    }
-    window.location.href = `${window.location.pathname}?gist=${gistURL}`;
-    logEvent('loadGist');
+    logEvent('download', { type: 'pdf' });
   };
 
-  const isNetlify = browser && window.location.host.includes('netlify');
 </script>
 
-{#snippet dualActionButton(text: string, download: (event: Event) => unknown, url?: string)}
-  <div class="flex flex-grow gap-0.5">
-    <Button
-      class={['flex-grow', url && 'rounded-r-none']}
-      onclick={download}
-      data-testid="download-{text}">
-      <DownloadIcon />
-      {text}
-    </Button>
-    <ExternalLinkWrapper domain={getDomain(url)} isVisible={!!url}>
-      <Button class="rounded-l-none" href={url} target="_blank" rel="noreferrer noopener">
-        <ExternalLinkIcon />
-      </Button>
-    </ExternalLinkWrapper>
-  </div>
-{/snippet}
-
-<div class="flex min-w-fit flex-col gap-2 p-2">
-  <div class="mb-1 text-xs font-bold text-muted-foreground uppercase">Image Size</div>
-  <div class="flex w-full items-center gap-2 whitespace-nowrap">
+<div class="flex min-w-fit flex-col gap-4 p-4">
+  <!-- Size Configuration -->
+  <div class="flex flex-col gap-2">
+    <div class="flex items-center justify-between">
+        <span class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Image Size</span>
+        <span class="text-[10px] font-medium px-1.5 py-0.5 rounded bg-muted text-muted-foreground">Px</span>
+    </div>
     <ToggleGroup.Root
       type="single"
       variant="outline"
       bind:value={imageSizeMode}
-      class="w-full justify-start">
-      <ToggleGroup.Item value="auto" class="flex-1">Auto</ToggleGroup.Item>
-      <ToggleGroup.Item value="width" class="flex-1">Width</ToggleGroup.Item>
-      <ToggleGroup.Item value="height" class="flex-1">Height</ToggleGroup.Item>
+      class="w-full justify-start h-8">
+      <ToggleGroup.Item value="auto" class="flex-1 text-xs px-2">Auto</ToggleGroup.Item>
+      <ToggleGroup.Item value="width" class="flex-1 text-xs px-2">Width</ToggleGroup.Item>
+      <ToggleGroup.Item value="height" class="flex-1 text-xs px-2">Height</ToggleGroup.Item>
     </ToggleGroup.Root>
-  </div>
 
-  {#if imageSizeMode !== 'auto'}
-    <div class="mt-1 flex items-center gap-2">
-      <WidthIcon
-        class={[
-          'size-6 shrink-0 text-muted-foreground transition-all',
-          imageSizeMode === 'width' && 'rotate-90'
-        ]} />
-      <Input
-        type="number"
-        min="3"
-        max="10000"
-        disabled={imageSizeMode === 'auto'}
-        bind:value={imageSize}
-        class="h-8" />
-    </div>
-  {/if}
-
-  <div class="flex items-center gap-2 py-2">
-    <input
-      id="transparent-bg"
-      type="checkbox"
-      bind:checked={isTransparent}
-      class="size-4 rounded border-gray-300 text-primary focus:ring-primary" />
-    <label for="transparent-bg" class="cursor-pointer text-sm whitespace-nowrap"
-      >Transparent background</label>
+    {#if imageSizeMode !== 'auto'}
+        <div class="flex items-center gap-2">
+            <WidthIcon class={['size-4 shrink-0 text-muted-foreground transition-all', imageSizeMode === 'width' && 'rotate-90']} />
+            <Input type="number" min="3" max="10000" bind:value={imageSize} class="h-8 text-xs" />
+        </div>
+    {/if}
   </div>
 
   <Separator />
 
-  <div class="mt-2 flex flex-col gap-2">
-    <div class="mb-1 text-xs font-bold text-muted-foreground uppercase">Download</div>
-    {@render dualActionButton('PNG', onDownloadPNG, $urlsStore.png)}
-    {@render dualActionButton('SVG', onDownloadSVG, $urlsStore.svg)}
+  <!-- Background Configuration -->
+  <div class="flex flex-col gap-3">
+    <div class="flex items-center justify-between">
+        <span class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Background</span>
+        <PaletteIcon class="size-3.5 text-muted-foreground" />
+    </div>
+    
+    <div class="flex flex-col gap-2">
+        <div class="flex items-center justify-between">
+            <label for="transparent-bg" class="cursor-pointer text-xs text-foreground font-medium select-none">Transparent</label>
+            <input id="transparent-bg" type="checkbox" bind:checked={isTransparent} class="size-3.5 rounded border-border bg-background text-primary focus:ring-primary" />
+        </div>
+        
+        {#if !isTransparent}
+            <div class="flex items-center gap-2">
+                <input type="color" bind:value={exportBackground} class="size-6 p-0 border-0 bg-transparent cursor-pointer rounded overflow-hidden" />
+                <Input type="text" bind:value={exportBackground} class="h-7 text-[10px] font-mono uppercase px-2" />
+            </div>
+        {/if}
+    </div>
   </div>
 
-  <div class="mt-2">
-    <ExternalLinkWrapper domain={getDomain($urlsStore.kroki)} isVisible={!!$urlsStore.kroki}>
-      <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-      <a target="_blank" rel="noreferrer" class="flex-grow" href={$urlsStore.kroki}>
-        <Button variant="outline" class="action-btn flex w-full items-center justify-start gap-2">
-          <ExternalLinkIcon /> Open in Kroki
-        </Button>
-      </a>
-    </ExternalLinkWrapper>
-  </div>
+  <Separator />
 
-  <Separator class="my-2" />
-
-  {#if isClipboardAvailable()}
-    <CopyButton onclick={onCopyClipboard} label="Copy Image" />
-  {/if}
-  <ExternalLinkWrapper
-    labelPrefix="Thumbnail generated by"
-    domain={getDomain($urlsStore.png)}
-    isVisible={!!$urlsStore.mdCode}>
-    <CopyInput value={$urlsStore.mdCode} label="Copy Markdown" testID={TID.copyMarkdown} />
-  </ExternalLinkWrapper>
-
-  <Separator class="my-2" />
-
+  <!-- Export Actions -->
   <div class="flex flex-col gap-2">
-    <div class="mb-1 text-xs font-bold text-muted-foreground uppercase">Gist</div>
-    <div class="flex w-full items-center gap-2">
-      <Input type="url" bind:value={gistURL} placeholder="Enter Gist URL" class="h-8" />
+    <div class="flex items-center justify-between mb-1">
+        <span class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider font-bold">Export Format</span>
     </div>
-    <Button variant="secondary" onclick={loadGist} class="w-full">Load Gist</Button>
+    
+    <div class="grid grid-cols-2 gap-2">
+        <Button variant="secondary" size="sm" onclick={onDownloadPNG} class="h-8 gap-2 text-xs font-bold">
+            <DownloadIcon class="size-3.5" /> PNG
+        </Button>
+        <Button variant="secondary" size="sm" onclick={onDownloadSVG} class="h-8 gap-2 text-xs font-bold">
+            <DownloadIcon class="size-3.5" /> SVG
+        </Button>
+    </div>
+    
+    <Button variant="secondary" size="sm" onclick={onDownloadPDF} class="h-8 gap-2 text-xs font-bold w-full">
+        <PrintIcon class="size-3.5" /> Export as PDF
+    </Button>
+
+    {#if isClipboardAvailable()}
+        <div class="mt-2">
+            <CopyButton onclick={onCopyClipboard} label="Copy to Clipboard" />
+        </div>
+    {/if}
   </div>
-  {#if isNetlify}
-    <div class="mt-4 flex w-full items-center justify-center">
-      <a class="link text-sm text-gray-500 underline" href="https://netlify.com">
-        This site is powered by Netlify
-      </a>
-    </div>
-  {/if}
+
+  <div class="mt-4 p-3 rounded-lg bg-orange-500/5 border border-orange-500/20">
+    <p class="text-[10px] text-orange-600/80 leading-relaxed font-medium">
+        Tip: PDF export works best with high-resolution settings for large diagrams.
+    </p>
+  </div>
 </div>
