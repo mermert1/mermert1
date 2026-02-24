@@ -5,7 +5,6 @@
 @custom-variant dark (&:is(.dark *));
 
 @layer base {
-
   *,
   ::after,
   ::before,
@@ -182,7 +181,8 @@ body {
 }
 
 .glow-hover:hover {
-  box-shadow: 0 0 25px rgba(114, 137, 218, 0.25),
+  box-shadow:
+    0 0 25px rgba(114, 137, 218, 0.25),
     0 0 80px rgba(114, 137, 218, 0.08);
 }
 
@@ -208,7 +208,6 @@ body {
 
 /* Pulse glow for active elements */
 @keyframes pulse-glow {
-
   0%,
   100% {
     box-shadow: 0 0 8px rgba(114, 137, 218, 0.2);
@@ -247,5 +246,5 @@ body {
 
 /* Re-enable focus rings which are important for accessibility and distinct from the branding glow */
 *:focus-visible {
-  @apply ring-2 ring-primary ring-offset-2 !important;
+  @apply ring-2 ring-primary ring-offset-2;
 }
