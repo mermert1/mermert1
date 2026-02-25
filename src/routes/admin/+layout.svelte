@@ -1,82 +1,40 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
-  import { setToken, getToken, validateUserAccess, logout } from '$lib/github/api';
   import { page } from '$app/stores';
+  import { base } from '$app/paths';
+  import { Home } from 'lucide-svelte';
+  import {
+    isAuthenticated,
+    isCheckingAuth,
+    login,
+    logout as storeLogout,
+    initAuthListener
+  } from '$lib/stores/auth';
 
-  let isCheckingAuth = true;
-  let isAuthenticated = false;
   let authError = '';
 
-  // Constants for OAuth Flow
-  const OAUTH_WORKER_URL = 'https://graphi-cms-oauth.thatzane.workers.dev/auth';
-
-  onMount(async () => {
-    // Check if already logged in
-    const existingToken = getToken();
-    if (existingToken) {
-      const isAuthorized = await validateUserAccess();
-      if (isAuthorized) {
-        isAuthenticated = true;
-      } else {
-        logout();
-        authError = 'Your session expired or you lost access.';
-      }
-    }
-
-    isCheckingAuth = false;
-
-    // Listen for postMessage specifically if the worker opens a popup window
-    window.addEventListener(
-      'message',
-      async (event) => {
-        // 1. Handshake: Worker says "I am ready to authorize"
-        if (event.data === 'authorizing:github') {
-          // Tell the popup we are ready to receive the token
-          (event.source as Window).postMessage('authorization:github:ready', event.origin);
-          return;
-        }
-
-        // 2. Success: Worker sends the token
-        if (
-          event.data &&
-          typeof event.data === 'string' &&
-          event.data.startsWith('authorization:github:success:')
-        ) {
-          const jsonStr = event.data.substring('authorization:github:success:'.length);
-          try {
-            const payload = JSON.parse(jsonStr);
-            if (payload.token) {
-              setToken(payload.token);
-
-              const isAuthorized = await validateUserAccess();
-              if (isAuthorized) {
-                isAuthenticated = true;
-                authError = '';
-                // If we were at /admin with a code, clean it (though we use popups now)
-                window.history.replaceState({}, document.title, '/admin');
-              } else {
-                logout();
-                authError = 'Your GitHub account is not authorized in cms-config.json.';
-              }
-            }
-          } catch (e) {
-            console.error('Failed to parse auth token', e);
-          }
-        }
+  onMount(() => {
+    // We already run initAuthListener globally, but we can capture errors locally if we want.
+    // The global listener in +layout.svelte handles state perfectly so we just show errors here if present.
+    // The callback sets local auth error if validation fails in this tab.
+    initAuthListener(
+      (err) => {
+        authError = err;
       },
-      false
+      () => {
+        authError = '';
+        window.history.replaceState({}, document.title, '/admin');
+      }
     );
   });
 
   function handleLogin() {
-    // Open OAuth in popup like Static CMS
-    window.open(OAUTH_WORKER_URL, 'Auth', 'width=800,height=600');
+    login();
   }
 
   function handleLogout() {
-    logout();
-    isAuthenticated = false;
+    storeLogout();
     goto('/admin');
   }
 </script>
@@ -90,6 +48,12 @@
   <header class="sticky top-0 z-30 border-b border-border bg-card/50 backdrop-blur-sm">
     <div class="container mx-auto flex h-16 items-center justify-between px-4">
       <div class="flex items-center gap-3">
+        <a
+          href="{base}/"
+          class="flex items-center justify-center rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted/50 hover:text-primary">
+          <Home class="h-5 w-5" />
+        </a>
+        <div class="h-6 w-px bg-border"></div>
         <img src="/graphi-logo.png" alt="Graphi Logo" class="h-8 w-8 rounded" />
         <h1
           class="bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-xl font-bold text-transparent">
@@ -97,7 +61,7 @@
         </h1>
       </div>
 
-      {#if isAuthenticated}
+      {#if $isAuthenticated}
         <div class="flex items-center gap-4">
           <nav class="hidden gap-1 md:flex">
             <a
@@ -133,14 +97,14 @@
 
   <!-- Main Content Area -->
   <main class="container mx-auto flex-grow p-4 md:p-8">
-    {#if isCheckingAuth}
+    {#if $isCheckingAuth}
       <div class="flex h-[60vh] items-center justify-center">
         <div class="flex flex-col items-center gap-4">
           <i class="fas fa-circle-notch fa-spin text-4xl text-primary"></i>
           <p class="animate-pulse text-muted-foreground">Authenticating with GitHub...</p>
         </div>
       </div>
-    {:else if !isAuthenticated}
+    {:else if !$isAuthenticated}
       <div class="flex h-[60vh] items-center justify-center">
         <div
           class="relative w-full max-w-md overflow-hidden rounded-xl border border-border bg-card p-8 shadow-xl">

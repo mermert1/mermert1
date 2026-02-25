@@ -2,10 +2,10 @@
   import { Toaster } from '$/components/ui/sonner/index.js';
   import { loadingStateStore } from '$/util/loading';
   import { toggleDarkTheme } from '$/util/state';
-  import { initHandler } from '$/util/util';
   import { base } from '$app/paths';
   import { mode, ModeWatcher } from 'mode-watcher';
   import { onMount, type Snippet } from 'svelte';
+  import { initAuthListener, checkAuth } from '$lib/stores/auth';
   import '../app.css';
 
   interface Props {
@@ -15,6 +15,8 @@
   let { children }: Props = $props();
 
   onMount(() => {
+    initAuthListener();
+    checkAuth();
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker
         .register(`${base}/service-worker.js`, { scope: `${base}/` })

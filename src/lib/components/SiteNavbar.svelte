@@ -1,8 +1,19 @@
 <script lang="ts">
   import { base } from '$app/paths';
   import { Button } from '$/components/ui/button';
-  import { Share2, Github, Sun, Moon, Menu, X } from 'lucide-svelte';
+  import {
+    Share2,
+    Github,
+    Sun,
+    Moon,
+    Menu,
+    X,
+    LogIn,
+    LogOut,
+    LayoutDashboard
+  } from 'lucide-svelte';
   import { mode, setMode } from 'mode-watcher';
+  import { isAuthenticated, login, logout } from '$lib/stores/auth';
 
   let isMobileMenuOpen = false;
 
@@ -41,6 +52,15 @@
           href="{base}/docs"
           class="font-medium text-muted-foreground transition-colors hover:text-primary"
           >Documentation</a>
+
+        {#if $isAuthenticated}
+          <a
+            href="{base}/admin"
+            class="flex items-center gap-1 font-medium text-muted-foreground transition-colors hover:text-primary">
+            <LayoutDashboard class="h-4 w-4" /> Admin
+          </a>
+        {/if}
+
         <div class="h-6 w-px bg-border"></div>
 
         <!-- Theme Toggle -->
@@ -67,6 +87,23 @@
           class="h-auto rounded-full bg-primary px-5 py-2.5 font-medium text-primary-foreground shadow-sm transition-all hover:opacity-90 hover:shadow-md">
           Open Editor
         </Button>
+        {#if $isAuthenticated}
+          <Button
+            variant="ghost"
+            size="sm"
+            onclick={logout}
+            class="text-muted-foreground hover:text-destructive">
+            <LogOut class="mr-2 h-4 w-4" /> Logout
+          </Button>
+        {:else}
+          <Button
+            variant="ghost"
+            size="sm"
+            onclick={login}
+            class="text-muted-foreground hover:text-primary">
+            <LogIn class="mr-2 h-4 w-4" /> Login
+          </Button>
+        {/if}
       </div>
 
       <!-- Mobile Menu Button -->
@@ -108,6 +145,13 @@
           on:click={toggleMobileMenu}
           class="block rounded-md px-3 py-2 text-base font-medium text-muted-foreground hover:bg-muted hover:text-primary"
           >Documentation</a>
+        {#if $isAuthenticated}
+          <a
+            href="{base}/admin"
+            on:click={toggleMobileMenu}
+            class="block rounded-md px-3 py-2 text-base font-medium text-muted-foreground hover:bg-muted hover:text-primary"
+            >Admin</a>
+        {/if}
         <div class="my-2 border-t border-border pt-2">
           <a
             href="https://github.com/mermert1/mermert1"
@@ -120,6 +164,25 @@
             class="mt-2 h-auto w-full rounded-md bg-indigo-600 px-3 py-2 text-center text-base font-medium text-white hover:bg-indigo-700">
             Open Editor
           </Button>
+          {#if $isAuthenticated}
+            <button
+              on:click={() => {
+                logout();
+                toggleMobileMenu();
+              }}
+              class="mt-2 flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-base font-medium text-muted-foreground hover:bg-destructive/10 hover:text-destructive">
+              <LogOut class="h-4 w-4" /> Logout
+            </button>
+          {:else}
+            <button
+              on:click={() => {
+                login();
+                toggleMobileMenu();
+              }}
+              class="mt-2 flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-base font-medium text-muted-foreground hover:bg-muted hover:text-primary">
+              <LogIn class="h-4 w-4" /> Login
+            </button>
+          {/if}
         </div>
       </div>
     </div>
