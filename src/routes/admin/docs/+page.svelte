@@ -16,8 +16,6 @@
   let isLoading = true;
   let error = '';
 
-  const DOCS_PATH = 'src/content/docs';
-
   onMount(async () => {
     try {
       const contents = await getDirectoryContents(DOCS_PATH);
