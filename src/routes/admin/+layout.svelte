@@ -90,15 +90,16 @@
           <div class="mx-2 h-6 w-px bg-border"></div>
           {#if $authUser}
             <DropdownMenu.Root>
-              <DropdownMenu.Trigger asChild let:builder>
-                <button
-                  use:builder.action
-                  {...builder}
-                  class="flex items-center gap-2 rounded-full border border-border p-1 pr-3 transition-colors hover:bg-muted/50 focus:ring-2 focus:ring-primary/20 focus:outline-none">
-                  <img src={$authUser.avatar_url} alt="Profile" class="h-8 w-8 rounded-full" />
-                  <span class="text-sm font-medium">{$authUser.login}</span>
-                  <ChevronDown class="h-4 w-4 text-muted-foreground" />
-                </button>
+              <DropdownMenu.Trigger asChild>
+                {#snippet child({ props })}
+                  <button
+                    {...props}
+                    class="flex items-center gap-2 rounded-full border border-border p-1 pr-3 transition-colors hover:bg-muted/50 focus:ring-2 focus:ring-primary/20 focus:outline-none">
+                    <img src={$authUser.avatar_url} alt="Profile" class="h-8 w-8 rounded-full" />
+                    <span class="text-sm font-medium">{$authUser.login}</span>
+                    <ChevronDown class="h-4 w-4 text-muted-foreground" />
+                  </button>
+                {/snippet}
               </DropdownMenu.Trigger>
               <DropdownMenu.Content align="end" class="w-56">
                 <DropdownMenu.Label class="font-normal">

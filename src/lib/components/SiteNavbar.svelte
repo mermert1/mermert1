@@ -92,18 +92,19 @@
         {#if $isAuthenticated}
           {#if $authUser}
             <DropdownMenu.Root>
-              <DropdownMenu.Trigger asChild let:builder>
-                <button
-                  use:builder.action
-                  {...builder}
-                  class="flex items-center gap-2 rounded-full border border-border p-1 pr-3 transition-all hover:border-primary hover:bg-muted/50 focus:ring-2 focus:ring-primary/20 focus:outline-none">
-                  <img
-                    src={$authUser.avatar_url}
-                    alt="Profile"
-                    class="h-8 w-8 rounded-full object-cover" />
-                  <span class="hidden text-sm font-medium sm:block">{$authUser.login}</span>
-                  <ChevronDown class="h-4 w-4 text-muted-foreground" />
-                </button>
+              <DropdownMenu.Trigger asChild>
+                {#snippet child({ props })}
+                  <button
+                    {...props}
+                    class="flex items-center gap-2 rounded-full border border-border p-1 pr-3 transition-all hover:border-primary hover:bg-muted/50 focus:ring-2 focus:ring-primary/20 focus:outline-none">
+                    <img
+                      src={$authUser.avatar_url}
+                      alt="Profile"
+                      class="h-8 w-8 rounded-full object-cover" />
+                    <span class="hidden text-sm font-medium sm:block">{$authUser.login}</span>
+                    <ChevronDown class="h-4 w-4 text-muted-foreground" />
+                  </button>
+                {/snippet}
               </DropdownMenu.Trigger>
               <DropdownMenu.Content align="end" class="w-56">
                 <DropdownMenu.Label class="font-normal">
@@ -129,7 +130,7 @@
           <Button
             size="sm"
             onclick={login}
-            class="flex items-center gap-2 bg-foreground text-background transition-all hover:scale-[1.02] hover:bg-foreground/90">
+            class="flex items-center gap-2 rounded-full border-2 border-indigo-600 bg-indigo-600/10 px-4 font-bold text-indigo-600 transition-all hover:bg-indigo-600 hover:text-white">
             <LogIn class="h-4 w-4" /> Login
           </Button>
         {/if}
