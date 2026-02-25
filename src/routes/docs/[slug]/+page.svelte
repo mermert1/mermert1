@@ -28,7 +28,7 @@
         <div class="flex items-center gap-2">
           <Calendar class="h-4 w-4 text-primary" />
           <span
-            >Published {new Date(doc.frontmatter.date).toLocaleDateString(undefined, {
+            >Published {new Date(doc.frontmatter.date.trim()).toLocaleDateString(undefined, {
               year: 'numeric',
               month: 'long',
               day: 'numeric'
@@ -61,15 +61,13 @@
             </button>
           </div>
 
-          <div class="rounded-2xl border border-primary/10 bg-primary/5 p-6">
-            <h4 class="mb-2 text-sm font-bold text-primary">Need help?</h4>
-            <p class="mb-4 text-xs leading-relaxed text-muted-foreground">
-              Cant find what you're looking for? Reach out to our community on GitHub.
+          <div
+            class="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-6 text-amber-900 dark:text-amber-100">
+            <h4 class="mb-2 text-sm font-bold text-amber-600 dark:text-amber-400">💡 Fun Fact</h4>
+            <p class="mb-0 text-xs leading-relaxed">
+              Did you know? Graphi renders complex UML diagrams locally in your browser so none of
+              your architecture secrets are ever sent to an external server.
             </p>
-            <a
-              href="https://github.com/mermert1/mermert1/issues"
-              target="_blank"
-              class="text-xs font-bold underline">Open an Issue</a>
           </div>
         </div>
       </div>
@@ -83,13 +81,7 @@
         <!-- Footer Meta -->
         <div
           class="mt-16 flex items-center justify-between border-t border-border pt-8 text-sm text-muted-foreground">
-          <p>Last edited on {new Date(doc.frontmatter.date).toLocaleDateString()}</p>
-          <div class="flex gap-4">
-            <a
-              href="https://github.com/mermert1/mermert1"
-              target="_blank"
-              class="font-medium transition-colors hover:text-primary">Edit this page on GitHub</a>
-          </div>
+          <p>Last edited on {new Date(doc.frontmatter.date.trim()).toLocaleDateString()}</p>
         </div>
       </article>
     </div>

@@ -1,30 +1,23 @@
 <script lang="ts">
   import { base } from '$app/paths';
-  import { Button } from '$/components/ui/button';
   import { onMount } from 'svelte';
   import {
-    Share2,
     Zap,
     ArrowRight,
     Settings,
     Download,
     Monitor,
     Activity,
-    CheckCircle2,
-    Menu,
-    X,
-    Github,
-    Sun,
-    Moon
+    CheckCircle2
   } from 'lucide-svelte';
-  import { mode, setMode } from 'mode-watcher';
+
+  import SiteNavbar from '$/components/SiteNavbar.svelte';
 
   const title = 'Graphi - Diagramming for everyone';
   const description =
     'Create beautiful diagrams with valid Markdown and Mermaid logic. The editor for professionals.';
 
   let isElectron = false;
-  let isMobileMenuOpen = false;
 
   onMount(() => {
     if (
@@ -34,10 +27,6 @@
       isElectron = true;
     }
   });
-
-  function toggleMobileMenu() {
-    isMobileMenuOpen = !isMobileMenuOpen;
-  }
 </script>
 
 <svelte:head>
@@ -54,113 +43,7 @@
 
 <div
   class="min-h-screen bg-background font-sans text-foreground transition-colors duration-300 selection:bg-indigo-100 selection:text-indigo-900">
-  <!-- Navbar -->
-  <nav
-    class="sticky top-0 z-50 w-full border-b border-border bg-background/80 shadow-sm backdrop-blur-md">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div class="flex h-16 items-center justify-between">
-        <!-- Logo -->
-        <div class="flex flex-shrink-0 cursor-pointer items-center gap-2">
-          <div
-            class="flex h-8 w-8 rotate-3 transform items-center justify-center rounded-lg bg-indigo-600 transition-transform hover:rotate-6">
-            <Share2 class="h-5 w-5 text-white" />
-          </div>
-          <span class="text-xl font-bold tracking-tight text-gray-900">Graphi</span>
-        </div>
-
-        <!-- Desktop Navigation -->
-        <div class="hidden items-center space-x-6 md:flex">
-          <a
-            href="#features"
-            class="font-medium text-muted-foreground transition-colors hover:text-primary"
-            >Features</a>
-          <a
-            href="#downloads"
-            class="font-medium text-muted-foreground transition-colors hover:text-primary"
-            >Downloads</a>
-          <a
-            href="{base}/docs"
-            class="font-medium text-muted-foreground transition-colors hover:text-primary"
-            >Documentation</a>
-          <div class="h-6 w-px bg-border"></div>
-
-          <!-- Theme Toggle -->
-          <Button
-            variant="ghost"
-            size="icon"
-            onclick={() => setMode($mode === 'dark' ? 'light' : 'dark')}
-            class="text-muted-foreground transition-colors hover:text-foreground">
-            {#if $mode === 'dark'}
-              <Sun class="h-5 w-5" />
-            {:else}
-              <Moon class="h-5 w-5" />
-            {/if}
-          </Button>
-
-          <a
-            href="https://github.com/mermert1/mermert1"
-            target="_blank"
-            class="flex items-center gap-2 font-medium text-foreground transition-colors hover:text-primary">
-            <Github class="h-4 w-4" /> GitHub
-          </a>
-          <Button
-            href="{base}/edit/"
-            class="h-auto rounded-full bg-primary px-5 py-2.5 font-medium text-primary-foreground shadow-sm transition-all hover:opacity-90 hover:shadow-md">
-            Open Editor
-          </Button>
-        </div>
-
-        <!-- Mobile Menu Button -->
-        <div class="flex items-center md:hidden">
-          <button
-            on:click={toggleMobileMenu}
-            class="p-2 text-gray-600 hover:text-gray-900 focus:outline-none">
-            {#if isMobileMenuOpen}
-              <X class="h-6 w-6" />
-            {:else}
-              <Menu class="h-6 w-6" />
-            {/if}
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Mobile Menu -->
-    {#if isMobileMenuOpen}
-      <div class="absolute w-full border-b border-gray-100 bg-white shadow-lg md:hidden">
-        <div class="space-y-1 px-4 pt-2 pb-4">
-          <a
-            href="#features"
-            on:click={toggleMobileMenu}
-            class="block rounded-md px-3 py-2 text-base font-medium text-gray-700 hover:bg-indigo-50 hover:text-indigo-600"
-            >Features</a>
-          <a
-            href="#downloads"
-            on:click={toggleMobileMenu}
-            class="block rounded-md px-3 py-2 text-base font-medium text-gray-700 hover:bg-indigo-50 hover:text-indigo-600"
-            >Downloads</a>
-          <a
-            href="{base}/docs"
-            on:click={toggleMobileMenu}
-            class="block rounded-md px-3 py-2 text-base font-medium text-gray-700 hover:bg-indigo-50 hover:text-indigo-600"
-            >Documentation</a>
-          <div class="my-2 border-t border-gray-100 pt-2">
-            <a
-              href="https://github.com/mermert1/mermert1"
-              target="_blank"
-              class="block flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-base font-medium text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">
-              <Github class="h-4 w-4" /> GitHub
-            </a>
-            <Button
-              href="{base}/edit/"
-              class="mt-2 h-auto w-full rounded-md bg-indigo-600 px-3 py-2 text-center text-base font-medium text-white hover:bg-indigo-700">
-              Open Editor
-            </Button>
-          </div>
-        </div>
-      </div>
-    {/if}
-  </nav>
+  <SiteNavbar />
 
   <main>
     <!-- Hero Section -->
