@@ -15,7 +15,7 @@
   </div>
   
   <article class="prose prose-slate dark:prose-invert max-w-none prose-headings:font-bold prose-a:text-primary">
-    <!-- svelte-ignore svelte_no_at_html_tags -->
+    <!-- svelte-ignore svelte/no-at-html-tags -->
     {@html doc.html}
   </article>
 </div>

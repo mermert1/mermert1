@@ -3,7 +3,7 @@ import { marked } from 'marked';
 
 export interface Document {
     slug: string;
-    frontmatter: Record<string, any>;
+    frontmatter: Record<string, unknown>;
     html: string;
 }
 
