@@ -9,7 +9,7 @@ export default {
         }
 
         // 2. Callback from GitHub
-        if (url.pathname === '/callback') {
+        if (url.pathname === '/callback' || (url.pathname === '/' && url.searchParams.has('code'))) {
             const code = url.searchParams.get('code');
 
             if (!code) {
