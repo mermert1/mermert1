@@ -12,57 +12,15 @@
   const OAUTH_WORKER_URL = 'https://graphi-cms-oauth.thatzane.workers.dev/auth';
 
   onMount(async () => {
-    // 1. Check if returning from OAuth flow via URL params
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code');
-
-    if (code) {
-      isCheckingAuth = true;
-      try {
-        // Exchange code for token directly by mimicking Static CMS postMessage flow
-        // BUT since we are on the same origin as the redirect, we can just call our worker
-        const response = await fetch(
-          `https://graphi-cms-oauth.thatzane.workers.dev/callback?code=${code}`
-        );
-        const htmlResponse = await response.text();
-
-        // Extract the token from the injected postMessage script the worker returns
-        const tokenMatch = htmlResponse.match(/"token":"([^"]+)"/);
-
-        if (tokenMatch && tokenMatch[1]) {
-          const token = tokenMatch[1];
-          setToken(token);
-
-          // Immediately clean the URL
-          window.history.replaceState({}, document.title, '/admin');
-
-          // Validate authorization
-          const isAuthorized = await validateUserAccess();
-          if (!isAuthorized) {
-            logout();
-            authError = 'Your GitHub account is not authorized in cms-config.json.';
-            isAuthenticated = false;
-          } else {
-            isAuthenticated = true;
-          }
-        } else {
-          authError = 'Failed to extract GitHub token from auth provider.';
-        }
-      } catch (err) {
-        authError = 'Authentication handshake failed.';
-        console.error(err);
-      }
-    } else {
-      // 2. Normal initial load, check if already logged in
-      const existingToken = getToken();
-      if (existingToken) {
-        const isAuthorized = await validateUserAccess();
-        if (isAuthorized) {
-          isAuthenticated = true;
-        } else {
-          logout();
-          authError = 'Your session expired or you lost access.';
-        }
+    // Check if already logged in
+    const existingToken = getToken();
+    if (existingToken) {
+      const isAuthorized = await validateUserAccess();
+      if (isAuthorized) {
+        isAuthenticated = true;
+      } else {
+        logout();
+        authError = 'Your session expired or you lost access.';
       }
     }
 
@@ -72,6 +30,14 @@
     window.addEventListener(
       'message',
       async (event) => {
+        // 1. Handshake: Worker says "I am ready to authorize"
+        if (event.data === 'authorizing:github') {
+          // Tell the popup we are ready to receive the token
+          (event.source as Window).postMessage('authorization:github:ready', event.origin);
+          return;
+        }
+
+        // 2. Success: Worker sends the token
         if (
           event.data &&
           typeof event.data === 'string' &&
@@ -87,6 +53,8 @@
               if (isAuthorized) {
                 isAuthenticated = true;
                 authError = '';
+                // If we were at /admin with a code, clean it (though we use popups now)
+                window.history.replaceState({}, document.title, '/admin');
               } else {
                 logout();
                 authError = 'Your GitHub account is not authorized in cms-config.json.';
