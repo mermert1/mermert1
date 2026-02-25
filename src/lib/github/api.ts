@@ -73,19 +73,31 @@ export async function getDirectoryContents(path: string) {
  * Fetches a single raw file
  */
 export async function getFileContent(path: string): Promise<{ content: string; sha: string }> {
-  const client = getClient();
-  const { data } = await client.rest.repos.getContent({
-    owner: REPO_OWNER,
-    repo: REPO_NAME,
-    path: path
-  });
+  try {
+    const client = getClient();
+    console.log(`Fetching file: ${path}`);
+    const { data } = await client.rest.repos.getContent({
+      owner: REPO_OWNER,
+      path: path,
+      repo: REPO_NAME
+    });
 
-  if (!Array.isArray(data) && data.type === 'file' && data.content) {
-    // GitHub API returns content as base64
-    const content = atob(data.content);
-    return { content, sha: data.sha };
+    if (!Array.isArray(data) && data.type === 'file' && data.content) {
+      // GitHub API returns content as base64.
+      // Use a UTF-8 safe decoder.
+      const content = decodeURIComponent(
+        atob(data.content.replace(/\s/g, ''))
+          .split('')
+          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      );
+      return { content, sha: data.sha };
+    }
+    throw new Error('Target path is not a file or is empty');
+  } catch (e) {
+    console.error(`Failed to fetch file ${path}:`, e);
+    throw e;
   }
-  throw new Error('Not a file or file is empty');
 }
 
 /**
@@ -99,8 +111,13 @@ export async function commitFile(
 ) {
   const client = getClient();
 
-  // GitHub API requires base64 encoded content for commits
-  const base64Content = btoa(unescape(encodeURIComponent(content)));
+  // GitHub API requires base64 encoded content for commits.
+  // Use a UTF-8 safe encoder.
+  const base64Content = btoa(
+    encodeURIComponent(content).replace(/%([0-9A-F]{2})/g, (match, p1) =>
+      String.fromCharCode(parseInt(p1, 16))
+    )
+  );
 
   await client.rest.repos.createOrUpdateFileContents({
     content: base64Content,

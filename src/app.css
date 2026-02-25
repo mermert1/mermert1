@@ -1,11 +1,11 @@
 @import '@fontsource-variable/recursive/crsv.css';
+@import '@fortawesome/fontawesome-free/css/all.min.css';
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
 @layer base {
-
   *,
   ::after,
   ::before,
@@ -209,7 +209,6 @@ body {
 
 /* Pulse glow for active elements */
 @keyframes pulse-glow {
-
   0%,
   100% {
     box-shadow: 0 0 8px rgba(114, 137, 218, 0.2);

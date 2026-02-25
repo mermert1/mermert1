@@ -37,7 +37,8 @@
         title = parsed.data.title || slug.replace(/-/g, ' ');
         category = parsed.data.category || 'docs';
       } catch (e) {
-        error = 'Failed to load document. It may have been deleted or moved on GitHub.';
+        const errorMsg = e instanceof Error ? e.message : String(e);
+        error = `Failed to load document: ${errorMsg}. Check if path is correct and token has permissions.`;
         console.error(e);
       }
     }
