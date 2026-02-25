@@ -8,7 +8,9 @@
     Download,
     Monitor,
     Activity,
-    CheckCircle2
+    CheckCircle2,
+    Share2,
+    Github
   } from 'lucide-svelte';
 
   import SiteNavbar from '$/components/SiteNavbar.svelte';
