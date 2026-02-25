@@ -7,10 +7,13 @@
   import {
     isAuthenticated,
     isCheckingAuth,
+    authUser,
     login,
     logout as storeLogout,
     initAuthListener
   } from '$lib/stores/auth';
+  import * as DropdownMenu from '$/components/ui/dropdown-menu';
+  import { Github, LogOut, ChevronDown } from 'lucide-svelte';
 
   let authError = '';
 
@@ -85,11 +88,43 @@
                 : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'}">Access</a>
           </nav>
           <div class="mx-2 h-6 w-px bg-border"></div>
-          <button
-            class="text-sm font-medium text-muted-foreground transition-colors hover:text-destructive"
-            on:click={handleLogout}>
-            <i class="fas fa-sign-out-alt mr-2"></i>Sign Out
-          </button>
+          {#if $authUser}
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger asChild let:builder>
+                <button
+                  use:builder.action
+                  {...builder}
+                  class="flex items-center gap-2 rounded-full border border-border p-1 pr-3 transition-colors hover:bg-muted/50 focus:ring-2 focus:ring-primary/20 focus:outline-none">
+                  <img src={$authUser.avatar_url} alt="Profile" class="h-8 w-8 rounded-full" />
+                  <span class="text-sm font-medium">{$authUser.login}</span>
+                  <ChevronDown class="h-4 w-4 text-muted-foreground" />
+                </button>
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Content align="end" class="w-56">
+                <DropdownMenu.Label class="font-normal">
+                  <div class="flex flex-col space-y-1">
+                    <p class="text-sm leading-none font-medium">{$authUser.login}</p>
+                    <p class="text-xs leading-none text-muted-foreground">GitHub Account</p>
+                  </div>
+                </DropdownMenu.Label>
+                <DropdownMenu.Separator />
+                <DropdownMenu.Item href={$authUser.html_url} target="_blank">
+                  <Github class="mr-2 h-4 w-4" /> Go to Profile
+                </DropdownMenu.Item>
+                <DropdownMenu.Item
+                  onclick={handleLogout}
+                  class="text-destructive focus:text-destructive">
+                  <LogOut class="mr-2 h-4 w-4" /> Log out
+                </DropdownMenu.Item>
+              </DropdownMenu.Content>
+            </DropdownMenu.Root>
+          {:else}
+            <!-- Fallback loading state -->
+            <div class="flex items-center gap-2 rounded-full border border-border p-1 pr-3">
+              <div class="h-8 w-8 animate-pulse rounded-full bg-muted"></div>
+              <div class="h-4 w-20 animate-pulse rounded bg-muted"></div>
+            </div>
+          {/if}
         </div>
       {/if}
     </div>

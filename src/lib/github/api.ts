@@ -57,6 +57,20 @@ export async function validateUserAccess(): Promise<boolean> {
 }
 
 /**
+ * Gets the current user's profile details
+ */
+export async function getUserProfile() {
+  try {
+    const client = getClient();
+    const { data: user } = await client.rest.users.getAuthenticated();
+    return user;
+  } catch (e) {
+    console.error('Failed to get user profile:', e);
+    return null;
+  }
+}
+
+/**
  * Fetches the contents of a directory (e.g., getting list of docs)
  */
 export async function getDirectoryContents(path: string) {

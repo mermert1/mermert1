@@ -3,12 +3,16 @@ import {
   logout as apiLogout,
   setToken as apiSetToken,
   getToken,
+  getUserProfile,
   validateUserAccess
 } from '$lib/github/api';
 import { writable } from 'svelte/store';
 
 export const isAuthenticated = writable(false);
 export const isCheckingAuth = writable(true);
+export const authUser = writable<{ login: string; avatar_url: string; html_url: string } | null>(
+  null
+);
 
 let authListenerAdded = false;
 
@@ -21,12 +25,16 @@ export async function checkAuth() {
     const isAuthorized = await validateUserAccess();
     if (isAuthorized) {
       isAuthenticated.set(true);
+      const profile = await getUserProfile();
+      authUser.set(profile as { login: string; avatar_url: string; html_url: string });
     } else {
       apiLogout();
       isAuthenticated.set(false);
+      authUser.set(null);
     }
   } else {
     isAuthenticated.set(false);
+    authUser.set(null);
   }
   isCheckingAuth.set(false);
 }
@@ -34,6 +42,7 @@ export async function checkAuth() {
 export function logout() {
   apiLogout();
   isAuthenticated.set(false);
+  authUser.set(null);
 }
 
 const OAUTH_WORKER_URL = 'https://graphi-cms-oauth.thatzane.workers.dev/auth';
@@ -69,10 +78,13 @@ export function initAuthListener(onAuthError?: (err: string) => void, onAuthSucc
           const isAuthorized = await validateUserAccess();
           if (isAuthorized) {
             isAuthenticated.set(true);
+            const profile = await getUserProfile();
+            authUser.set(profile as { login: string; avatar_url: string; html_url: string });
             if (onAuthSuccess) onAuthSuccess();
           } else {
             apiLogout();
             isAuthenticated.set(false);
+            authUser.set(null);
             if (onAuthError)
               onAuthError('Your GitHub account is not authorized in cms-config.json.');
           }

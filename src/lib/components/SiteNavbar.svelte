@@ -9,11 +9,13 @@
     Menu,
     X,
     LogIn,
+    LayoutDashboard,
     LogOut,
-    LayoutDashboard
+    ChevronDown
   } from 'lucide-svelte';
   import { mode, setMode } from 'mode-watcher';
-  import { isAuthenticated, login, logout } from '$lib/stores/auth';
+  import { isAuthenticated, authUser, login, logout } from '$lib/stores/auth';
+  import * as DropdownMenu from '$/components/ui/dropdown-menu';
 
   let isMobileMenuOpen = false;
 
@@ -88,20 +90,47 @@
           Open Editor
         </Button>
         {#if $isAuthenticated}
-          <Button
-            variant="ghost"
-            size="sm"
-            onclick={logout}
-            class="text-muted-foreground hover:text-destructive">
-            <LogOut class="mr-2 h-4 w-4" /> Logout
-          </Button>
+          {#if $authUser}
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger asChild let:builder>
+                <button
+                  use:builder.action
+                  {...builder}
+                  class="flex items-center gap-2 rounded-full border border-border p-1 pr-3 transition-all hover:border-primary hover:bg-muted/50 focus:ring-2 focus:ring-primary/20 focus:outline-none">
+                  <img
+                    src={$authUser.avatar_url}
+                    alt="Profile"
+                    class="h-8 w-8 rounded-full object-cover" />
+                  <span class="hidden text-sm font-medium sm:block">{$authUser.login}</span>
+                  <ChevronDown class="h-4 w-4 text-muted-foreground" />
+                </button>
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Content align="end" class="w-56">
+                <DropdownMenu.Label class="font-normal">
+                  <div class="flex flex-col space-y-1">
+                    <p class="text-sm leading-none font-medium">{$authUser.login}</p>
+                    <p class="text-xs leading-none text-muted-foreground">GitHub Account</p>
+                  </div>
+                </DropdownMenu.Label>
+                <DropdownMenu.Separator />
+                <DropdownMenu.Item href={$authUser.html_url} target="_blank">
+                  <Github class="mr-2 h-4 w-4" /> Go to Profile
+                </DropdownMenu.Item>
+                <DropdownMenu.Item onclick={logout} class="text-destructive focus:text-destructive">
+                  <LogOut class="mr-2 h-4 w-4" /> Log out
+                </DropdownMenu.Item>
+              </DropdownMenu.Content>
+            </DropdownMenu.Root>
+          {:else}
+            <!-- Loading pulse while fetching profile -->
+            <div class="h-10 w-10 animate-pulse rounded-full bg-muted"></div>
+          {/if}
         {:else}
           <Button
-            variant="ghost"
             size="sm"
             onclick={login}
-            class="text-muted-foreground hover:text-primary">
-            <LogIn class="mr-2 h-4 w-4" /> Login
+            class="flex items-center gap-2 bg-foreground text-background transition-all hover:scale-[1.02] hover:bg-foreground/90">
+            <LogIn class="h-4 w-4" /> Login
           </Button>
         {/if}
       </div>

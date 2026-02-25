@@ -135,6 +135,9 @@ importers:
       '@iconify-json/mdi':
         specifier: ^1.2.3
         version: 1.2.3
+      '@lucide/svelte':
+        specifier: ^0.482.0
+        version: 0.482.0(svelte@5.38.6)
       '@playwright/test':
         specifier: ^1.52.0
         version: 1.52.0
@@ -184,8 +187,8 @@ importers:
         specifier: ^10.4.21
         version: 10.4.21(postcss@8.5.3)
       bits-ui:
-        specifier: ^2.9.6
-        version: 2.9.6(@internationalized/date@3.10.1)(svelte@5.38.6)
+        specifier: ^1.8.0
+        version: 1.8.0(svelte@5.38.6)
       c8:
         specifier: 7.14.0
         version: 7.14.0
@@ -834,6 +837,11 @@ packages:
 
   '@lezer/yaml@1.0.3':
     resolution: {integrity: sha512-GuBLekbw9jDBDhGur82nuwkxKQ+a3W5H0GfaAthDXcAu+XdpS43VlnxA9E9hllkpSP5ellRDKjLLj7Lu9Wr6xA==}
+
+  '@lucide/svelte@0.482.0':
+    resolution: {integrity: sha512-n2ycHU9cNcleRDwwpEHBJ6pYzVhHIaL3a+9dQa8kns9hB2g05bY+v2p2KP8v0pZwtNhYTHk/F2o2uZ1bVtQGhw==}
+    peerDependencies:
+      svelte: ^5
 
   '@marijn/find-cluster-break@1.0.2':
     resolution: {integrity: sha512-l0h88YhZFyKdXIFNfSWpyjStDjGHwZ/U7iobcK1cQQD8sejsONdQtTVU+1wVN1PBw40PiiHB1vA5S7VTfQiP9g==}
@@ -1704,12 +1712,11 @@ packages:
     resolution: {integrity: sha512-Ceh+7ox5qe7LJuLHoY0feh3pHuUDHAcRUeyL2VYghZwfpkNIy/+8Ocg0a3UuSoYzavmylwuLWQOf3hl0jjMMIw==}
     engines: {node: '>=8'}
 
-  bits-ui@2.9.6:
-    resolution: {integrity: sha512-OzHktsQRsIz/hIMk5VwHo96Wpp/KY68q/ebUPUzTbvuFBrALB/X+QvO4KLgdczj5dfb3xHs9zpWq8yMH8ZbZlA==}
-    engines: {node: '>=20'}
+  bits-ui@1.8.0:
+    resolution: {integrity: sha512-CXD6Orp7l8QevNDcRPLXc/b8iMVgxDWT2LyTwsdLzJKh9CxesOmPuNePSPqAxKoT59FIdU4aFPS1k7eBdbaCxg==}
+    engines: {node: '>=18', pnpm: '>=8.7.0'}
     peerDependencies:
-      '@internationalized/date': ^3.8.1
-      svelte: ^5.33.0
+      svelte: ^5.11.0
 
   body-parser@1.20.1:
     resolution: {integrity: sha512-jWi7abTbYwajOytWCQc37VulmWiRae5RyTpaCyDcS5/lMdtwSz5lOpDE67srw/HYe35f1z3fDQw+3txg7gNtWw==}
@@ -4259,6 +4266,12 @@ packages:
     peerDependencies:
       svelte: ^5.0.0
 
+  svelte-toolbelt@0.7.1:
+    resolution: {integrity: sha512-HcBOcR17Vx9bjaOceUvxkY3nGmbBmCBBbuWLLEWO6jtmWH8f/QoWmbyUfQZrpDINH39en1b8mptfPQT9VKQ1xQ==}
+    engines: {node: '>=18', pnpm: '>=8.7.0'}
+    peerDependencies:
+      svelte: ^5.0.0
+
   svelte-toolbelt@0.9.3:
     resolution: {integrity: sha512-HCSWxCtVmv+c6g1ACb8LTwHVbDqLKJvHpo6J8TaqwUme2hj9ATJCpjCPNISR1OCq2Q4U1KT41if9ON0isINQZw==}
     engines: {node: '>=18', pnpm: '>=8.7.0'}
@@ -5315,6 +5328,10 @@ snapshots:
       '@lezer/highlight': 1.2.1
       '@lezer/lr': 1.4.2
 
+  '@lucide/svelte@0.482.0(svelte@5.38.6)':
+    dependencies:
+      svelte: 5.38.6
+
   '@marijn/find-cluster-break@1.0.2': {}
 
   '@mermaid-js/examples@1.0.0(mermaid@11.12.0)':
@@ -6294,15 +6311,16 @@ snapshots:
 
   binary-extensions@2.3.0: {}
 
-  bits-ui@2.9.6(@internationalized/date@3.10.1)(svelte@5.38.6):
+  bits-ui@1.8.0(svelte@5.38.6):
     dependencies:
       '@floating-ui/core': 1.7.2
       '@floating-ui/dom': 1.7.2
       '@internationalized/date': 3.10.1
+      css.escape: 1.5.1
       esm-env: 1.2.2
-      runed: 0.29.2(svelte@5.38.6)
+      runed: 0.23.4(svelte@5.38.6)
       svelte: 5.38.6
-      svelte-toolbelt: 0.9.3(svelte@5.38.6)
+      svelte-toolbelt: 0.7.1(svelte@5.38.6)
       tabbable: 6.2.0
 
   body-parser@1.20.1:
@@ -8843,6 +8861,13 @@ snapshots:
   svelte-sonner@1.0.5(svelte@5.38.6):
     dependencies:
       runed: 0.28.0(svelte@5.38.6)
+      svelte: 5.38.6
+
+  svelte-toolbelt@0.7.1(svelte@5.38.6):
+    dependencies:
+      clsx: 2.1.1
+      runed: 0.23.4(svelte@5.38.6)
+      style-to-object: 1.0.8
       svelte: 5.38.6
 
   svelte-toolbelt@0.9.3(svelte@5.38.6):
