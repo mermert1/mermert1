@@ -114,7 +114,7 @@
                   </div>
                 </DropdownMenu.Label>
                 <DropdownMenu.Separator />
-                <DropdownMenu.Item href={$authUser.html_url} target="_blank">
+                <DropdownMenu.Item onclick={() => window.open($authUser.html_url, '_blank')}>
                   <Github class="mr-2 h-4 w-4" /> Go to Profile
                 </DropdownMenu.Item>
                 <DropdownMenu.Item onclick={logout} class="text-destructive focus:text-destructive">
