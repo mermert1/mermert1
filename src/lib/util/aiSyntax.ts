@@ -24,6 +24,7 @@ Use the following specific syntax rules to generate PERFECTION.
     *   Dotted: \`A -.-> B\`
     *   Thick: \`A ==> B\`
     *   Labeled: \`A -->|text| B\` or \`A -- "text" --> B\`
+    *   **CRITICAL INVALID SYNTAX:** NEVER use \`|>\` or \`-->|text|>\` or \`-...->|text|>\`. The arrow head is ALWAYS exactly \`-->\`. Use \`-->|text| B\` for labels. There is NO \`>\` after the label text.
 *   **Styling:**
     *   \`style id fill:#f9f,stroke:#333,stroke-width:4px\`
     *   \`classDef myClass fill:#f96; class A,B myClass\`

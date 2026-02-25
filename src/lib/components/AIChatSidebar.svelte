@@ -154,33 +154,35 @@
   }
 </script>
 
-<div class="ai-sidebar">
+<div class="flex h-full w-[360px] flex-col bg-card border-l border-border text-sm">
   <!-- Header -->
-  <div class="ai-header">
-    <div class="ai-header-title">
-      <SparklesIcon class="ai-icon text-primary" />
-      <span>AI Assistant</span>
+  <div class="flex items-center justify-between border-b border-border bg-muted/30 p-2">
+    <div class="flex items-center gap-1.5 px-1">
+      <SparklesIcon class="size-4 text-primary" />
+      <h3 class="text-[10px] font-bold tracking-[0.2em] text-muted-foreground uppercase">
+        AI Assistant
+      </h3>
     </div>
-    <div class="ai-header-actions">
-      <button class="ai-btn-icon" onclick={() => (showSettings = !showSettings)} title="Settings" class:active={showSettings}>
-        <SettingsIcon />
-      </button>
-      <button class="ai-btn-icon" onclick={clearChat} title="Clear chat">
-        <DeleteIcon />
-      </button>
-      <button class="ai-btn-icon" onclick={onClose} title="Close">
-         <CloseIcon />
-      </button>
+    <div class="flex gap-0.5">
+      <Button variant="ghost" size="icon" class={showSettings ? 'bg-muted size-6' : 'size-6'} onclick={() => (showSettings = !showSettings)} title="Settings">
+        <SettingsIcon class="size-3.5" />
+      </Button>
+      <Button variant="ghost" size="icon" class="size-6" onclick={clearChat} title="Clear chat">
+        <DeleteIcon class="size-3.5" />
+      </Button>
+      <Button variant="ghost" size="icon" class="size-6" onclick={onClose} title="Close">
+         <CloseIcon class="size-3.5" />
+      </Button>
     </div>
   </div>
 
   <!-- Settings Panel -->
   {#if showSettings}
-    <div class="ai-settings glass-subtle">
-      <div class="ai-settings-field">
-        <span class="ai-label">Provider</span>
-        <div class="custom-select-container">
-          <button class="custom-select-trigger" onclick={() => showProviderDropdown = !showProviderDropdown}>
+    <div class="flex flex-col gap-3 border-b border-border bg-muted/15 p-3 glass-subtle">
+      <div class="flex flex-col gap-1">
+        <span class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Provider</span>
+        <div class="relative w-full">
+          <button class="flex w-full items-center justify-between rounded-md border border-border bg-background px-3 py-1.5 text-xs text-foreground transition-all hover:border-primary/50" onclick={() => showProviderDropdown = !showProviderDropdown}>
             {#if provider === 'groq'}
               <span>⚡ Groq (Fast & Free)</span>
             {:else if provider === 'gemini'}
@@ -192,11 +194,10 @@
           </button>
           
           {#if showProviderDropdown}
-            <div class="custom-select-options">
+            <div class="absolute z-50 mt-1 w-full overflow-hidden rounded-md border border-border bg-popover p-1 shadow-md">
               {#each providers as p}
                 <button 
-                  class="custom-option" 
-                  class:selected={provider === p.value}
+                  class="flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs text-popover-foreground hover:bg-accent hover:text-accent-foreground {provider === p.value ? 'bg-primary/10 text-primary font-medium' : ''}" 
                   onclick={() => selectProvider(p.value as any)}>
                   <span>{p.icon} {p.label}</span>
                   {#if provider === p.value}✓{/if}
@@ -209,8 +210,8 @@
         </div>
       </div>
 
-      <div class="ai-settings-field">
-        <label for="ai-key" class="ai-label">
+      <div class="flex flex-col gap-1">
+        <label for="ai-key" class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
           API Key
           {#if provider === 'groq'}
             (<a href="https://console.groq.com/keys" target="_blank" class="text-primary hover:underline">Get Key</a>)
@@ -221,26 +222,25 @@
         <input
           id="ai-key"
           type="password"
-          class="custom-input"
+          class="w-full rounded-md border border-border bg-background px-3 py-1.5 text-xs text-foreground outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15"
           placeholder={provider === 'gemini' ? 'AIza...' : provider === 'groq' ? 'gsk_...' : 'sk-...'}
           bind:value={apiKey}
         />
       </div>
 
-      <div class="ai-settings-field">
-        <label for="ai-model" class="ai-label">Model</label>
-         <div class="custom-select-container">
-            <button class="custom-select-trigger" onclick={() => showModelDropdown = !showModelDropdown}>
+      <div class="flex flex-col gap-1">
+        <label for="ai-model" class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Model</label>
+         <div class="relative w-full">
+            <button class="flex w-full items-center justify-between rounded-md border border-border bg-background px-3 py-1.5 text-xs text-foreground transition-all hover:border-primary/50" onclick={() => showModelDropdown = !showModelDropdown}>
               <span>{models[provider]?.find(m => m.value === model)?.label || model}</span>
               <ChevronDownIcon class="size-4 opacity-50" />
             </button>
             
             {#if showModelDropdown}
-              <div class="custom-select-options">
+              <div class="absolute z-50 mt-1 w-full overflow-hidden rounded-md border border-border bg-popover p-1 shadow-md">
                 {#each models[provider] || [] as m}
                   <button 
-                    class="custom-option" 
-                    class:selected={model === m.value}
+                    class="flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs text-popover-foreground hover:bg-accent hover:text-accent-foreground {model === m.value ? 'bg-primary/10 text-primary font-medium' : ''}" 
                     onclick={() => selectModel(m.value)}>
                     <span>{m.label}</span>
                     {#if model === m.value}✓{/if}
@@ -252,24 +252,27 @@
          </div>
       </div>
 
-      <div class="ai-settings-actions">
-        <Button size="sm" onclick={saveSettings} class="w-full">Save Settings</Button>
+      <div class="mt-1 flex gap-2">
+        <Button size="sm" onclick={saveSettings} class="w-full text-xs font-bold h-8">Save Settings</Button>
       </div>
     </div>
   {/if}
 
   <!-- Messages -->
-  <div class="ai-messages">
+  <div class="flex flex-1 flex-col gap-3 overflow-y-auto p-3">
     {#if messages.length === 0}
-      <div class="ai-welcome">
-        <p class="ai-welcome-title flex flex-col items-center gap-2">
-            <SparklesIcon class="size-8 text-primary/50" />
+      <div class="p-8 text-center text-muted-foreground flex flex-col items-center justify-center h-full">
+        <div class="mb-2 flex flex-col items-center gap-2 text-[15px] font-bold tracking-tight text-foreground">
+            <div class="flex size-12 items-center justify-center rounded-2xl bg-primary/10 shadow-inner">
+                <SparklesIcon class="size-6 text-primary" />
+            </div>
             Text to Diagram
-        </p>
-        <p class="ai-welcome-text">Describe what you want and I'll generate the Mermaid code.</p>
-        <div class="ai-suggestions">
+        </div>
+        <p class="mb-6 text-xs leading-relaxed">Describe what you want and I'll generate the Mermaid code.</p>
+        
+        <div class="flex flex-wrap justify-center gap-2">
           <button
-            class="ai-suggestion"
+            class="rounded-full border border-border bg-muted/30 px-3 py-1.5 text-xs text-foreground transition-all hover:border-primary/30 hover:bg-primary/10"
             onclick={() => {
               inputText = 'Create a login flow diagram';
               sendMessage();
@@ -278,7 +281,7 @@
             Login flow
           </button>
           <button
-            class="ai-suggestion"
+            class="rounded-full border border-border bg-muted/30 px-3 py-1.5 text-xs text-foreground transition-all hover:border-primary/30 hover:bg-primary/10"
             onclick={() => {
               inputText = 'Create a database ER diagram for a blog';
               sendMessage();
@@ -287,7 +290,7 @@
             Blog ER diagram
           </button>
           <button
-            class="ai-suggestion"
+            class="rounded-full border border-border bg-muted/30 px-3 py-1.5 text-xs text-foreground transition-all hover:border-primary/30 hover:bg-primary/10"
             onclick={() => {
               inputText = 'Create a CI/CD pipeline diagram';
               sendMessage();
@@ -300,414 +303,73 @@
     {/if}
 
     {#each messages as msg}
-      <div class="ai-message ai-message-{msg.role}">
-        <div class="ai-message-avatar shadow-sm">
+      <div class="flex items-start gap-3">
+        <div class="flex size-7 shrink-0 items-center justify-center rounded-full border border-border bg-muted shadow-sm mt-0.5">
           {#if msg.role === 'user'}
-            <UserIcon class="size-4" />
+            <UserIcon class="size-3.5" />
           {:else}
-            <RobotIcon class="size-4 text-primary" />
+            <RobotIcon class="size-3.5 text-primary" />
           {/if}
         </div>
-        <div class="ai-message-content" class:shadow-md={msg.role === 'user'}>
-          {#if msg.role === 'assistant'}
-            <pre class="ai-code-block shadow-inner"><code>{msg.content}</code></pre>
-            <Button
-              size="sm"
-              class="ai-insert-btn"
-              onclick={() => insertCode(msg.content)}
-            >
-              <ContentCopyIcon class="mr-2 size-3" />
-              Insert into Editor
-            </Button>
+        
+        <div class="flex-1 min-w-0">
+          {#if msg.role === 'user'}
+            <div class="bg-primary text-primary-foreground rounded-2xl rounded-tl-sm px-3.5 py-2 shadow-sm text-xs leading-relaxed max-w-[90%] break-words">
+                {msg.content}
+            </div>
           {:else}
-            <p>{msg.content}</p>
+            <div class="bg-muted/30 border border-border rounded-2xl rounded-tr-sm px-3.5 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] text-xs leading-relaxed">
+              <pre class="overflow-x-auto rounded-lg border border-border bg-background/50 p-2.5 text-[11px] shadow-inner font-mono mt-1 mb-2 whitespace-pre-wrap break-words"><code>{msg.content}</code></pre>
+              <Button
+                size="sm"
+                variant="secondary"
+                class="h-7 text-[10px] gap-1.5 font-bold"
+                onclick={() => insertCode(msg.content)}
+              >
+                <ContentCopyIcon class="size-3" />
+                Insert into Editor
+              </Button>
+            </div>
           {/if}
         </div>
       </div>
     {/each}
 
     {#if isLoading}
-      <div class="ai-message ai-message-assistant">
-        <div class="ai-message-avatar">
-            <RobotIcon class="size-4 text-primary" />
+      <div class="flex items-start gap-3">
+        <div class="flex size-7 shrink-0 items-center justify-center rounded-full border border-border bg-muted shadow-sm mt-0.5">
+            <RobotIcon class="size-3.5 text-primary" />
         </div>
-        <div class="ai-message-content">
-          <div class="ai-loading">
-            <span class="ai-dot"></span>
-            <span class="ai-dot"></span>
-            <span class="ai-dot"></span>
+        <div class="bg-muted/30 border border-border rounded-2xl rounded-tr-sm px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] h-9 flex items-center">
+          <div class="flex gap-1">
+            <span class="block size-1.5 animate-bounce rounded-full bg-primary opacity-60"></span>
+            <span class="block size-1.5 animate-bounce rounded-full bg-primary opacity-60" style="animation-delay: 0.2s"></span>
+            <span class="block size-1.5 animate-bounce rounded-full bg-primary opacity-60" style="animation-delay: 0.4s"></span>
           </div>
         </div>
       </div>
     {/if}
 
     {#if error}
-      <div class="ai-error shadow-sm">{error}</div>
+      <div class="rounded-lg bg-destructive/10 p-2.5 text-xs text-destructive border border-destructive/20 shadow-sm mt-2">{error}</div>
     {/if}
   </div>
 
   <!-- Input -->
-  <div class="ai-input-area">
+  <div class="flex items-end gap-2 border-t border-border bg-background/50 p-3 backdrop-blur-md">
     <textarea
-      class="ai-input"
-      placeholder="Describe your diagram..."
+      class="flex-1 resize-none rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground outline-none transition-all placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/15 shadow-sm"
+      placeholder="Wait what diagram should i compose?"
       bind:value={inputText}
       onkeydown={handleKeydown}
       rows="2"
     ></textarea>
-    <Button size="sm" onclick={sendMessage} disabled={isLoading || !inputText.trim()}>
+    <Button size="icon" class="size-9 rounded-xl shadow-sm shrink-0 mb-0.5 bg-primary hover:bg-primary/90 text-primary-foreground" onclick={sendMessage} disabled={isLoading || !inputText.trim()}>
       {#if isLoading}
-        ...
+        <div class="size-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent"></div>
       {:else}
         <SendIcon class="size-4" />
       {/if}
     </Button>
   </div>
 </div>
-
-<style>
-  .ai-sidebar {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    width: 360px;
-    background: var(--background);
-    border-left: 1px solid var(--border);
-    font-size: 0.875rem;
-  }
-
-  .ai-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid var(--border);
-    background: var(--muted) / 0.3;
-  }
-
-  .ai-header-title {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-weight: 600;
-  }
-
-  .ai-icon {
-    font-size: 1.1rem;
-  }
-
-  .ai-header-actions {
-    display: flex;
-    gap: 0.25rem;
-  }
-
-  .ai-btn-icon {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0.25rem 0.4rem;
-    border-radius: 4px;
-    font-size: 0.85rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.15s;
-    color: hsl(var(--muted-foreground));
-  }
-
-  .ai-btn-icon:hover {
-    background: var(--muted);
-    color: var(--foreground);
-  }
-
-  /* Settings */
-  .ai-settings {
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid var(--border);
-    background: var(--muted) / 0.15;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .ai-settings-field {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-  }
-
-  .ai-label {
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--muted-foreground);
-    margin-bottom: 0.25rem;
-  }
-
-  .custom-select-container {
-    position: relative;
-    width: 100%;
-  }
-
-  .custom-select-trigger {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 0.75rem;
-    border: 1px solid hsl(var(--border));
-    border-radius: 6px;
-    background: var(--background);
-    color: var(--foreground);
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .custom-select-trigger:hover {
-    border-color: var(--primary) / 0.5;
-  }
-
-  .custom-select-options {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    margin-top: 4px;
-    margin-top: 4px;
-    background: var(--popover); 
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    z-index: 50;
-    overflow: hidden;
-    padding: 4px;
-  }
-
-  .custom-option {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    padding: 0.5rem 0.75rem;
-    cursor: pointer;
-    border: none;
-    background: transparent;
-    color: var(--popover-foreground);
-    font-size: 0.85rem;
-    border-radius: 4px;
-    text-align: left;
-  }
-
-  .custom-option:hover {
-    background: var(--accent);
-    color: var(--accent-foreground);
-  }
-
-  .custom-option.selected {
-    background: var(--primary) / 0.1;
-    color: var(--primary);
-    font-weight: 500;
-  }
-
-  .custom-input {
-    width: 100%;
-    padding: 0.5rem 0.75rem;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    background: var(--background);
-    color: var(--foreground);
-    font-size: 0.85rem;
-    outline: none;
-    transition: all 0.2s;
-  }
-
-  .custom-input:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 2px var(--primary) / 0.1;
-  }
-
-  .ai-settings-actions {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 0.25rem;
-  }
-
-  /* Messages */
-  .ai-messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 0.75rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .ai-welcome {
-    text-align: center;
-    padding: 2rem 1rem;
-    color: hsl(var(--muted-foreground));
-  }
-
-  .ai-welcome-title {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    color: hsl(var(--foreground));
-  }
-
-  .ai-welcome-text {
-    margin-bottom: 1.25rem;
-  }
-
-  .ai-suggestions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    justify-content: center;
-  }
-
-  .ai-suggestion {
-    padding: 0.4rem 0.75rem;
-    border: 1px solid hsl(var(--border));
-    border-radius: 99px;
-    background: hsl(var(--muted) / 0.3);
-    color: hsl(var(--foreground));
-    font-size: 0.75rem;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-
-  .ai-suggestion:hover {
-    background: hsl(var(--primary) / 0.1);
-    border-color: hsl(var(--primary) / 0.3);
-  }
-
-  .ai-message {
-    display: flex;
-    gap: 0.75rem;
-    align-items: flex-start;
-  }
-
-  .ai-message-avatar {
-    flex-shrink: 0;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: hsl(var(--muted));
-    font-size: 0.8rem;
-    border: 1px solid hsl(var(--border));
-  }
-
-  .ai-message-content {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .ai-message-content p {
-    margin: 0;
-    line-height: 1.5;
-  }
-
-  /* User Message Bubble */
-  .ai-message-user .ai-message-content {
-    background: hsl(var(--primary));
-    color: hsl(var(--primary-foreground));
-    padding: 0.6rem 0.8rem;
-    border-radius: 12px 12px 4px 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1); /* Drop shadow */
-  }
-
-  .ai-code-block {
-    background: hsl(var(--muted) / 0.5);
-    border: 1px solid hsl(var(--border));
-    border-radius: 8px;
-    padding: 0.6rem 0.75rem;
-    overflow-x: auto;
-    font-size: 0.78rem;
-    line-height: 1.5;
-    margin: 0;
-  }
-
-  .ai-code-block code {
-    white-space: pre-wrap;
-    word-break: break-word;
-  }
-
-  :global(.ai-insert-btn) {
-    margin-top: 0.4rem;
-  }
-
-  /* Loading dots */
-  .ai-loading {
-    display: flex;
-    gap: 4px;
-    padding: 0.5rem 0;
-  }
-
-  .ai-dot {
-    width: 6px;
-    height: 6px;
-    background: hsl(var(--primary));
-    border-radius: 50%;
-    animation: ai-bounce 1.2s infinite;
-  }
-
-  .ai-dot:nth-child(2) {
-    animation-delay: 0.2s;
-  }
-
-  .ai-dot:nth-child(3) {
-    animation-delay: 0.4s;
-  }
-
-  @keyframes ai-bounce {
-    0%,
-    80%,
-    100% {
-      transform: scale(0.6);
-      opacity: 0.4;
-    }
-    40% {
-      transform: scale(1);
-      opacity: 1;
-    }
-  }
-
-  .ai-error {
-    color: hsl(var(--destructive));
-    font-size: 0.8rem;
-    padding: 0.5rem 0.75rem;
-    background: hsl(var(--destructive) / 0.08);
-    border-radius: 8px;
-  }
-
-  /* Input */
-  .ai-input-area {
-    display: flex;
-    gap: 0.5rem;
-    padding: 0.75rem;
-    border-top: 1px solid hsl(var(--border));
-    align-items: flex-end;
-  }
-
-  .ai-input {
-    flex: 1;
-    padding: 0.5rem 0.75rem;
-    border: 1px solid hsl(var(--border));
-    border-radius: 8px;
-    background: hsl(var(--background));
-    color: hsl(var(--foreground));
-    font-size: 0.85rem;
-    resize: none;
-    font-family: inherit;
-    line-height: 1.4;
-  }
-
-  .ai-input:focus {
-    outline: none;
-    border-color: hsl(var(--primary));
-    box-shadow: 0 0 0 2px hsl(var(--primary) / 0.15);
-  }
-</style>

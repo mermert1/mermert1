@@ -89,6 +89,7 @@
         } else {
           mermaidConfig = state.mermaid as unknown as MermaidConfig;
         }
+        mermaidConfig.suppressErrorRendering = true;
 
         const {
           svg,
@@ -96,6 +97,15 @@
           diagramType: detectedDiagramType
         } = await renderDiagram(mermaidConfig, code, viewID);
         diagramType = detectedDiagramType;
+        
+        // Prevent Mermaid's fallback error SVG from overwriting the last valid diagram
+        // We use DOMParser because Mermaid v11+ includes ".error-icon" in the CSS block of valid diagrams
+        const parser = new DOMParser();
+        const svgDoc = parser.parseFromString(svg, 'image/svg+xml');
+        if (svgDoc.querySelector('#d-error, .error-icon, .error-text')) {
+          throw new Error('Mermaid rendering syntax error');
+        }
+
         if (svg.length > 0) {
           // eslint-disable-next-line svelte/no-dom-manipulating
           container.innerHTML = svg;
@@ -141,6 +151,8 @@
     } catch (error_) {
       console.error('view fail', error_);
       error = true;
+      // Clean up any Mermaid sandbox elements that leaked into the body
+      document.querySelectorAll('[id^="dgraph-"], #d-error, svg[id^="mermaid-"]').forEach(el => el.remove());
     }
     const renderTime = Date.now() - startTime;
     saveStatistics({ code, diagramType, isRough: state.rough, renderTime });
@@ -165,7 +177,7 @@
 <div
   id="view"
   bind:this={view}
-  class={['h-full w-full', shouldShowGrid && `grid-bg-${$mode}`, error && 'opacity-50']}>
+  class={['h-full w-full', shouldShowGrid && `grid-bg-${$mode}`, error && 'opacity-20 pointer-events-none']}>
   <div id="container" bind:this={container} class="h-full overflow-auto"></div>
 </div>
 

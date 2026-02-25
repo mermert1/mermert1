@@ -260,7 +260,7 @@
       <div class="flex h-full flex-col border-b">
         <div class="flex items-center justify-between border-b bg-muted/30 p-2">
           <div class="flex items-center gap-1.5 px-1">
-            <CloudIcon class="size-4 text-accent" />
+            <CloudIcon class="size-4 text-primary" />
             <h3 class="text-[10px] font-bold tracking-[0.2em] text-muted-foreground uppercase">
               Cloud Workspace
             </h3>
@@ -401,10 +401,10 @@
             class:rotate-90={expansionStore[item.id]}>
             <ChevronRight class="size-3.5" />
           </span>
-          <FolderIcon class="size-3.5 shrink-0 text-accent opacity-80" />
+          <FolderIcon class="size-3.5 shrink-0 text-primary opacity-80" />
         {:else}
           <div class="size-3.5 shrink-0" style="margin-left: 17.5px">
-            <DocumentIcon class="size-3.5 text-accent opacity-60" />
+            <DocumentIcon class="size-3.5 text-primary opacity-60" />
           </div>
         {/if}
         <span class="truncate text-xs font-semibold">{item.name}</span>
@@ -542,7 +542,7 @@
             {#if fileMetadata[entry.path]?.icon}
               {@const IconComp =
                 iconMap[fileMetadata[entry.path].icon ?? 'Default'] || DocumentIcon}
-              <IconComp class="size-4 text-accent opacity-100" />
+              <IconComp class="size-4 text-primary opacity-100" />
             {:else}
               <DocumentIcon class="size-4 text-primary opacity-60" />
             {/if}

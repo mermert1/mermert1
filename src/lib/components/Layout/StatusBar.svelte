@@ -60,7 +60,6 @@
   <div class="flex items-center gap-4">
     <div class="flex items-center gap-1 hover:text-white/80 transition-colors cursor-pointer" title="Privacy & Security">
       <Privacy />
-      <span class="hidden md:inline">Privacy</span>
     </div>
     
     <div class="h-3 w-[1px] bg-white/30 hidden md:block"></div>

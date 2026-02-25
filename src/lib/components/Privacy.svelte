@@ -5,41 +5,39 @@
 </script>
 
 <Dialog.Root>
-  <Dialog.Trigger>
+  <Dialog.Trigger class="flex items-center gap-1">
     <ShieldIcon />
+    <span class="hidden md:inline">Privacy</span>
   </Dialog.Trigger>
-  <Dialog.Content class="max-h-full overflow-hidden overflow-y-auto p-12">
+  <Dialog.Content class="max-h-full overflow-hidden overflow-y-auto p-12 bg-card text-card-foreground border border-border">
     <Dialog.Header>
-      <Dialog.Title class="flex items-center gap-2 text-xl">
-        <ShieldIcon class="size-8 text-green-700" />
-        Data security
+      <Dialog.Title class="flex items-center gap-2 text-xl font-bold">
+        <ShieldIcon class="size-8 text-primary" />
+        Data Security & Privacy
       </Dialog.Title>
     </Dialog.Header>
 
-    <p class="text-xl font-semibold">Your diagrams never leave your browser.</p>
-    <p>They're only stored in the URL and your browser's local storage.</p>
-    <p>
-      This is a fully open source, client-side app deployed on <a
-        href="https://github.com/mermaid-js/mermaid-live-editor/deployments"
-        class="underline"
-        target="_blank">GitHub Pages</a>
-      that works offline as a
-      <a href="https://web.dev/explore/progressive-web-apps" target="_blank">Progressive Web App</a
-      >.
-    </p>
-    <p>
-      We use self hosted, privacy-friendly Plausible Analytics to collect anonymous usage metadata
-      (diagram types, feature usage, etc.). All data is <a
-        href="https://p.mermaid.live/mermaid.live"
-        class="underline"
-        target="_blank">publicly available</a
-      >.
-    </p>
-    <ExternalLinkWrapper domain="example.com" isVisible>
-      <p class="text-left">
-        External services (PNG/SVG/Kroki exports, "Save to Mermaid Chart", "Repair with AI", etc)
-        will share your diagram with those 3rd parties, and are highlighted in the UI on hover.
-      </p>
-    </ExternalLinkWrapper>
+    <div class="flex flex-col gap-4 mt-6">
+      <div class="rounded-xl border border-border bg-muted/30 p-4">
+        <p class="text-base font-semibold text-foreground mb-1">Your data stays local.</p>
+        <p class="text-sm text-muted-foreground leading-relaxed">
+          Graphi is a local-first application. Your diagrams, configurations, and project files are stored locally on your device or in your designated Cloud Workspace. We do not track your usage or collect telemetry data.
+        </p>
+      </div>
+
+      <div class="rounded-xl border border-border bg-muted/30 p-4">
+        <p class="text-base font-semibold text-foreground mb-1">AI Assistant Usage</p>
+        <p class="text-sm text-muted-foreground leading-relaxed">
+          When using the AI Assistant, your active diagram code and prompts are sent directly to the AI provider you configure (Groq, Gemini, or OpenAI) using your own API key. No intermediate servers store this interaction.
+        </p>
+      </div>
+
+      <div class="rounded-xl border border-border bg-muted/30 p-4">
+        <p class="text-base font-semibold text-foreground mb-1">Mermaid Engine</p>
+        <p class="text-sm text-muted-foreground leading-relaxed">
+          Graphi uses the open-source Mermaid.js engine to render diagrams. However, it operates entirely independently of the official Mermaid Live Editor and its associated services.
+        </p>
+      </div>
+    </div>
   </Dialog.Content>
 </Dialog.Root>

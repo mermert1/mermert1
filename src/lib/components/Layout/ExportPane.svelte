@@ -190,8 +190,12 @@ ${svgString}`);
     });
   };
 
-  const onDownloadPDF = () => {
+  const onDownloadPDF = async () => {
     if (typeof window === 'undefined') return;
+    (inputStateStore as any).update((s: any) => ({ ...s, panZoom: false }));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await waitForRender();
+
     const svg = getSvgElement();
     if (!svg) return;
     
@@ -202,7 +206,10 @@ ${svgString}`);
     svg.style.width = '100%';
     svg.style.height = '100%';
     
-    const svgBase64 = getBase64SVG(svg);
+    const svgHTML = svg.outerHTML
+      .replaceAll('<br>', '<br/>')
+      .replaceAll(/<img([^>]*)>/g, (m: string, g: string) => `<img ${g} />`);
+
     const printWindow = window.open('', '_blank');
     if (printWindow) {
       printWindow.document.write(`
@@ -210,6 +217,7 @@ ${svgString}`);
         <html>
           <head>
             <title>Mermaid Export - PDF</title>
+            <link rel="stylesheet" href="${FONT_AWESOME_URL}">
             <style>
               @page { size: auto; margin: 0; }
               html, body { 
@@ -229,7 +237,7 @@ ${svgString}`);
                 padding: 20px;
                 box-sizing: border-box;
               }
-              img { 
+              svg { 
                 max-width: 100%; 
                 max-height: 100%; 
                 object-fit: contain;
@@ -239,13 +247,13 @@ ${svgString}`);
           </head>
           <body>
             <div class="container">
-              <img src="data:image/svg+xml;base64,${svgBase64}" />
+              ${svgHTML}
             </div>
             <scr` + `ipt>
               window.onload = () => {
                 setTimeout(() => {
                     window.print();
-                    window.close();
+                    // window.close(); // Keep it open for user to manually close if print fails or to preview
                 }, 1000);
               };
             </scr` + `ipt>
@@ -254,6 +262,7 @@ ${svgString}`);
       `);
       printWindow.document.close();
     }
+    (inputStateStore as any).update((s: any) => ({ ...s, panZoom: true }));
     logEvent('download', { type: 'pdf' });
   };
 
