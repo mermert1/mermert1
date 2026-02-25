@@ -37,6 +37,7 @@ jobs:
           MERMAID_RENDERER_URL: 'https://mermaid.ink'
           MERMAID_KROKI_RENDERER_URL: 'https://kroki.io'
           MERMAID_IS_ENABLED_MERMAID_CHART_LINKS: 'true'
+          NODE_OPTIONS: "--max-old-space-size=4096"
         run: |
           export DEPLOY=true
           [ "$GITHUB_EVENT_NAME" != "pull_request" ] && rm -rf docs/_app/

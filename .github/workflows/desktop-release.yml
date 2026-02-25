@@ -45,6 +45,8 @@ jobs:
         run: pnpm install
 
       - name: Build Web Application
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
         run: pnpm build
 
       - name: Build Desktop Application
