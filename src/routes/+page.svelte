@@ -2,17 +2,35 @@
   import { base } from '$app/paths';
   import { Button } from '$/components/ui/button';
   import { onMount } from 'svelte';
-  import { Share2, Zap, ArrowRight, MousePointer2, Settings, Download, Monitor, Activity, CheckCircle2, Menu, X, Github, Twitter, Linkedin, Sun, Moon } from 'lucide-svelte';
+  import {
+    Share2,
+    Zap,
+    ArrowRight,
+    Settings,
+    Download,
+    Monitor,
+    Activity,
+    CheckCircle2,
+    Menu,
+    X,
+    Github,
+    Sun,
+    Moon
+  } from 'lucide-svelte';
   import { mode, setMode } from 'mode-watcher';
 
   const title = 'Graphi - Diagramming for everyone';
-  const description = 'Create beautiful diagrams with valid Markdown and Mermaid logic. The editor for professionals.';
+  const description =
+    'Create beautiful diagrams with valid Markdown and Mermaid logic. The editor for professionals.';
 
   let isElectron = false;
   let isMobileMenuOpen = false;
 
   onMount(() => {
-    if (typeof navigator !== 'undefined' && navigator.userAgent.toLowerCase().includes(' electron/')) {
+    if (
+      typeof navigator !== 'undefined' &&
+      navigator.userAgent.toLowerCase().includes(' electron/')
+    ) {
       isElectron = true;
     }
   });
@@ -34,54 +52,73 @@
   </style>
 </svelte:head>
 
-<div class="min-h-screen font-sans selection:bg-indigo-100 selection:text-indigo-900 bg-background text-foreground transition-colors duration-300">
+<div
+  class="min-h-screen bg-background font-sans text-foreground transition-colors duration-300 selection:bg-indigo-100 selection:text-indigo-900">
   <!-- Navbar -->
-  <nav class="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-md border-b border-border shadow-sm">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between h-16 items-center">
+  <nav
+    class="sticky top-0 z-50 w-full border-b border-border bg-background/80 shadow-sm backdrop-blur-md">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="flex h-16 items-center justify-between">
         <!-- Logo -->
-        <div class="flex-shrink-0 flex items-center gap-2 cursor-pointer">
-          <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center transform rotate-3 hover:rotate-6 transition-transform">
-            <Share2 class="text-white w-5 h-5" />
+        <div class="flex flex-shrink-0 cursor-pointer items-center gap-2">
+          <div
+            class="flex h-8 w-8 rotate-3 transform items-center justify-center rounded-lg bg-indigo-600 transition-transform hover:rotate-6">
+            <Share2 class="h-5 w-5 text-white" />
           </div>
-          <span class="font-bold text-xl tracking-tight text-gray-900">Graphi</span>
+          <span class="text-xl font-bold tracking-tight text-gray-900">Graphi</span>
         </div>
 
         <!-- Desktop Navigation -->
-        <div class="hidden md:flex items-center space-x-6">
-          <a href="#features" class="text-muted-foreground hover:text-primary font-medium transition-colors">Features</a>
-          <a href="#downloads" class="text-muted-foreground hover:text-primary font-medium transition-colors">Downloads</a>
+        <div class="hidden items-center space-x-6 md:flex">
+          <a
+            href="#features"
+            class="font-medium text-muted-foreground transition-colors hover:text-primary"
+            >Features</a>
+          <a
+            href="#downloads"
+            class="font-medium text-muted-foreground transition-colors hover:text-primary"
+            >Downloads</a>
+          <a
+            href="{base}/docs"
+            class="font-medium text-muted-foreground transition-colors hover:text-primary"
+            >Documentation</a>
           <div class="h-6 w-px bg-border"></div>
-          
+
           <!-- Theme Toggle -->
-          <Button 
-            variant="ghost" 
-            size="icon" 
+          <Button
+            variant="ghost"
+            size="icon"
             onclick={() => setMode($mode === 'dark' ? 'light' : 'dark')}
-            class="text-muted-foreground hover:text-foreground transition-colors"
-          >
+            class="text-muted-foreground transition-colors hover:text-foreground">
             {#if $mode === 'dark'}
-                <Sun class="w-5 h-5" />
+              <Sun class="h-5 w-5" />
             {:else}
-                <Moon class="w-5 h-5" />
+              <Moon class="h-5 w-5" />
             {/if}
           </Button>
 
-          <a href="https://github.com/mermert1/mermert1" target="_blank" class="text-foreground font-medium hover:text-primary transition-colors flex items-center gap-2">
-            <Github class="w-4 h-4"/> GitHub
+          <a
+            href="https://github.com/mermert1/mermert1"
+            target="_blank"
+            class="flex items-center gap-2 font-medium text-foreground transition-colors hover:text-primary">
+            <Github class="h-4 w-4" /> GitHub
           </a>
-          <Button href="{base}/edit/" class="bg-primary text-primary-foreground px-5 py-2.5 rounded-full font-medium hover:opacity-90 transition-all shadow-sm hover:shadow-md h-auto">
+          <Button
+            href="{base}/edit/"
+            class="h-auto rounded-full bg-primary px-5 py-2.5 font-medium text-primary-foreground shadow-sm transition-all hover:opacity-90 hover:shadow-md">
             Open Editor
           </Button>
         </div>
 
         <!-- Mobile Menu Button -->
-        <div class="md:hidden flex items-center">
-          <button on:click={toggleMobileMenu} class="text-gray-600 hover:text-gray-900 focus:outline-none p-2">
+        <div class="flex items-center md:hidden">
+          <button
+            on:click={toggleMobileMenu}
+            class="p-2 text-gray-600 hover:text-gray-900 focus:outline-none">
             {#if isMobileMenuOpen}
-              <X class="w-6 h-6" />
+              <X class="h-6 w-6" />
             {:else}
-              <Menu class="w-6 h-6" />
+              <Menu class="h-6 w-6" />
             {/if}
           </button>
         </div>
@@ -90,15 +127,33 @@
 
     <!-- Mobile Menu -->
     {#if isMobileMenuOpen}
-      <div class="md:hidden bg-white border-b border-gray-100 absolute w-full shadow-lg">
-        <div class="px-4 pt-2 pb-4 space-y-1">
-          <a href="#features" on:click={toggleMobileMenu} class="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-md">Features</a>
-          <a href="#downloads" on:click={toggleMobileMenu} class="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-md">Downloads</a>
-          <div class="border-t border-gray-100 my-2 pt-2">
-            <a href="https://github.com/mermert1/mermert1" target="_blank" class="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-md flex items-center gap-2">
-               <Github class="w-4 h-4"/> GitHub
+      <div class="absolute w-full border-b border-gray-100 bg-white shadow-lg md:hidden">
+        <div class="space-y-1 px-4 pt-2 pb-4">
+          <a
+            href="#features"
+            on:click={toggleMobileMenu}
+            class="block rounded-md px-3 py-2 text-base font-medium text-gray-700 hover:bg-indigo-50 hover:text-indigo-600"
+            >Features</a>
+          <a
+            href="#downloads"
+            on:click={toggleMobileMenu}
+            class="block rounded-md px-3 py-2 text-base font-medium text-gray-700 hover:bg-indigo-50 hover:text-indigo-600"
+            >Downloads</a>
+          <a
+            href="{base}/docs"
+            on:click={toggleMobileMenu}
+            class="block rounded-md px-3 py-2 text-base font-medium text-gray-700 hover:bg-indigo-50 hover:text-indigo-600"
+            >Documentation</a>
+          <div class="my-2 border-t border-gray-100 pt-2">
+            <a
+              href="https://github.com/mermert1/mermert1"
+              target="_blank"
+              class="block flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-base font-medium text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">
+              <Github class="h-4 w-4" /> GitHub
             </a>
-            <Button href="{base}/edit/" class="w-full mt-2 bg-indigo-600 text-white px-3 py-2 text-base font-medium text-center rounded-md hover:bg-indigo-700 h-auto">
+            <Button
+              href="{base}/edit/"
+              class="mt-2 h-auto w-full rounded-md bg-indigo-600 px-3 py-2 text-center text-base font-medium text-white hover:bg-indigo-700">
               Open Editor
             </Button>
           </div>
@@ -110,82 +165,117 @@
   <main>
     <!-- Hero Section -->
     <section class="relative overflow-hidden bg-background pt-16 pb-32">
-      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[800px] opacity-10 pointer-events-none">
-        <div class="absolute inset-0 bg-[linear-gradient(to_right,theme(colors.muted.foreground/0.1)_1px,transparent_1px),linear-gradient(to_bottom,theme(colors.muted.foreground/0.1)_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+      <div
+        class="pointer-events-none absolute top-0 left-1/2 h-[800px] w-full -translate-x-1/2 opacity-10">
+        <div
+          class="absolute inset-0 bg-[linear-gradient(to_right,theme(colors.muted.foreground/0.1)_1px,transparent_1px),linear-gradient(to_bottom,theme(colors.muted.foreground/0.1)_1px,transparent_1px)] bg-[size:24px_24px]">
+        </div>
       </div>
 
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-sm font-medium mb-8">
-          <Zap class="w-4 h-4" />
+      <div class="relative z-10 mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+        <div
+          class="mb-8 inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1 text-sm font-medium text-indigo-700">
+          <Zap class="h-4 w-4" />
           <span>Graphi brings code-to-diagrams alive.</span>
         </div>
 
-        <h1 class="text-5xl md:text-7xl font-extrabold text-foreground tracking-tight mb-6 leading-tight">
-          Diagrams for <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">everyone.</span><br />
+        <h1
+          class="mb-6 text-5xl leading-tight font-extrabold tracking-tight text-foreground md:text-7xl">
+          Diagrams for <span
+            class="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent"
+            >everyone.</span
+          ><br />
           Simple, fast, code-driven.
         </h1>
 
-        <p class="mt-4 max-w-2xl mx-auto text-xl text-muted-foreground mb-10">
-          The intuitive diagramming tool built on Mermaid.js. Create Flowcharts, Architecture diagrams, and Mindmaps instantly – directly in your browser.
+        <p class="mx-auto mt-4 mb-10 max-w-2xl text-xl text-muted-foreground">
+          The intuitive diagramming tool built on Mermaid.js. Create Flowcharts, Architecture
+          diagrams, and Mindmaps instantly – directly in your browser.
         </p>
 
-        <div class="flex flex-col sm:flex-row justify-center gap-4 mb-16">
-          <a href="{base}/edit/" class="bg-indigo-600 text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-indigo-700 transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center gap-2">
+        <div class="mb-16 flex flex-col justify-center gap-4 sm:flex-row">
+          <a
+            href="{base}/edit/"
+            class="flex items-center justify-center gap-2 rounded-full bg-indigo-600 px-8 py-4 text-lg font-semibold text-white shadow-md transition-all hover:-translate-y-0.5 hover:bg-indigo-700 hover:shadow-lg">
             Open Web Editor
-            <ArrowRight class="w-5 h-5" />
+            <ArrowRight class="h-5 w-5" />
           </a>
-          <a href="#downloads" class="bg-background text-foreground border border-border px-8 py-4 rounded-full font-semibold text-lg hover:bg-muted transition-all flex items-center justify-center gap-2">
+          <a
+            href="#downloads"
+            class="flex items-center justify-center gap-2 rounded-full border border-border bg-background px-8 py-4 text-lg font-semibold text-foreground transition-all hover:bg-muted">
             Download Desktop App
           </a>
         </div>
 
         <!-- Hero Mockup Canvas -->
-        <div class="relative mx-auto max-w-5xl animate-in slide-in-from-bottom-5 duration-700">
-          <div class="rounded-2xl border border-gray-200 bg-white/50 backdrop-blur-sm shadow-2xl overflow-hidden">
-            <div class="h-12 border-b border-gray-200 bg-gray-50/80 flex items-center px-4 gap-4">
+        <div class="relative mx-auto max-w-5xl animate-in duration-700 slide-in-from-bottom-5">
+          <div
+            class="overflow-hidden rounded-2xl border border-gray-200 bg-white/50 shadow-2xl backdrop-blur-sm">
+            <div class="flex h-12 items-center gap-4 border-b border-gray-200 bg-gray-50/80 px-4">
               <div class="flex gap-1.5">
-                <div class="w-3 h-3 rounded-full bg-red-400"></div>
-                <div class="w-3 h-3 rounded-full bg-amber-400"></div>
-                <div class="w-3 h-3 rounded-full bg-green-400"></div>
+                <div class="h-3 w-3 rounded-full bg-red-400"></div>
+                <div class="h-3 w-3 rounded-full bg-amber-400"></div>
+                <div class="h-3 w-3 rounded-full bg-green-400"></div>
               </div>
-              <div class="flex-1 flex justify-center">
-                <div class="bg-white px-3 py-1 rounded-md border border-gray-200 text-xs text-gray-500 font-medium flex items-center gap-2">
+              <div class="flex flex-1 justify-center">
+                <div
+                  class="flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-1 text-xs font-medium text-gray-500">
                   <span>architecture.mermaid</span>
                 </div>
               </div>
               <div class="flex -space-x-2">
-                  <div class="w-8 h-8 rounded-full bg-indigo-100 border-2 border-white flex items-center justify-center text-xs font-bold text-indigo-600">G</div>
+                <div
+                  class="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-indigo-100 text-xs font-bold text-indigo-600">
+                  G
+                </div>
               </div>
             </div>
 
             <!-- Display Diagram Logic -->
-            <div class="h-[400px] md:h-[500px] bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] relative overflow-hidden flex items-center justify-center">
-                <!-- Visual Mockup similar to the template, but simplified for Svelte -->
-                <div class="absolute top-1/4 left-1/4 transform -translate-x-1/2 -translate-y-1/2 bg-white border-2 border-indigo-400 rounded-lg p-4 shadow-sm w-48 z-10 text-left">
-                  <div class="text-sm font-bold text-gray-800 mb-1">Graphi Client</div>
-                  <div class="text-xs text-gray-500">SvelteKit Frontend</div>
-                </div>
+            <div
+              class="relative flex h-[400px] items-center justify-center overflow-hidden bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] md:h-[500px]">
+              <!-- Visual Mockup similar to the template, but simplified for Svelte -->
+              <div
+                class="absolute top-1/4 left-1/4 z-10 w-48 -translate-x-1/2 -translate-y-1/2 transform rounded-lg border-2 border-indigo-400 bg-white p-4 text-left shadow-sm">
+                <div class="mb-1 text-sm font-bold text-gray-800">Graphi Client</div>
+                <div class="text-xs text-gray-500">SvelteKit Frontend</div>
+              </div>
 
-                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-indigo-600 text-white border-2 border-indigo-700 rounded-lg p-4 shadow-md w-56 z-10 text-left">
-                  <div class="text-sm font-bold mb-1 flex items-center gap-2">
-                    <Zap class="w-4 h-4 text-amber-300" /> Mermaid.js
-                  </div>
-                  <div class="text-xs text-indigo-100">Local Markdown Renderer</div>
+              <div
+                class="absolute top-1/2 left-1/2 z-10 w-56 -translate-x-1/2 -translate-y-1/2 transform rounded-lg border-2 border-indigo-700 bg-indigo-600 p-4 text-left text-white shadow-md">
+                <div class="mb-1 flex items-center gap-2 text-sm font-bold">
+                  <Zap class="h-4 w-4 text-amber-300" /> Mermaid.js
                 </div>
+                <div class="text-xs text-indigo-100">Local Markdown Renderer</div>
+              </div>
 
-                <div class="absolute top-3/4 left-3/4 transform -translate-x-1/2 -translate-y-1/2 bg-white border-2 border-emerald-400 rounded-lg p-4 shadow-sm w-48 z-10 text-left">
-                  <div class="text-sm font-bold text-gray-800 mb-1">Local Storage</div>
-                  <div class="text-xs text-gray-500">File System Access API</div>
-                </div>
+              <div
+                class="absolute top-3/4 left-3/4 z-10 w-48 -translate-x-1/2 -translate-y-1/2 transform rounded-lg border-2 border-emerald-400 bg-white p-4 text-left shadow-sm">
+                <div class="mb-1 text-sm font-bold text-gray-800">Local Storage</div>
+                <div class="text-xs text-gray-500">File System Access API</div>
+              </div>
 
-                <svg class="absolute inset-0 w-full h-full pointer-events-none" style="z-index: 0;">
-                  <!-- Top left to Center -->
-                  <path d="M 25% 25% C 35% 25%, 35% 50%, 50% 50%" fill="none" stroke="#9ca3af" stroke-width="2" stroke-dasharray="4 4" class="animate-[dash_2s_linear_infinite]" />
-                  <circle cx="50%" cy="50%" r="4" fill="#4f46e5" />
-                  <!-- Center to Bottom Right -->
-                  <path d="M 50% 50% C 65% 50%, 65% 75%, 75% 75%" fill="none" stroke="#9ca3af" stroke-width="2" />
-                  <polygon points="75%,75% 73%,71% 77%,71%" fill="#9ca3af" transform="translate(-10, 0) rotate(45, 75%, 75%)" />
-                </svg>
+              <svg class="pointer-events-none absolute inset-0 h-full w-full" style="z-index: 0;">
+                <!-- Top left to Center -->
+                <path
+                  d="M 25% 25% C 35% 25%, 35% 50%, 50% 50%"
+                  fill="none"
+                  stroke="#9ca3af"
+                  stroke-width="2"
+                  stroke-dasharray="4 4"
+                  class="animate-[dash_2s_linear_infinite]" />
+                <circle cx="50%" cy="50%" r="4" fill="#4f46e5" />
+                <!-- Center to Bottom Right -->
+                <path
+                  d="M 50% 50% C 65% 50%, 65% 75%, 75% 75%"
+                  fill="none"
+                  stroke="#9ca3af"
+                  stroke-width="2" />
+                <polygon
+                  points="75%,75% 73%,71% 77%,71%"
+                  fill="#9ca3af"
+                  transform="translate(-10, 0) rotate(45, 75%, 75%)" />
+              </svg>
             </div>
           </div>
         </div>
@@ -193,37 +283,60 @@
     </section>
 
     <!-- Actual Features Section -->
-    <section id="features" class="py-24 bg-muted/30 border-t border-border">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center max-w-3xl mx-auto mb-16">
-          <h2 class="text-indigo-600 dark:text-indigo-400 font-semibold tracking-wide uppercase text-sm mb-3">Why Graphi?</h2>
-          <h3 class="text-3xl md:text-4xl font-bold text-foreground mb-4">Everything you need, driven by code</h3>
-          <p class="text-lg text-muted-foreground">Graphi brings the power of Mermaid.js into a modern, lightning-fast editor interface. Say goodbye to drag-and-drop fatigue.</p>
+    <section id="features" class="border-t border-border bg-muted/30 py-24">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mx-auto mb-16 max-w-3xl text-center">
+          <h2
+            class="mb-3 text-sm font-semibold tracking-wide text-indigo-600 uppercase dark:text-indigo-400">
+            Why Graphi?
+          </h2>
+          <h3 class="mb-4 text-3xl font-bold text-foreground md:text-4xl">
+            Everything you need, driven by code
+          </h3>
+          <p class="text-lg text-muted-foreground">
+            Graphi brings the power of Mermaid.js into a modern, lightning-fast editor interface.
+            Say goodbye to drag-and-drop fatigue.
+          </p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-          <div class="bg-card p-8 rounded-2xl shadow-sm border border-border hover:shadow-md transition-shadow">
-            <div class="w-12 h-12 bg-indigo-50 dark:bg-indigo-950/30 rounded-xl flex items-center justify-center mb-6">
-              <Activity class="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+        <div class="grid grid-cols-1 gap-10 md:grid-cols-3">
+          <div
+            class="rounded-2xl border border-border bg-card p-8 shadow-sm transition-shadow hover:shadow-md">
+            <div
+              class="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-950/30">
+              <Activity class="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
             </div>
-            <h4 class="text-xl font-bold text-foreground mb-3">Live Preview Rendering</h4>
-            <p class="text-muted-foreground leading-relaxed">Type your diagram logic in the Monaco editor and watch it render instantly in the preview panel.</p>
+            <h4 class="mb-3 text-xl font-bold text-foreground">Live Preview Rendering</h4>
+            <p class="leading-relaxed text-muted-foreground">
+              Type your diagram logic in the Monaco editor and watch it render instantly in the
+              preview panel.
+            </p>
           </div>
-          
-          <div class="bg-card p-8 rounded-2xl shadow-sm border border-border hover:shadow-md transition-shadow">
-            <div class="w-12 h-12 bg-indigo-50 dark:bg-indigo-950/30 rounded-xl flex items-center justify-center mb-6">
-              <Download class="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+
+          <div
+            class="rounded-2xl border border-border bg-card p-8 shadow-sm transition-shadow hover:shadow-md">
+            <div
+              class="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-950/30">
+              <Download class="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
             </div>
-            <h4 class="text-xl font-bold text-foreground mb-3">Seamless Exports</h4>
-            <p class="text-muted-foreground leading-relaxed">Export your rendered diagrams cleanly to SVG or PNG to include them easily in your documentation.</p>
+            <h4 class="mb-3 text-xl font-bold text-foreground">Seamless Exports</h4>
+            <p class="leading-relaxed text-muted-foreground">
+              Export your rendered diagrams cleanly to SVG or PNG to include them easily in your
+              documentation.
+            </p>
           </div>
-          
-          <div class="bg-card p-8 rounded-2xl shadow-sm border border-border hover:shadow-md transition-shadow">
-            <div class="w-12 h-12 bg-indigo-50 dark:bg-indigo-950/30 rounded-xl flex items-center justify-center mb-6">
-              <Settings class="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+
+          <div
+            class="rounded-2xl border border-border bg-card p-8 shadow-sm transition-shadow hover:shadow-md">
+            <div
+              class="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-950/30">
+              <Settings class="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
             </div>
-            <h4 class="text-xl font-bold text-foreground mb-3">Advanced Configuration</h4>
-            <p class="text-muted-foreground leading-relaxed">Dive into the JSON configuration pane to precisely control Mermaid themes, layouts, and strictness.</p>
+            <h4 class="mb-3 text-xl font-bold text-foreground">Advanced Configuration</h4>
+            <p class="leading-relaxed text-muted-foreground">
+              Dive into the JSON configuration pane to precisely control Mermaid themes, layouts,
+              and strictness.
+            </p>
           </div>
         </div>
       </div>
@@ -231,89 +344,135 @@
 
     <!-- Desktop Downloads Section -->
     {#if !isElectron}
-      <section id="downloads" class="py-24 bg-background border-t border-border">
-        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-            <h2 class="text-3xl font-bold text-foreground mb-4">Get Graphi for Desktop</h2>
-            <p class="text-lg text-muted-foreground max-w-2xl mx-auto">Working offline? Download the desktop app to use Graphi without an internet connection, directly on your machine.</p>
+      <section id="downloads" class="border-t border-border bg-background py-24">
+        <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <div class="mb-12 text-center">
+            <h2 class="mb-4 text-3xl font-bold text-foreground">Get Graphi for Desktop</h2>
+            <p class="mx-auto max-w-2xl text-lg text-muted-foreground">
+              Working offline? Download the desktop app to use Graphi without an internet
+              connection, directly on your machine.
+            </p>
+          </div>
+
+          <div
+            class="relative overflow-hidden rounded-3xl bg-indigo-600 p-10 text-center text-white shadow-2xl">
+            <div
+              class="absolute top-0 right-0 h-64 w-64 translate-x-1/2 -translate-y-1/2 transform rounded-full bg-white opacity-5 blur-3xl">
+            </div>
+            <div
+              class="absolute bottom-0 left-0 h-48 w-48 -translate-x-1/2 translate-y-1/2 transform rounded-full bg-black opacity-10 blur-2xl">
             </div>
 
-            <div class="bg-indigo-600 rounded-3xl p-10 text-center text-white relative overflow-hidden shadow-2xl">
-            <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
-            <div class="absolute bottom-0 left-0 w-48 h-48 bg-black opacity-10 rounded-full blur-2xl transform -translate-x-1/2 translate-y-1/2"></div>
+            <div class="relative z-10 flex flex-col justify-center gap-6 md:flex-row">
+              <!-- Windows -->
+              <a
+                href="https://github.com/mermert1/mermert1/releases/latest/download/Graphi-Desktop-Win-Installer.exe"
+                target="_blank"
+                class="group flex flex-1 flex-col items-center gap-4 rounded-2xl border border-white/20 bg-white/10 p-6 backdrop-blur-sm transition-all hover:bg-white/20">
+                <Monitor
+                  class="h-10 w-10 text-indigo-200 transition-colors group-hover:text-white" />
+                <div>
+                  <h4 class="mb-1 text-xl font-bold">Windows</h4>
+                  <p class="text-sm text-indigo-200">Download .exe Setup</p>
+                </div>
+              </a>
 
-            <div class="relative z-10 flex flex-col md:flex-row justify-center gap-6">
-                <!-- Windows -->
-                <a href="https://github.com/mermert1/mermert1/releases/latest/download/Graphi-Desktop-Win-Installer.exe" target="_blank"
-                class="flex-1 bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-sm p-6 rounded-2xl transition-all flex flex-col items-center gap-4 group">
-                    <Monitor class="w-10 h-10 text-indigo-200 group-hover:text-white transition-colors" />
-                    <div>
-                    <h4 class="font-bold text-xl mb-1">Windows</h4>
-                    <p class="text-indigo-200 text-sm">Download .exe Setup</p>
-                    </div>
-                </a>
+              <!-- macOS -->
+              <a
+                href="https://github.com/mermert1/mermert1/releases/latest/download/Graphi-Desktop-macOS.dmg"
+                target="_blank"
+                class="group flex flex-1 flex-col items-center gap-4 rounded-2xl border border-white/20 bg-white/10 p-6 backdrop-blur-sm transition-all hover:bg-white/20">
+                <svg
+                  class="h-10 w-10 text-indigo-200 transition-colors group-hover:text-white"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10H12V2z" /></svg>
+                <div>
+                  <h4 class="mb-1 text-xl font-bold">macOS</h4>
+                  <p class="text-sm text-indigo-200">Download .dmg</p>
+                </div>
+              </a>
 
-                <!-- macOS -->
-                <a href="https://github.com/mermert1/mermert1/releases/latest/download/Graphi-Desktop-macOS.dmg" target="_blank"
-                class="flex-1 bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-sm p-6 rounded-2xl transition-all flex flex-col items-center gap-4 group">
-                    <svg class="w-10 h-10 text-indigo-200 group-hover:text-white transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10H12V2z" /></svg>
-                    <div>
-                    <h4 class="font-bold text-xl mb-1">macOS</h4>
-                    <p class="text-indigo-200 text-sm">Download .dmg</p>
-                    </div>
-                </a>
-
-                <!-- Linux -->
-                <a href="https://github.com/mermert1/mermert1/releases/latest/download/Graphi-Desktop-Linux.AppImage" target="_blank"
-                class="flex-1 bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-sm p-6 rounded-2xl transition-all flex flex-col items-center gap-4 group">
-                    <svg class="w-10 h-10 text-indigo-200 group-hover:text-white transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2" /><line x1="8" y1="21" x2="16" y2="21" /><line x1="12" y1="17" x2="12" y2="21" /></svg>
-                    <div>
-                    <h4 class="font-bold text-xl mb-1">Linux</h4>
-                    <p class="text-indigo-200 text-sm">Download .AppImage</p>
-                    </div>
-                </a>
+              <!-- Linux -->
+              <a
+                href="https://github.com/mermert1/mermert1/releases/latest/download/Graphi-Desktop-Linux.AppImage"
+                target="_blank"
+                class="group flex flex-1 flex-col items-center gap-4 rounded-2xl border border-white/20 bg-white/10 p-6 backdrop-blur-sm transition-all hover:bg-white/20">
+                <svg
+                  class="h-10 w-10 text-indigo-200 transition-colors group-hover:text-white"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  ><rect x="2" y="3" width="20" height="14" rx="2" ry="2" /><line
+                    x1="8"
+                    y1="21"
+                    x2="16"
+                    y2="21" /><line x1="12" y1="17" x2="12" y2="21" /></svg>
+                <div>
+                  <h4 class="mb-1 text-xl font-bold">Linux</h4>
+                  <p class="text-sm text-indigo-200">Download .AppImage</p>
+                </div>
+              </a>
             </div>
-            </div>
+          </div>
         </div>
       </section>
     {/if}
 
-    <section class="py-20 bg-muted/30 border-t border-border">
-      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 class="text-3xl md:text-5xl font-bold text-foreground mb-6">Ready to visualize your ideas?</h2>
-        <p class="text-xl text-muted-foreground mb-10">Jump straight into the editor. No account required.</p>
-        <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
-          <a href="{base}/edit/" class="w-full sm:w-auto bg-indigo-600 text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-indigo-700 transition-colors shadow-md">
+    <section class="border-t border-border bg-muted/30 py-20">
+      <div class="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
+        <h2 class="mb-6 text-3xl font-bold text-foreground md:text-5xl">
+          Ready to visualize your ideas?
+        </h2>
+        <p class="mb-10 text-xl text-muted-foreground">
+          Jump straight into the editor. No account required.
+        </p>
+        <div class="flex flex-col items-center justify-center gap-4 sm:flex-row">
+          <a
+            href="{base}/edit/"
+            class="w-full rounded-full bg-indigo-600 px-8 py-4 text-lg font-bold text-white shadow-md transition-colors hover:bg-indigo-700 sm:w-auto">
             Open Editor Now
           </a>
         </div>
         <div class="mt-8 flex items-center justify-center gap-2 text-sm text-gray-500">
-          <CheckCircle2 class="w-4 h-4 text-emerald-500" /> Free and open-source forever.
+          <CheckCircle2 class="h-4 w-4 text-emerald-500" /> Free and open-source forever.
         </div>
       </div>
     </section>
   </main>
 
   <!-- Footer -->
-  <footer class="bg-background border-t border-border pt-16 pb-8">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex flex-col md:flex-row items-center justify-between gap-6 mb-8 text-center md:text-left">
-         <div class="flex items-center gap-2">
-            <div class="w-6 h-6 bg-indigo-600 rounded flex items-center justify-center transform rotate-3">
-              <Share2 class="text-white w-3 h-3" />
-            </div>
-            <span class="font-bold text-xl text-foreground">Graphi</span>
+  <footer class="border-t border-border bg-background pt-16 pb-8">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div
+        class="mb-8 flex flex-col items-center justify-between gap-6 text-center md:flex-row md:text-left">
+        <div class="flex items-center gap-2">
+          <div
+            class="flex h-6 w-6 rotate-3 transform items-center justify-center rounded bg-indigo-600">
+            <Share2 class="h-3 w-3 text-white" />
           </div>
-          
-          <div class="flex gap-4">
-            <a href="https://github.com/mermert1/mermert1" target="_blank" class="text-muted-foreground hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-2 transition-colors">
-              <Github class="w-5 h-5" /> Code on GitHub
-            </a>
-          </div>
+          <span class="text-xl font-bold text-foreground">Graphi</span>
+        </div>
+
+        <div class="flex gap-4">
+          <a
+            href="https://github.com/mermert1/mermert1"
+            target="_blank"
+            class="flex items-center gap-2 text-muted-foreground transition-colors hover:text-indigo-600 dark:hover:text-indigo-400">
+            <Github class="h-5 w-5" /> Code on GitHub
+          </a>
+        </div>
       </div>
 
-      <div class="border-t border-gray-100 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-        <p class="text-gray-400 text-sm">
+      <div
+        class="flex flex-col items-center justify-between gap-4 border-t border-gray-100 pt-8 md:flex-row">
+        <p class="text-sm text-gray-400">
           © {new Date().getFullYear()} Graphi. Built with SvelteKit & Mermaid.js.
         </p>
       </div>
