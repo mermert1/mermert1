@@ -2,10 +2,24 @@
   /* eslint-disable svelte/no-at-html-tags */
   import type { PageData } from './$types';
   import { base } from '$app/paths';
-  import { ChevronLeft, Calendar, User, Clock, Share2 } from 'lucide-svelte';
+  import { ChevronLeft, Calendar, User, Clock, Share2, Check } from 'lucide-svelte';
 
   export let data: PageData;
   const doc = data.doc;
+
+  let copied = false;
+
+  async function handleCopyLink() {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      copied = true;
+      setTimeout(() => {
+        copied = false;
+      }, 2000);
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+    }
+  }
 </script>
 
 <div class="min-h-screen bg-background pb-20">
@@ -56,8 +70,15 @@
               Share this guide
             </h3>
             <button
-              class="flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary">
-              <Share2 class="h-4 w-4" /> Copy Link
+              on:click={handleCopyLink}
+              class="flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary {copied
+                ? 'text-primary'
+                : ''}">
+              {#if copied}
+                <Check class="h-4 w-4" /> Copied!
+              {:else}
+                <Share2 class="h-4 w-4" /> Copy Link
+              {/if}
             </button>
           </div>
 

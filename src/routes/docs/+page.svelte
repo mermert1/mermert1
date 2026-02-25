@@ -64,7 +64,7 @@
               <div
                 class="flex items-center gap-1.5 rounded-md bg-muted/50 px-2 py-1 text-xs text-muted-foreground">
                 <Clock class="h-3.5 w-3.5" />
-                {new Date(doc.date).toLocaleDateString(undefined, {
+                {new Date(doc.date.trim()).toLocaleDateString(undefined, {
                   year: 'numeric',
                   month: 'short',
                   day: 'numeric'
