@@ -11,7 +11,6 @@
   import SettingsIcon from '~icons/material-symbols/settings-outline';
   import UserIcon from '~icons/material-symbols/person';
   import RobotIcon from '~icons/material-symbols/smart-toy-outline';
-  import ContentCopyIcon from '~icons/material-symbols/content-copy';
   import ChevronDownIcon from '~icons/material-symbols/keyboard-arrow-down';
   import AddNoteIcon from '~icons/material-symbols/note-add-outline';
   import FullscreenIcon from '~icons/material-symbols/fullscreen';
@@ -111,9 +110,6 @@
     }
   }
 
-  function insertCode(code: string) {
-    onInsertCode(code);
-  }
 
   function replaceCode(code: string) {
     if (onReplaceCode) {
@@ -528,15 +524,6 @@
                         title="Overwrites the editor code">
                         <CheckIcon class="size-3" />
                         Replace
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        class="h-7 flex-1 gap-1 px-2.5 text-[10px] font-bold"
-                        onclick={() => insertCode(block.content)}
-                        title="Inserts at cursor">
-                        <ContentCopyIcon class="size-3" />
-                        Insert
                       </Button>
                       <Button
                         size="sm"
