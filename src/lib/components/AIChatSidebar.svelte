@@ -1,5 +1,6 @@
 <script lang="ts">
   import { generateDiagram, getConfig, saveConfig, clearConfig } from '$/util/aiService';
+  import { packFileContent } from '$/util/fileContent';
   import { SvelteMap } from 'svelte/reactivity';
   import type { ChatMessage, AIServiceConfig } from '$/util/aiService';
   import { Button } from '$/components/ui/button';
@@ -126,7 +127,8 @@
   async function newFileFromCode(code: string, fileName?: string) {
     const finalName = fileName || 'AI-Diagram.dia';
     try {
-      await createVirtualFile(finalName, JSON.stringify({ code: code, mermaid: '{}' }), 'root');
+      const formattedContent = packFileContent(code, '{}');
+      await createVirtualFile(finalName, formattedContent, 'root');
       toast.success(`Saved as ${finalName} in workspace!`);
     } catch {
       toast.error('Failed to create new file.');
