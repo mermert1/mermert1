@@ -253,7 +253,8 @@
   }
 </script>
 
-<div class="flex h-full w-[360px] flex-col border-l border-border bg-card text-sm">
+<div
+  class="flex h-full w-full max-w-[420px] min-w-[200px] flex-col border-l border-border bg-card text-sm">
   <!-- Header -->
   <div class="flex items-center justify-between border-b border-border bg-muted/30 p-2">
     <div class="flex items-center gap-1.5 px-1">
