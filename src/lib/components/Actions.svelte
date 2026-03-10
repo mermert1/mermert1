@@ -11,6 +11,7 @@
   import { getDomain } from '$/util/util';
   import { browser } from '$app/environment';
   import { waitForRender } from '$lib/util/autoSync';
+  import { activeVirtualFileId } from '$/util/fileSystem';
   import { inputStateStore, stateStore, urlsStore } from '$lib/util/state';
   import { logEvent } from '$lib/util/stats';
   import { version as FAVersion } from '@fortawesome/fontawesome-free/package.json';
@@ -138,8 +139,18 @@ ${svgString}`);
     event.preventDefault();
   };
 
-  const getFileName = (extension: string) =>
-    `mermaid-diagram-${dayjs().format('YYYY-MM-DD-HHmmss')}.${extension}`;
+  const getFileName = async (extension: string) => {
+    const virtualId = get(activeVirtualFileId);
+    if (virtualId) {
+      const { siteFiles } = await import('$/util/siteWorkspace.svelte');
+      const file = siteFiles.find((f) => f.id === virtualId);
+      if (file && file.name) {
+        const baseName = file.name.replace(/\.[^/.]+$/, '');
+        return `${baseName}.${extension}`;
+      }
+    }
+    return `mermaid-diagram-${dayjs().format('YYYY-MM-DD-HHmmss')}.${extension}`;
+  };
 
   const simulateDownload = (download: string, href: string): void => {
     const a = document.createElement('a');
@@ -150,11 +161,12 @@ ${svgString}`);
   };
 
   const downloadImage: Exporter = (context, image) => {
-    return () => {
+    return async () => {
       const { canvas } = context;
       context.drawImage(image, 0, 0, canvas.width, canvas.height);
+      const filename = await getFileName('png');
       simulateDownload(
-        getFileName('png'),
+        filename,
         canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream')
       );
     };
@@ -197,8 +209,9 @@ ${svgString}`);
     });
   };
 
-  const onDownloadSVG = () => {
-    simulateDownload(getFileName('svg'), `data:image/svg+xml;base64,${getBase64SVG()}`);
+  const onDownloadSVG = async () => {
+    const filename = await getFileName('svg');
+    simulateDownload(filename, `data:image/svg+xml;base64,${getBase64SVG()}`);
     logEvent('download', {
       type: 'svg'
     });
@@ -333,12 +346,13 @@ ${svgString}`);
         }}>
         Jira
       </Button>
-      <Button
+        <Button
         size="sm"
         variant="outline"
         class="flex-1 text-xs"
-        onclick={() => {
-          downloadAsFile(exportToHtml($stateStore.code), 'graphi-diagram.html', 'text/html');
+        onclick={async () => {
+          const filename = await getFileName('html');
+          downloadAsFile(exportToHtml($stateStore.code), filename, 'text/html');
           toast.success('HTML file downloaded!');
         }}>
         HTML

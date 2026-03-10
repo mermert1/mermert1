@@ -41,9 +41,25 @@ CRITICAL: ALWAYS wrap diagram code in EXACTLY \`\`\`mermaid\n<diagram>\n\`\`\` b
     - **NEVER** use the keyword \`component\`. ALWAYS use \`service\`.
     - **NEVER** add text labels to edges. Edge labels like \`-- "label" -->\` are NOT supported.
     - **SIDE NOTATION IS MANDATORY:** Every edge MUST specify sides like \`:L -- R:\`.
-- **Icons:** Use Iconify notation like \`logos:aws-aurora\` etc.
+- **Icons:** Use standard Iconify notation like \`logos:aws-aurora\`. (For Azure, see Azure Icons rule below).
 
-#### 2.2 BLOCK DIAGRAM (\`block\`) [v11.10.0+]
+### 2.2 AZURE ICONS IN FLOWCHARTS (CRITICAL)
+- You have access to a custom local Azure icon pack prefixed with \`azure:\`.
+- **Mapping Logic:** To find the correct name, take the standard Azure service name, convert spaces to dashes, and lowercase it.
+- **Common Mappings:**
+  - API Gateway: \`azure:api-management-services\`
+  - Entra / Active Directory: \`azure:entra-connect\`
+  - Function Apps: \`azure:function-apps\`
+  - Key Vault: \`azure:key-vaults\`
+  - Log Analytics: \`azure:log-analytics-workspaces\`
+  - Storage Account: \`azure:storage-accounts\`
+  - Graph API: \`azure:resource-graph-explorer\`
+  - SQL Database: \`azure:sql-database\`
+- **Syntax:** Attach them to flowchart nodes using \`@{icon: "azure:..."}\`. 
+  - Example: \`API[API Gateway]@{icon: "azure:api-management-services"}\`.
+- **Fallback:** If a specific Azure resource doesn't have an obvious map, use a standard FontAwesome (e.g., \`fas:database\`) or Material (\`mdi:cloud\`) icon.
+
+#### 2.3 BLOCK DIAGRAM (\`block\`) [v11.10.0+]
 - **Starter:** \`block\`
 - **Layout:** \`columns 3\`
 - **Blocks:** \`A["Label"]\`, \`B:2\` (Spans 2 columns), \`space\` (Empty grid cell)
