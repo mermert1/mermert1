@@ -19,13 +19,14 @@
   import { Button } from '$/components/ui/button';
   import * as Resizable from '$/components/ui/resizable';
   import type { Tab } from '$/types';
-  import { loadRoots, saveFile } from '$/util/fileSystem';
+  import { loadRoots, saveFile } from '$lib/util/fileSystem';
   import { packFileContent } from '$/util/fileContent';
   import { PanZoomState } from '$/util/panZoom';
+
   import { stateStore, updateCodeStore } from '$/util/state';
   import { logEvent } from '$/util/stats';
   import { initHandler } from '$/util/util';
-  import { siteFiles } from '$/util/siteWorkspace.svelte';
+  import { siteFiles } from '$lib/util/siteWorkspace.svelte';
   import { onMount } from 'svelte';
   import { toast } from 'svelte-sonner';
   import CodeIcon from '~icons/custom/code';
@@ -108,7 +109,7 @@
     saveActiveFile,
     saveStatus,
     writeFile
-  } from '$/util/fileSystem';
+  } from '$lib/util/fileSystem';
   import { debounce } from 'lodash-es';
 
   const isDirty = $derived(

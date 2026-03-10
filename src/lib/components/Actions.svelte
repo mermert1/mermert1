@@ -9,10 +9,11 @@
   import * as ToggleGroup from '$/components/ui/toggle-group';
   import { TID } from '$/constants';
   import { getDomain } from '$/util/util';
+  import { browser } from '$app/environment';
   import { get } from 'svelte/store';
   import { waitForRender } from '$lib/util/autoSync';
-  import { activeFileHandle, activeVirtualFileId } from '$/util/fileSystem';
-  import { siteFiles } from '$/util/siteWorkspace.svelte';
+  import { activeFileHandle, activeVirtualFileId } from '$lib/util/fileSystem';
+  import { siteFiles } from '$lib/util/siteWorkspace.svelte';
   import { inputStateStore, stateStore, urlsStore } from '$lib/util/state';
   import { logEvent } from '$lib/util/stats';
   import { version as FAVersion } from '@fortawesome/fontawesome-free/package.json';
@@ -141,8 +142,10 @@ ${svgString}`);
   };
 
   const getFileName = (extension: string) => {
+    console.log('getFileName triggered for extension', extension);
     // 1. Check local file system handles
     const pHandle = get(activeFileHandle);
+    console.log('activeFileHandle is', pHandle);
     if (pHandle && pHandle.name) {
       const baseName = pHandle.name.replace(/\.[^/.]+$/, '');
       return `${baseName}.${extension}`;
@@ -150,8 +153,11 @@ ${svgString}`);
 
     // 2. Check workspace handles
     const virtualId = get(activeVirtualFileId);
+    console.log('activeVirtualFileId is', virtualId);
     if (virtualId) {
+      console.log('siteFiles is', siteFiles, 'length:', siteFiles.length);
       const file = siteFiles.find((f) => f.id === virtualId);
+      console.log('found virtual file:', file);
       if (file && file.name) {
         const baseName = file.name.replace(/\.[^/.]+$/, '');
         return `${baseName}.${extension}`;

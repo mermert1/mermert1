@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { generateDiagram, getConfig, saveConfig, clearConfig } from '$/util/aiService';
+  import { generateDiagram, getConfig, saveConfig } from '$/util/aiService';
   import { packFileContent } from '$/util/fileContent';
   import { SvelteMap } from 'svelte/reactivity';
   import type { ChatMessage, AIServiceConfig } from '$/util/aiService';
@@ -17,7 +17,7 @@
   import CheckIcon from '~icons/material-symbols/check-circle-outline';
   import AIIcon from '~icons/material-symbols/auto-awesome';
   import Mermaid from 'mermaid';
-  import { createVirtualFile } from '$/util/siteWorkspace.svelte';
+  import { createVirtualFile } from '$lib/util/siteWorkspace.svelte';
   import { toast } from 'svelte-sonner';
 
   interface Props {
@@ -63,14 +63,6 @@
     error = '';
   }
 
-  function resetSettings() {
-    clearConfig();
-    apiKey = '';
-    provider = 'gemini';
-    model = '';
-    showSettings = true;
-  }
-
   async function sendMessage() {
     if (!inputText.trim() || isLoading) return;
 
@@ -110,7 +102,6 @@
     }
   }
 
-
   function replaceCode(code: string) {
     if (onReplaceCode) {
       onReplaceCode(code);
@@ -139,7 +130,11 @@
     error = '';
   }
 
-  interface ParsedBlock { type: 'text' | 'mermaid'; content: string; filename?: string };
+  interface ParsedBlock {
+    type: 'text' | 'mermaid';
+    content: string;
+    filename?: string;
+  }
 
   function parseMessageBlocks(content: string): ParsedBlock[] {
     const blocks: ParsedBlock[] = [];
@@ -196,7 +191,8 @@
   const svgCache = new SvelteMap<string, string>();
 
   async function renderMermaidPreview(code: string, id: string): Promise<string> {
-    if (svgCache.has(code)) return svgCache.get(code)!;
+    const cached = svgCache.get(code);
+    if (cached) return cached;
     try {
       Mermaid.initialize({ startOnLoad: false, theme: 'default' });
       const { svg } = await Mermaid.render(`ai-preview-${id}`, code);
@@ -509,7 +505,7 @@
                       {:then svgHtml}
                         <div
                           class="pointer-events-none flex w-full justify-center [&>svg]:h-auto [&>svg]:max-h-[250px] [&>svg]:max-w-full">
-                          <!-- svelte-ignore svelte/no-at-html-tags -->
+                          <!-- eslint-disable-next-line svelte/no-at-html-tags -->
                           {@html svgHtml}
                         </div>
                       {/await}
@@ -629,7 +625,7 @@
           {:then svgHtml}
             <div
               class="diagram-zoom-container flex w-full justify-center [&>svg]:h-auto [&>svg]:max-w-full">
-              <!-- svelte-ignore svelte/no-at-html-tags -->
+              <!-- eslint-disable-next-line svelte/no-at-html-tags -->
               {@html svgHtml}
             </div>
           {/await}
