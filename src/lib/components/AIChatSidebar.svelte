@@ -194,11 +194,15 @@
     const cached = svgCache.get(code);
     if (cached) return cached;
     try {
-      Mermaid.initialize({ startOnLoad: false, theme: 'default' });
+      Mermaid.initialize({ startOnLoad: false, suppressErrorRendering: true, theme: 'default' });
       const { svg } = await Mermaid.render(`ai-preview-${id}`, code);
       svgCache.set(code, svg);
       return svg;
     } catch {
+      // Clean up any mermaid error elements leaked into the DOM
+      document
+        .querySelectorAll('[id^="dai-preview-"], #d-error, [id^="dmermaid-"]')
+        .forEach((el) => el.remove());
       return `<div class="text-destructive p-2 text-xs">Syntax Error rendering diagram preview.</div><pre class="text-[10px] overflow-x-auto p-2 bg-background">${code}</pre>`;
     }
   }

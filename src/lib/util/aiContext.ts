@@ -41,11 +41,12 @@ CRITICAL: ALWAYS wrap diagram code in EXACTLY \`\`\`mermaid\n<diagram>\n\`\`\` b
     - **NEVER** use the keyword \`component\`. ALWAYS use \`service\`.
     - **NEVER** add text labels to edges. Edge labels like \`-- "label" -->\` are NOT supported.
     - **SIDE NOTATION IS MANDATORY:** Every edge MUST specify sides like \`:L -- R:\`.
-- **Icons:** Use standard Iconify notation like \`logos:aws-aurora\`. (For Azure, see Azure Icons rule below).
+    - **NEVER** use \`@{icon: "..."}\` syntax. Icons are NOT supported in architecture-beta in this editor. Use plain services without icons.
 
-### 2.2 AZURE ICONS IN FLOWCHARTS (CRITICAL)
-- You have access to a custom local Azure icon pack prefixed with \`azure:\`.
-- **Mapping Logic:** To find the correct name, take the standard Azure service name, convert spaces to dashes, and lowercase it.
+### 2.2 ICONS IN FLOWCHARTS
+- The \`@{icon: "..."}\` icon annotation syntax is ONLY supported on **flowchart** nodes, NOT on architecture-beta services.
+- **Azure Icon Pack:** A custom local Azure icon pack is available, prefixed with \`azure:\`.
+- **Mapping Logic:** Take the standard Azure service name, convert spaces to dashes, and lowercase it.
 - **Common Mappings:**
   - API Gateway: \`azure:api-management-services\`
   - Entra / Active Directory: \`azure:entra-connect\`
@@ -55,8 +56,9 @@ CRITICAL: ALWAYS wrap diagram code in EXACTLY \`\`\`mermaid\n<diagram>\n\`\`\` b
   - Storage Account: \`azure:storage-accounts\`
   - Graph API: \`azure:resource-graph-explorer\`
   - SQL Database: \`azure:sql-database\`
-- **Syntax:** Attach them to flowchart nodes using \`@{icon: "azure:..."}\`. 
+- **Syntax:** Attach them to **flowchart** nodes using \`@{icon: "azure:..."}\`. 
   - Example: \`API[API Gateway]@{icon: "azure:api-management-services"}\`.
+- **IMPORTANT:** Do NOT use \`@{icon}\` in architecture-beta diagrams.
 - **Fallback:** If a specific Azure resource doesn't have an obvious map, use a standard FontAwesome (e.g., \`fas:database\`) or Material (\`mdi:cloud\`) icon.
 
 #### 2.3 BLOCK DIAGRAM (\`block\`) [v11.10.0+]
@@ -113,7 +115,7 @@ CRITICAL: ALWAYS wrap diagram code in EXACTLY \`\`\`mermaid\n<diagram>\n\`\`\` b
 ### 3. SELECTION LOGIC
 1. Hierarchy/Org Chart -> \`mindmap\`
 2. Chronology/History -> \`timeline\`
-3. Cloud Infra/Resources -> \`architecture-beta\`
+3. Cloud Infra/Resources -> \`flowchart\` (use \`@{icon}\` for Azure/cloud icons). Only use \`architecture-beta\` if the user explicitly asks for it, and NEVER with icons.
 4. Grid Layouts/Abstract blocks -> \`block\`
 5. Tech/Network Protocol Details -> \`packet\`
 6. Numerical Trends -> \`xychart\`
