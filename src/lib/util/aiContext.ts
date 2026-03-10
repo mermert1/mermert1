@@ -59,7 +59,7 @@ CRITICAL: ALWAYS wrap diagram code in EXACTLY \`\`\`mermaid\n<diagram>\n\`\`\` b
 - **Syntax:** Attach them to **flowchart** nodes using \`@{icon: "azure:..."}\`. 
   - Example: \`API[API Gateway]@{icon: "azure:api-management-services"}\`.
 - **IMPORTANT:** Do NOT use \`@{icon}\` in architecture-beta diagrams.
-- **Fallback:** If a specific Azure resource doesn't have an obvious map, use a standard FontAwesome (e.g., \`fas:database\`) or Material (\`mdi:cloud\`) icon.
+- **Fallback:** If a specific Azure resource doesn't have an obvious map, use a standard Material (e.g., \`mdi:cloud\`) icon.
 
 #### 2.3 BLOCK DIAGRAM (\`block\`) [v11.10.0+]
 - **Starter:** \`block\`
