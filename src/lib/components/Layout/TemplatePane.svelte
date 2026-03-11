@@ -1,8 +1,6 @@
 <script lang="ts">
-  import { Button } from '$/components/ui/button';
   import { Input } from '$/components/ui/input';
-  import { getSampleDiagrams } from '$/util/mermaid';
-  import { updateCode, stateStore, updateCodeStore } from '$lib/util/state';
+  import { stateStore, updateCodeStore } from '$lib/util/state';
   import { logEvent } from '$lib/util/stats';
   import TemplateIcon from '~icons/material-symbols/account-tree';
   import SearchIcon from '~icons/material-symbols/search';
@@ -177,12 +175,46 @@
       code: `C4Context\n  title Container Diagram\n  Person(user, "User")\n  System_Boundary(b, "System") {\n    Container(web, "Web App", "React")\n    Container(api, "API", "Node.js")\n    ContainerDb(db, "Database", "PostgreSQL")\n  }\n  Rel(user, web, "Uses")\n  Rel(web, api, "Calls")\n  Rel(api, db, "Reads/Writes")`
     },
 
-    // Architecture (2)
-    { category: 'Architecture', name: 'ZenUML Service', code: extras.ZenUML },
+    // Architecture & Requirement
     {
       category: 'Architecture',
-      name: 'Requirement',
+      name: 'Cloud Services',
+      code: `architecture-beta\n  group api(cloud)[API Gateway]\n  service db(database)[Database] in api\n  service web(internet)[Web App]\n  web:L -- R:api\n  api:L -- R:db`
+    },
+    { category: 'Architecture', name: 'ZenUML Service', code: extras.ZenUML },
+    {
+      category: 'Requirement',
+      name: 'System Specs',
       code: `requirementDiagram\n\n    requirement test_req {\n    id: 1\n    text: the test text.\n    risk: high\n    verifymethod: test\n    }\n\n    element test_entity {\n    type: simulation\n    }\n\n    test_entity - satisfies -> test_req`
+    },
+
+    // User Journey & Timeline
+    {
+      category: 'Journey',
+      name: 'User Experience',
+      code: `journey\n    title Working Day\n    section Go to work\n      Make tea: 5: Me\n      Go downstairs: 3: Me\n      Do work: 1: Me, Cat\n    section Go home\n      Go downstairs: 5: Me\n      Sit down: 5: Me`
+    },
+    {
+      category: 'Timeline',
+      name: 'Tech History',
+      code: `timeline\n    title History of Social Media\n    2002 : LinkedIn\n    2004 : Facebook\n         : Google\n    2005 : Youtube\n    2006 : Twitter`
+    },
+
+    // Charts & Network
+    {
+      category: 'XYChart',
+      name: 'Revenue Trends',
+      code: `xychart-beta\n    title "Sales Revenue"\n    x-axis [jan, feb, mar, apr, may]\n    y-axis "Revenue" 4000 --> 10000\n    bar [5000, 6000, 7500, 8200, 9500]\n    line [5000, 6000, 7500, 8200, 9500]`
+    },
+    {
+      category: 'Block',
+      name: 'Topology',
+      code: `block-beta\n  columns 1\n  db(("Database"))\n  blockArrowId6<["&nbsp;&nbsp;&nbsp;"]>(down)\n  block:group1\n    columns 3\n    server1\n    server2\n    server3\n  end\n  blockArrowId6<["&nbsp;&nbsp;&nbsp;"]>(up)\n  front["Frontend"]`
+    },
+    {
+      category: 'Packet',
+      name: 'IP Header',
+      code: `packet-beta\n0-3: "Version"\n4-7: "IHL"\n8-13: "DSCP"\n14-15: "ECN"\n16-31: "Total Length"\n32-47: "Identification"\n48-50: "Flags"\n51-63: "Fragment Offset"\n64-71: "Time to Live"\n72-79: "Protocol"\n80-95: "Header Checksum"\n96-127: "Source IP"\n128-159: "Dest IP"`
     }
   ];
 
@@ -210,7 +242,7 @@
 
   const loadTemplate = (template: (typeof templates)[0]) => {
     // Determine theme based on current diagram dark mode
-    let themeConfig: Record<string, any>;
+    let themeConfig: Record<string, unknown>;
     try {
       const currentConfig = JSON.parse($stateStore.mermaid);
       const isDark = currentConfig.theme === 'dark';
@@ -223,11 +255,11 @@
     updateCodeStore({
       code: template.code,
       mermaid: JSON.stringify(themeConfig, null, 2),
-      updateDiagram: true,
       pan: undefined,
+      updateDiagram: true,
       zoom: undefined
     });
-    logEvent('loadTemplate', { name: template.name });
+    logEvent('loadSampleDiagram', { name: template.name });
   };
 </script>
 
@@ -238,13 +270,13 @@
   </div>
 
   <div class="flex-1 space-y-6 overflow-y-auto">
-    {#each Object.entries(grouped) as [category, items]}
+    {#each Object.entries(grouped) as [category, items] (category)}
       <div class="space-y-2">
         <h3 class="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
           {category}
         </h3>
         <div class="grid grid-cols-2 gap-2">
-          {#each items as item}
+          {#each items as item (item.name)}
             <button
               class="flex flex-col items-start gap-1 rounded-lg border bg-card p-3 text-left transition-all hover:scale-[1.02] hover:bg-accent hover:text-accent-foreground hover:shadow-md focus:ring-2 focus:ring-ring focus:outline-none"
               onclick={() => loadTemplate(item)}>
