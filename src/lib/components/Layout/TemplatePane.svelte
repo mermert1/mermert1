@@ -5,15 +5,6 @@
   import TemplateIcon from '~icons/material-symbols/account-tree';
   import SearchIcon from '~icons/material-symbols/search';
 
-  const extras = {
-    ZenUML: `zenuml
-    title Demo
-    Alice->John: Hello John, how are you?
-    John->Alice: Great!
-    Alice->John: See you later!
-`
-  };
-
   const templates = [
     // Flowchart (3)
     { category: 'Flowchart', name: 'Simple Flow', code: `flowchart TD\n    Start --> Stop` },
@@ -171,7 +162,7 @@
       name: 'Cloud Services',
       code: `architecture-beta\n  group api(cloud)[API Gateway]\n  service db(database)[Database] in api\n  service web(internet)[Web App]\n  web:L -- R:api\n  api:L -- R:db`
     },
-    { category: 'Architecture', name: 'ZenUML Service', code: extras.ZenUML },
+
     {
       category: 'Requirement',
       name: 'System Specs',
