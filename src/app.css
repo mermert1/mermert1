@@ -252,24 +252,49 @@ body {
 
 /* === ZenUML CSS Bleeding Safeguards === */
 /* ZenUML injects global selectors that break Tailwind and the app UI. */
-/* We reset the main app container so ZenUML's * { font-family: ... } does not override it. */
-body {
-  font-family: 'Recursive Variable', sans-serif !important;
-}
 
-/* ZenUML incorrectly targets generic classes and IDs in the global scope */
-:root {
-  /* Prevent ZenUML from overriding base background colors */
-  background-color: var(--background) !important;
-}
-
-/* Prevent ZenUML's #diagram-bg from turning the whole screen white/black */
-#view #diagram-bg {
-  fill: transparent !important;
+/* OVERRIDE: ZenUML's `#diagram-bg` and `svg` background rules */
+#view svg#graph-div {
   background-color: transparent !important;
 }
 
-/* Scope zenuml font changes ONLY to zenuml containers */
-.zenuml {
+#view #diagram-bg {
+  fill: transparent !important;
+  background-color: transparent !important;
+  opacity: 0 !important;
+}
+
+/* OVERRIDE: ZenUML's aggressive `*` font-family selector */
+/* We must explicitly protect our core elements from being hijacked */
+html,
+body,
+#svelte,
+.bg-background,
+.text-foreground,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+span,
+div,
+button,
+input {
+  font-family: 'Recursive Variable', sans-serif !important;
+}
+
+/* BUT allow ZenUML itself to use its required fonts internally */
+.zenuml,
+.zenuml * {
   font-family: Arial, Helvetica, sans-serif !important;
+}
+
+/* OVERRIDE: ZenUML changing the global body background */
+:root,
+html,
+body {
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
 }
